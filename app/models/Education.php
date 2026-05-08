@@ -1,0 +1,21 @@
+<?php
+class Education extends Model {
+    public function getEducationByUserId($user_id) {
+        $this->db->query("SELECT * FROM user_education WHERE user_id = :user_id ORDER BY start_year DESC");
+        $this->db->bind(':user_id', $user_id);
+        return $this->db->resultSet();
+    }
+
+    public function addEducation($data) {
+        $this->db->query("INSERT INTO user_education (user_id, institution, degree, field, start_year, end_year, description) 
+                          VALUES (:user_id, :institution, :degree, :field, :start_year, :end_year, :description)");
+        $this->db->bind(':user_id', $data['user_id']);
+        $this->db->bind(':institution', $data['institution']);
+        $this->db->bind(':degree', $data['degree'] ?? '');
+        $this->db->bind(':field', $data['field'] ?? '');
+        $this->db->bind(':start_year', $data['start_year'] ?? null);
+        $this->db->bind(':end_year', $data['end_year'] ?? null);
+        $this->db->bind(':description', $data['description'] ?? '');
+        return $this->db->execute();
+    }
+}

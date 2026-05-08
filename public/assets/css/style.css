@@ -1,0 +1,26 @@
+:root {
+  --pronetwork-blue: #0A66C2;
+  --radius-md: 10px;
+  --card-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+}
+body { font-family: Inter, Manrope, "Segoe UI", sans-serif; }
+
+/* Form Validation Styles */
+.invalid-field {
+  border-color: #dc2626 !important;
+  box-shadow: 0 0 0 1px #dc2626 !important;
+}
+
+.field-error {
+  animation: slideIn 0.2s ease-out;
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
+}

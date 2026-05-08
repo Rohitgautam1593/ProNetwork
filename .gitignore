@@ -1,0 +1,22 @@
+# Dependencies
+/vendor
+/node_modules
+
+# Configuration
+/app/config/config.php
+
+# IDEs
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+/logs
+*.log
+
+# Temp files
+/tmp
+.cache/

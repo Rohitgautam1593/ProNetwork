@@ -1,0 +1,3 @@
+.btn-primary { background: var(--pronetwork-blue); border-radius: var(--radius-md); }
+.card { border-radius: var(--radius-md); box-shadow: var(--card-shadow); }
+
