@@ -145,6 +145,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 password: document.getElementById('edit-password').value
             };
 
+            if (data.password && data.password.length < 6) {
+                showToast('Password must be at least 6 characters.', 'error');
+                return;
+            }
+
             try {
                 const res = await fetch(`${URLROOT}/admin/update_user`, {
                     method: 'POST',

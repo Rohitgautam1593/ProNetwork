@@ -102,6 +102,12 @@ class AdminController extends Controller {
                 return;
             }
 
+            // Password validation if provided
+            if (!empty($data['password']) && strlen($data['password']) < 6) {
+                echo json_encode(['success' => false, 'error' => 'Password must be at least 6 characters.']);
+                return;
+            }
+
             if ($this->adminModel->updateUser($data)) {
                 echo json_encode(['success' => true]);
             } else {
