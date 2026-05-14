@@ -5,6 +5,12 @@
 
 // App Root
 define('APPROOT', dirname(dirname(__FILE__)));
+// Project Root
+define('PROJECTROOT', dirname(APPROOT));
+// Role Module Roots
+define('ADMINROOT', PROJECTROOT . '/admin');
+define('COMPANYROOT', PROJECTROOT . '/company');
+define('USERROOT', PROJECTROOT . '/user');
 // URL Root
 define('URLROOT', 'http://localhost/YOUR_PROJECT_NAME/public');
 // Site Name
@@ -15,3 +21,10 @@ define('DB_HOST', 'localhost');
 define('DB_USER', 'root');
 define('DB_PASS', 'YOUR_PASSWORD');
 define('DB_NAME', 'pronetwork');
+
+// SMTP Config
+define('SMTP_HOST', 'smtp.example.com');
+define('SMTP_PORT', 587);
+define('SMTP_USER', 'no-reply@example.com');
+define('SMTP_PASS', 'YOUR_SMTP_PASSWORD');
+define('ADMIN_EMAIL', 'admin@example.com');

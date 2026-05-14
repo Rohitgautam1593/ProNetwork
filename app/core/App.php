@@ -6,42 +6,47 @@
  */
 class App {
     protected $currentController = 'AuthController'; // Default controller
+    protected $currentControllerPath = '../user/backend/controllers/AuthController.php';
     protected $currentMethod = 'index'; // Default method
     protected $params = [];
-    protected $isAdminRoute = false;
 
     public function __construct() {
         $url = $this->getUrl();
 
         // Check if URL is set and controller exists
         if(isset($url[0])) {
-            $controllerName = ucwords($url[0]) . 'Controller';
-            
-            // Check main controllers folder
-            if(file_exists('../app/controllers/' . $controllerName . '.php')) {
+            $cleanSeg = str_replace('.php', '', $url[0]);
+            $controllerName = ucwords($cleanSeg) . 'Controller';
+
+            $controllerPaths = [
+                '../admin/backend/controllers/' . $controllerName . '.php',
+                '../company/backend/controllers/' . $controllerName . '.php',
+                '../user/backend/controllers/' . $controllerName . '.php'
+            ];
+
+            foreach ($controllerPaths as $controllerPath) {
+                if (!file_exists($controllerPath)) {
+                    continue;
+                }
                 $this->currentController = $controllerName;
+                $this->currentControllerPath = $controllerPath;
                 unset($url[0]);
-            } 
-            // Check admin subfolder
-            elseif(file_exists('../app/controllers/admin/' . $controllerName . '.php')) {
-                $this->currentController = $controllerName;
-                $this->isAdminRoute = true; // Flag if we need it
-                unset($url[0]);
+                break;
             }
         }
 
         // Require the controller
-        $path = $this->isAdminRoute ? '../app/controllers/admin/' : '../app/controllers/';
-        require_once $path . $this->currentController . '.php';
+        require_once $this->currentControllerPath;
 
         // Instantiate controller class
         $this->currentController = new $this->currentController;
 
         // Check for second part of url
         if(isset($url[1])) {
+            $cleanMethod = str_replace('.php', '', $url[1]);
             // Check to see if method exists in controller
-            if(method_exists($this->currentController, $url[1])) {
-                $this->currentMethod = $url[1];
+            if(method_exists($this->currentController, $cleanMethod)) {
+                $this->currentMethod = $cleanMethod;
                 unset($url[1]);
             }
         }

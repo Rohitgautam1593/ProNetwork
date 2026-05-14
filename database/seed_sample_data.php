@@ -193,8 +193,8 @@ function insertJob(PDO $pdo, int $companyId, array $job): int {
     }
 
     $stmt = $pdo->prepare(
-        'INSERT INTO jobs (company_id, title, description, location, salary_range, job_type, experience_level, easy_apply, applicant_count, status)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
+        'INSERT INTO jobs (company_id, title, description, location, salary_range, job_type, experience_level, easy_apply, applicant_count, applicant_limit, status)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
     );
     $stmt->execute([
         $companyId,
@@ -206,6 +206,7 @@ function insertJob(PDO $pdo, int $companyId, array $job): int {
         $job['experience_level'],
         $job['easy_apply'],
         $job['applicant_count'],
+        $job['applicant_limit'] ?? null,
         $job['status'],
     ]);
 
@@ -275,8 +276,8 @@ try {
         [
             'full_name' => 'Neha Sharma',
             'email' => 'neha.sharma@demo.pronetwork',
-            'role' => 'Recruiter',
-            'headline' => 'Technical recruiter for early-career engineering roles',
+            'role' => 'Company',
+            'headline' => 'Company hiring lead for early-career engineering roles',
             'location' => 'Hyderabad, India',
             'industry' => 'Recruiting',
             'bio' => 'Helping students and professionals find strong software teams.',
@@ -344,6 +345,7 @@ try {
         'experience_level' => 'Entry',
         'easy_apply' => 1,
         'applicant_count' => 18,
+        'applicant_limit' => 20,
         'status' => 'Live',
     ]);
     $jobs[] = insertJob($pdo, $companyIds['Nexa Analytics'], [
@@ -355,6 +357,7 @@ try {
         'experience_level' => 'Entry',
         'easy_apply' => 1,
         'applicant_count' => 32,
+        'applicant_limit' => 35,
         'status' => 'Live',
     ]);
     $jobs[] = insertJob($pdo, $companyIds['GreenGrid Labs'], [
@@ -366,6 +369,7 @@ try {
         'experience_level' => 'Mid-Senior',
         'easy_apply' => 0,
         'applicant_count' => 11,
+        'applicant_limit' => 12,
         'status' => 'Live',
     ]);
 
@@ -482,4 +486,3 @@ try {
     fwrite(STDERR, "Seed failed: " . $e->getMessage() . "\n");
     exit(1);
 }
-

@@ -297,11 +297,22 @@ function initSearchForms() {
 
 function initAuthActions() {
   document.querySelectorAll('[data-action="forgot-password"]').forEach(link => {
-    link.addEventListener('click', (e) => {
+    link.addEventListener('click', async (e) => {
       e.preventDefault();
-      const entered = window.prompt('Enter your email to reset password:');
+      const entered = await pnModal({
+        title: 'Forgot Password',
+        message: 'Enter your registered email address to receive a password reset link.',
+        type: 'info',
+        isPrompt: true,
+        placeholder: 'e.g. name@example.com',
+        confirmText: 'Send Reset Link',
+        cancelText: 'Cancel'
+      });
+      
       if (entered && validateEmail(entered)) {
         showToast('Password reset link sent to ' + entered.trim() + '.', 'success');
+      } else if (entered !== null) {
+        showToast('Please enter a valid email address.', 'error');
       }
     });
   });
@@ -372,6 +383,8 @@ function initSettingsEditor() {
 function initFeedComposer() {
   const openBtn = document.getElementById('open-post-composer');
   const openMediaBtn = document.getElementById('open-post-media');
+  const openEventBtn = document.getElementById('open-post-event');
+  const openArticleBtn = document.getElementById('open-post-article');
   const modal = document.getElementById('post-composer-modal');
   const closeBtn = document.getElementById('close-post-composer');
   const form = document.getElementById('feed-post-form');
@@ -382,19 +395,31 @@ function initFeedComposer() {
 
   function setType(type) {
     document.getElementById('post-media-section')?.classList.toggle('hidden', type !== 'media');
+    document.getElementById('post-event-section')?.classList.toggle('hidden', type !== 'event');
+    document.getElementById('post-article-section')?.classList.toggle('hidden', type !== 'article');
+  }
+
+  function openModal(type) {
+    setType(type);
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+    content.focus();
   }
 
   openBtn.addEventListener('click', () => { 
-    setType('post'); 
-    modal.classList.remove('hidden'); 
-    modal.classList.add('flex'); 
-    content.focus(); 
+    openModal('');
   });
 
   openMediaBtn?.addEventListener('click', () => { 
-    setType('media'); 
-    modal.classList.remove('hidden'); 
-    modal.classList.add('flex'); 
+    openModal('media');
+  });
+
+  openEventBtn?.addEventListener('click', () => {
+    openModal('event');
+  });
+
+  openArticleBtn?.addEventListener('click', () => {
+    openModal('article');
   });
 
   closeBtn.addEventListener('click', () => { 

@@ -41,21 +41,53 @@ function hydrateUserState() {
 
 function populateUserData(u) {
     if (!u) return;
-    // Update all elements with dynamic data attributes
-    document.querySelectorAll('[data-user-name="full"]').forEach(el => el.textContent = u.full_name);
-    document.querySelectorAll('[data-user-headline]').forEach(el => el.textContent = u.headline || 'Professional');
-    document.querySelectorAll('[data-user-location]').forEach(el => el.textContent = u.location || 'Location not set');
+    const placeholderAvatar =
+        'data:image/svg+xml,' +
+        encodeURIComponent(
+            '<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128"><rect fill="#e2e8f0" width="128" height="128"/><text x="50%" y="54%" dominant-baseline="middle" text-anchor="middle" fill="#64748b" font-family="system-ui,sans-serif" font-size="40" font-weight="600">' +
+                String((u.full_name || '?').trim().charAt(0) || '?').toUpperCase() +
+                '</text></svg>'
+        );
+
+    document.querySelectorAll('[data-user-name="full"]').forEach(el => { el.textContent = u.full_name || ''; });
+    document.querySelectorAll('[data-user-headline]').forEach(el => { el.textContent = u.headline || 'Add a headline'; });
+    document.querySelectorAll('[data-user-location]').forEach(el => { el.textContent = u.location || 'Location not set'; });
+    document.querySelectorAll('[data-user-industry]').forEach(el => { el.textContent = u.industry || 'Industry not set'; });
     document.querySelectorAll('[data-user-bio]').forEach(el => {
         if (el.tagName === 'TEXTAREA') el.value = u.bio || '';
         else el.textContent = u.bio || 'No bio yet.';
     });
-    document.querySelectorAll('[data-user-email]').forEach(el => el.textContent = u.email);
-    
-    if (u.profile_pic) {
-        const picUrl = u.profile_pic.startsWith('http') ? u.profile_pic : `${URLROOT}/uploads/profiles/` + u.profile_pic;
-        document.querySelectorAll('img[data-user-pic="true"]').forEach(img => img.src = picUrl);
-        document.querySelectorAll('[data-user-pic]').forEach(el => { if(el.tagName === 'IMG') el.src = picUrl; });
-    }
+    document.querySelectorAll('[data-user-email]').forEach(el => { el.textContent = u.email || ''; });
+
+    const parts = [u.full_name, u.location, u.industry].filter(Boolean);
+    document.querySelectorAll('[data-user-summary]').forEach(el => {
+        el.textContent = parts.length ? parts.join(' · ') : 'Complete your profile to stand out.';
+    });
+
+    const picUrl = u.profile_pic
+        ? (u.profile_pic.startsWith('http') ? u.profile_pic : `${URLROOT}/uploads/profiles/${u.profile_pic}`)
+        : placeholderAvatar;
+    document.querySelectorAll('img[data-user-pic="true"]').forEach(img => {
+        img.src = picUrl;
+        img.alt = u.full_name ? `${u.full_name} profile photo` : 'Profile photo';
+    });
+    document.querySelectorAll('[data-user-pic]').forEach(el => {
+        if (el.tagName === 'IMG') {
+            el.src = picUrl;
+            el.alt = u.full_name ? `${u.full_name} profile photo` : 'Profile photo';
+        }
+    });
+
+    document.querySelectorAll('img[data-user-cover="true"]').forEach(img => {
+        if (u.cover_image) {
+            const coverUrl = u.cover_image.startsWith('http') ? u.cover_image : `${URLROOT}/uploads/covers/${u.cover_image}`;
+            img.src = coverUrl;
+            img.classList.remove('hidden');
+        } else {
+            img.removeAttribute('src');
+            img.classList.add('hidden');
+        }
+    });
 }
 
 function escapeHtml(s) {
@@ -200,3 +232,100 @@ function initGlobalSearch() {
         return value.startsWith('http') ? value : `${URLROOT}/uploads/${folder}/${value}`;
     }
 }
+
+/**
+ * Custom Professional Modal
+ * Replaces standard alert/confirm/prompt
+ * @param {Object} options { title, message, type, isPrompt, placeholder, confirmText, cancelText, isDanger }
+ * @returns {Promise} Resolves with value (true/false or input string)
+ */
+window.pnModal = function(options = {}) {
+    return new Promise((resolve) => {
+        const {
+            title = 'Notification',
+            message = '',
+            type = 'info', // info, warning, success, flag
+            isPrompt = false,
+            placeholder = 'Enter details...',
+            confirmText = 'Confirm',
+            cancelText = 'Cancel',
+            isDanger = false,
+            defaultValue = ''
+        } = options;
+
+        // Create elements
+        const backdrop = document.createElement('div');
+        backdrop.className = 'pn-modal-backdrop';
+        
+        const iconMap = {
+            info: 'info',
+            warning: 'warning',
+            success: 'check_circle',
+            flag: 'flag'
+        };
+
+        const safeTitle = escapeHtml(title);
+        const safeMessage = escapeHtml(message);
+        const safePlaceholder = escapeHtml(placeholder);
+        const safeDefaultValue = escapeHtml(defaultValue);
+        const safeConfirmText = escapeHtml(confirmText);
+        const safeCancelText = escapeHtml(cancelText);
+
+        backdrop.innerHTML = `
+            <div class="pn-modal-container">
+                <div class="pn-modal-header">
+                    <div class="pn-modal-icon ${type}">
+                        <span class="material-symbols-outlined">${iconMap[type] || 'info'}</span>
+                    </div>
+                    <h3 class="pn-modal-title">${safeTitle}</h3>
+                </div>
+                <div class="pn-modal-body">
+                    <p class="pn-modal-message">${safeMessage}</p>
+                    ${isPrompt ? `<textarea class="pn-modal-input" placeholder="${safePlaceholder}" rows="3">${safeDefaultValue}</textarea>` : ''}
+                </div>
+                <div class="pn-modal-footer">
+                    <button class="pn-modal-btn pn-modal-btn-secondary" id="pn-modal-cancel">${safeCancelText}</button>
+                    <button class="pn-modal-btn ${isDanger ? 'pn-modal-btn-danger' : 'pn-modal-btn-primary'}" id="pn-modal-confirm">${safeConfirmText}</button>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(backdrop);
+
+        // Animation
+        setTimeout(() => backdrop.classList.add('active'), 10);
+        if (isPrompt) {
+            setTimeout(() => {
+                const input = backdrop.querySelector('.pn-modal-input');
+                if (input) {
+                    input.focus();
+                    input.setSelectionRange(input.value.length, input.value.length);
+                }
+            }, 100);
+        }
+
+        const close = (val) => {
+            backdrop.classList.remove('active');
+            setTimeout(() => {
+                backdrop.remove();
+                resolve(val);
+            }, 300);
+        };
+
+        backdrop.querySelector('#pn-modal-confirm').onclick = () => {
+            if (isPrompt) {
+                const input = backdrop.querySelector('.pn-modal-input').value;
+                close(input);
+            } else {
+                close(true);
+            }
+        };
+
+        backdrop.querySelector('#pn-modal-cancel').onclick = () => close(isPrompt ? null : false);
+        
+        // Close on backdrop click
+        backdrop.onclick = (e) => {
+            if (e.target === backdrop) close(isPrompt ? null : false);
+        };
+    });
+};

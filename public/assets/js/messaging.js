@@ -89,7 +89,7 @@ async function fetchConversations() {
             }
             
             data.conversations.forEach(conv => {
-                const picUrl = conv.profile_pic ? (conv.profile_pic.startsWith('http') ? conv.profile_pic : '/ProNetwork/public/uploads/profiles/' + conv.profile_pic) : '';
+                const picUrl = conv.profile_pic ? (conv.profile_pic.startsWith('http') ? conv.profile_pic : `${URLROOT}/uploads/profiles/` + conv.profile_pic) : '';
                 const picHtml = picUrl ? `<img src="${picUrl}" class="w-12 h-12 rounded-full object-cover">` : `<div class="w-12 h-12 rounded-full bg-slate-200 flex items-center justify-center"><span class="material-symbols-outlined text-slate-400">person</span></div>`;
                 
                 const timeAgo = conv.last_message_time ? formatTimeAgoMsg(new Date(conv.last_message_time)) : 'now';
@@ -208,7 +208,7 @@ async function fetchChatHistory(forceScroll = true) {
             } else {
                 data.messages.forEach(msg => {
                     const isMine = msg.sender_id != currentChatUserId;
-                    const picUrl = msg.sender_pic ? (msg.sender_pic.startsWith('http') ? msg.sender_pic : '/ProNetwork/public/uploads/profiles/' + msg.sender_pic) : '';
+                    const picUrl = msg.sender_pic ? (msg.sender_pic.startsWith('http') ? msg.sender_pic : `${URLROOT}/uploads/profiles/` + msg.sender_pic) : '';
                     
                     if (isMine) {
                         html += `

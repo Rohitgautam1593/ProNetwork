@@ -20,3 +20,10 @@ Thumbs.db
 # Temp files
 /tmp
 .cache/
+
+# Composer binary (use global composer install)
+composer.phar
+
+# User uploads (runtime)
+/public/uploads/*
+!/public/uploads/.gitkeep
