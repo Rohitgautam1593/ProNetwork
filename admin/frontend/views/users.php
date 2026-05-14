@@ -208,6 +208,6 @@
     </div>
 </div>
 
-<script src="<?php echo str_replace('/public', '', URLROOT); ?>/admin/frontend/assets/js/admin.js?v=<?php echo time(); ?>"></script>
+<script src="<?php echo URLROOT; ?>/assets/js/admin/admin.js?v=<?php echo time(); ?>"></script>
 
 <?php require ADMINROOT . '/frontend/views/layouts/admin_footer.php'; ?>

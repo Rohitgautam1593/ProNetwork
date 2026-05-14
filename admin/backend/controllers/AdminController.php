@@ -1,26 +1,113 @@
 <?php
 class AdminController extends Controller {
-    private $dashboardModel;
-    private $adminModel;
-    private $db;
+    private $dashboardModel = null;
+    private $adminModel = null;
+    private $db = null;
 
-    public function __construct() {
-        if(!isLoggedIn()) {
-            header('Location: ' . URLROOT . '/auth/login');
+    private function requireAdmin() {
+        if (!isLoggedIn()) {
+            header('Location: ' . URLROOT . '/admin/login');
             exit;
         }
 
-        if(!hasRole('Admin')) {
+        if (!hasRole('Admin')) {
             header('Location: ' . URLROOT . '/user/feed');
             exit;
         }
 
-        $this->db = Database::getInstance();
-        $this->dashboardModel = $this->model('Dashboard');
-        $this->adminModel = $this->model('admin/Admin');
+        if ($this->dashboardModel === null) {
+            $this->db = Database::getInstance();
+            $this->dashboardModel = $this->model('Dashboard');
+            $this->adminModel = $this->model('admin/Admin');
+        }
+    }
+
+    public function index() {
+        if (isLoggedIn() && hasRole('Admin')) {
+            header('Location: ' . URLROOT . '/admin/dashboard');
+            exit;
+        }
+        header('Location: ' . URLROOT . '/admin/login');
+        exit;
+    }
+
+    /**
+     * Admin login form + POST handler (no auth required).
+     */
+    public function login() {
+        if (isLoggedIn() && hasRole('Admin')) {
+            header('Location: ' . URLROOT . '/admin/dashboard');
+            exit;
+        }
+
+        $error = '';
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $input = json_decode(file_get_contents('php://input'), true);
+            if (!$input) {
+                $input = $_POST;
+            }
+
+            $email = trim($input['email'] ?? '');
+            $password = trim($input['password'] ?? '');
+
+            if (empty($email) || empty($password)) {
+                $error = 'Please fill in both the administrative email and password.';
+            } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                $error = 'Provided address does not adhere to standard email structures.';
+            } else {
+                $db = Database::getInstance();
+                $db->query('SELECT * FROM users WHERE email = :email');
+                $db->bind(':email', $email);
+                $user = $db->single();
+
+                if ($user && password_verify($password, $user['password'])) {
+                    if (!empty($user['is_admin']) || ($user['role'] ?? '') === 'Admin') {
+                        if (($user['status'] ?? '') === 'Pending') {
+                            $error = 'Administrative identity setup review pending execution.';
+                        } elseif (($user['status'] ?? '') === 'Rejected') {
+                            $error = 'System entry authorization revoked. Please contact core infrastructure personnel.';
+                        } else {
+                            session_regenerate_id(true);
+                            $_SESSION['user_id'] = $user['user_id'];
+                            $_SESSION['user_name'] = $user['full_name'];
+                            $_SESSION['role'] = $user['role'];
+                            $_SESSION['is_admin'] = true;
+
+                            if (isset($_SERVER['CONTENT_TYPE']) && strpos($_SERVER['CONTENT_TYPE'], 'application/json') !== false) {
+                                echo json_encode([
+                                    'success' => true,
+                                    'redirect' => URLROOT . '/admin/dashboard',
+                                ]);
+                                exit;
+                            }
+
+                            header('Location: ' . URLROOT . '/admin/dashboard');
+                            exit;
+                        }
+                    } else {
+                        $error = 'Access Verification Failed: Insufficient administrative command authorization clearance.';
+                    }
+                } elseif ($user) {
+                    $error = 'Invalid credentials provided.';
+                } else {
+                    $error = 'No administrative identity matched the submitted parameters.';
+                }
+            }
+
+            if (isset($_SERVER['CONTENT_TYPE']) && strpos($_SERVER['CONTENT_TYPE'], 'application/json') !== false) {
+                echo json_encode([
+                    'success' => false,
+                    'message' => $error,
+                ]);
+                exit;
+            }
+        }
+
+        $this->view('admin/gateway', ['error' => $error]);
     }
 
     public function dashboard() {
+        $this->requireAdmin();
         $stats          = $this->dashboardModel->getAdminStats();
         $recentActivity = $this->adminModel->getCombinedActivity(5);
         $users          = $this->adminModel->getAllUsers();
@@ -39,6 +126,7 @@ class AdminController extends Controller {
     }
 
     public function activity_api() {
+        $this->requireAdmin();
         $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
         $limit = 15;
         $offset = ($page - 1) * $limit;
@@ -53,6 +141,7 @@ class AdminController extends Controller {
     }
 
     public function users() {
+        $this->requireAdmin();
         $users = $this->adminModel->getAllUsers();
         $this->view('admin/users', [
             'users' => $users,
@@ -61,6 +150,7 @@ class AdminController extends Controller {
     }
 
     public function update_role() {
+        $this->requireAdmin();
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $data = json_decode(file_get_contents('php://input'), true);
             if (!is_array($data) || empty($data['user_id']) || empty($data['role'])) {
@@ -68,21 +158,12 @@ class AdminController extends Controller {
                 return;
             }
 
-            // Self-healing database schema update to ensure 'role' enum supports 'Company' and legacy records are healed
-            try {
-                $this->db->query("ALTER TABLE users MODIFY COLUMN role ENUM('Student','Professional','Company','Recruiter','Admin') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'Professional'");
-                $this->db->execute();
-                $this->db->query("UPDATE users SET role = 'Company' WHERE role = 'Recruiter'");
-                $this->db->execute();
-            } catch (Throwable $e) {
-                // Safely continue if permissions block dynamic alteration
-            }
-
             $this->json(['success' => (bool)$this->adminModel->updateRole($data['user_id'], $data['role'])]);
         }
     }
 
     public function delete_user($id) {
+        $this->requireAdmin();
         // Prevent self-deletion
         if ($id == $_SESSION['user_id']) {
             flash('admin_message', 'You cannot delete your own account.', 'bg-red-100 text-red-600');
@@ -108,6 +189,7 @@ class AdminController extends Controller {
     }
 
     public function posts() {
+        $this->requireAdmin();
         $posts = $this->adminModel->getAllPosts();
         $this->view('admin/posts', [
             'posts' => $posts,
@@ -116,6 +198,7 @@ class AdminController extends Controller {
     }
 
     public function delete_post($id) {
+        $this->requireAdmin();
         if ($this->adminModel->deletePost($id)) {
             $this->jsonSuccess();
         } else {
@@ -124,6 +207,7 @@ class AdminController extends Controller {
     }
 
     public function update_user() {
+        $this->requireAdmin();
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $data = json_decode(file_get_contents('php://input'), true);
             if (!is_array($data) || empty($data['user_id'])) {
@@ -143,16 +227,6 @@ class AdminController extends Controller {
                 return;
             }
 
-            // Self-healing database schema update to ensure 'role' enum supports 'Company' and legacy records are healed
-            try {
-                $this->db->query("ALTER TABLE users MODIFY COLUMN role ENUM('Student','Professional','Company','Recruiter','Admin') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'Professional'");
-                $this->db->execute();
-                $this->db->query("UPDATE users SET role = 'Company' WHERE role = 'Recruiter'");
-                $this->db->execute();
-            } catch (Throwable $e) {
-                // Safely continue if permissions block dynamic alteration
-            }
-
             if ($this->adminModel->updateUser($data)) {
                 $this->jsonSuccess();
             } else {
@@ -162,11 +236,13 @@ class AdminController extends Controller {
     }
 
     public function stats_api() {
+        $this->requireAdmin();
         $stats = $this->dashboardModel->getAdminStats();
         $this->json($stats);
     }
 
     public function companies() {
+        $this->requireAdmin();
         $companies = $this->adminModel->getAllCompanies();
         $this->view('admin/companies', [
             'companies' => $companies,
@@ -175,12 +251,7 @@ class AdminController extends Controller {
     }
 
     public function jobs() {
-        try {
-            $this->db->query("ALTER TABLE jobs ADD COLUMN applicant_limit INT NULL DEFAULT NULL");
-            $this->db->execute();
-        } catch (Throwable $e) {
-            // Column already exists or error ignored safely
-        }
+        $this->requireAdmin();
 
         $jobs = $this->adminModel->getAllJobs();
         $this->view('admin/jobs', [
@@ -190,6 +261,7 @@ class AdminController extends Controller {
     }
 
     public function reports() {
+        $this->requireAdmin();
         $reports = $this->adminModel->getReportsWithContext();
         
         $this->view('admin/reports', [
@@ -199,6 +271,7 @@ class AdminController extends Controller {
     }
 
     public function get_report_details($id) {
+        $this->requireAdmin();
         $report = $this->adminModel->getReportById($id);
         if (!$report) {
             $this->jsonFailure();
@@ -297,6 +370,7 @@ class AdminController extends Controller {
     }
 
     public function report_action($id, $action) {
+        $this->requireAdmin();
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             $this->jsonFailure('Invalid request method.');
             return;
@@ -317,6 +391,7 @@ class AdminController extends Controller {
     }
 
     public function target_reports_action($targetType, $targetId, $action) {
+        $this->requireAdmin();
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             $this->jsonFailure('Invalid request method.');
             return;
@@ -341,6 +416,7 @@ class AdminController extends Controller {
     }
 
     public function delete_company($id) {
+        $this->requireAdmin();
         if ($this->adminModel->deleteCompany($id)) {
             $this->jsonSuccess();
         } else {
@@ -349,6 +425,7 @@ class AdminController extends Controller {
     }
 
     public function delete_job($id) {
+        $this->requireAdmin();
         if ($this->adminModel->deleteJob($id)) {
             $this->jsonSuccess();
         } else {
@@ -357,6 +434,7 @@ class AdminController extends Controller {
     }
 
     public function toggle_job_status($id) {
+        $this->requireAdmin();
         if ($this->adminModel->toggleJobStatus($id)) {
             $this->jsonSuccess();
         } else {
@@ -365,6 +443,7 @@ class AdminController extends Controller {
     }
 
     public function approve_user($id) {
+        $this->requireAdmin();
         $user = $this->adminModel->getUserById($id);
         if ($this->adminModel->approveUser($id)) {
             $emailSent = $user ? MailHelper::sendApprovalNotification($user) : false;
@@ -380,6 +459,7 @@ class AdminController extends Controller {
     }
 
     public function reject_user($id) {
+        $this->requireAdmin();
         if ($this->adminModel->rejectUser($id)) {
             flash('admin_message', 'User rejected successfully');
         } else {
@@ -389,6 +469,7 @@ class AdminController extends Controller {
     }
 
     public function resolve_report($id) {
+        $this->requireAdmin();
         if ($this->adminModel->resolveReport($id)) {
             flash('admin_message', 'Report marked as resolved');
         } else {
@@ -398,6 +479,7 @@ class AdminController extends Controller {
     }
 
     public function dismiss_report($id) {
+        $this->requireAdmin();
         if ($this->adminModel->dismissReport($id)) {
             flash('admin_message', 'Report dismissed');
         } else {
@@ -407,6 +489,7 @@ class AdminController extends Controller {
     }
 
     public function delete_report($id) {
+        $this->requireAdmin();
         if ($this->adminModel->deleteReport($id)) {
             flash('admin_message', 'Report deleted');
         } else {
@@ -416,6 +499,7 @@ class AdminController extends Controller {
     }
 
     public function add_user() {
+        $this->requireAdmin();
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $data = json_decode(file_get_contents('php://input'), true);
             if (!is_array($data)) {
@@ -431,16 +515,6 @@ class AdminController extends Controller {
             if (strlen($data['password']) < 6) {
                 $this->jsonError('Password must be at least 6 characters.');
                 return;
-            }
-
-            // Self-healing database schema update to ensure 'role' enum supports 'Company' and legacy records are healed
-            try {
-                $this->db->query("ALTER TABLE users MODIFY COLUMN role ENUM('Student','Professional','Company','Recruiter','Admin') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'Professional'");
-                $this->db->execute();
-                $this->db->query("UPDATE users SET role = 'Company' WHERE role = 'Recruiter'");
-                $this->db->execute();
-            } catch (Throwable $e) {
-                // Safely continue if permissions block dynamic alteration
             }
 
             // Check if email already exists
@@ -460,6 +534,7 @@ class AdminController extends Controller {
     }
 
     public function get_entity_info($type, $id) {
+        $this->requireAdmin();
         header('Content-Type: application/json');
         $type = ucfirst(strtolower($type));
         $id = (int)$id;

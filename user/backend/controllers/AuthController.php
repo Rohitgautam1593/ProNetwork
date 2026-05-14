@@ -49,17 +49,6 @@ class AuthController extends Controller {
                 $role = 'Professional';
             }
 
-            // Self-healing database schema update to ensure 'role' enum supports 'Company' and legacy records are healed
-            try {
-                $db = Database::getInstance();
-                $db->query("ALTER TABLE users MODIFY COLUMN role ENUM('Student','Professional','Company','Recruiter','Admin') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'Professional'");
-                $db->execute();
-                $db->query("UPDATE users SET role = 'Company' WHERE role = 'Recruiter'");
-                $db->execute();
-            } catch (Throwable $e) {
-                // Safely continue if permissions block dynamic alteration
-            }
-
             if($this->userModel->findUserByEmail($email)) {
                 echo json_encode(['success' => false, 'message' => 'Email already taken']);
                 return;

@@ -14,14 +14,14 @@ class App {
         $url = $this->getUrl();
 
         // Check if URL is set and controller exists
-        if(isset($url[0])) {
+        if (isset($url[0])) {
             $cleanSeg = str_replace('.php', '', $url[0]);
             $controllerName = ucwords($cleanSeg) . 'Controller';
 
             $controllerPaths = [
                 '../admin/backend/controllers/' . $controllerName . '.php',
                 '../company/backend/controllers/' . $controllerName . '.php',
-                '../user/backend/controllers/' . $controllerName . '.php'
+                '../user/backend/controllers/' . $controllerName . '.php',
             ];
 
             foreach ($controllerPaths as $controllerPath) {
@@ -35,17 +35,19 @@ class App {
             }
         }
 
+        $this->registerModuleFromPath($this->currentControllerPath);
+
         // Require the controller
         require_once $this->currentControllerPath;
 
         // Instantiate controller class
-        $this->currentController = new $this->currentController;
+        $this->currentController = new $this->currentController();
 
         // Check for second part of url
-        if(isset($url[1])) {
+        if (isset($url[1])) {
             $cleanMethod = str_replace('.php', '', $url[1]);
             // Check to see if method exists in controller
-            if(method_exists($this->currentController, $cleanMethod)) {
+            if (method_exists($this->currentController, $cleanMethod)) {
                 $this->currentMethod = $cleanMethod;
                 unset($url[1]);
             }
@@ -58,13 +60,34 @@ class App {
         call_user_func_array([$this->currentController, $this->currentMethod], $this->params);
     }
 
-    public function getUrl() {
-        if(isset($_GET['url'])) {
-            $url = rtrim($_GET['url'], '/');
-            $url = filter_var($url, FILTER_SANITIZE_URL);
-            $url = explode('/', $url);
-            return $url;
+    /**
+     * Tag which module owns the active controller so models resolve from that module first.
+     */
+    private function registerModuleFromPath($controllerPath) {
+        if (defined('APP_MODULE')) {
+            return;
         }
-        return [];
+        $normalized = str_replace('\\', '/', $controllerPath);
+        if (strpos($normalized, '/admin/backend/controllers/') !== false) {
+            define('APP_MODULE', 'admin');
+        } elseif (strpos($normalized, '/company/backend/controllers/') !== false) {
+            define('APP_MODULE', 'company');
+        } else {
+            define('APP_MODULE', 'user');
+        }
+    }
+
+    public function getUrl() {
+        if (!isset($_GET['url'])) {
+            return [];
+        }
+        $url = rtrim((string) $_GET['url'], '/');
+        // Avoid deprecated FILTER_SANITIZE_URL; keep safe path segments only
+        $url = preg_replace('/[^a-zA-Z0-9\/_\-\.]/', '', $url);
+        $url = str_replace(['..', '//'], '', $url);
+        if ($url === '') {
+            return [];
+        }
+        return explode('/', $url);
     }
 }

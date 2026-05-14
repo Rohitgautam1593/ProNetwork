@@ -1,5 +1,5 @@
-<?php require COMPANYROOT . '/frontend/views/layouts/header.php'; ?>
-<?php require COMPANYROOT . '/frontend/views/layouts/navbar.php'; ?>
+<?php require USERROOT . '/frontend/views/layouts/header.php'; ?>
+<?php require USERROOT . '/frontend/views/layouts/navbar.php'; ?>
 <?php
     $company = $data['company'] ?? [];
     $jobs = $data['jobs'] ?? [];
@@ -794,4 +794,4 @@ function escapeHtml(str) {
 }
 </script>
 
-<?php require COMPANYROOT . '/frontend/views/layouts/footer.php'; ?>
+<?php require USERROOT . '/frontend/views/layouts/footer.php'; ?>
