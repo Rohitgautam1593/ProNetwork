@@ -57,13 +57,14 @@ function insertCompany(PDO $pdo, array $company): int {
     }
 
     $stmt = $pdo->prepare(
-        'INSERT INTO companies (name, industry, logo_path, description, website, size, founded_year, followers)
-         VALUES (:name, :industry, :logo_path, :description, :website, :size, :founded_year, :followers)'
+        'INSERT INTO companies (name, industry, logo_path, banner_path, description, website, size, founded_year, followers)
+         VALUES (:name, :industry, :logo_path, :banner_path, :description, :website, :size, :founded_year, :followers)'
     );
     $stmt->execute([
         ':name' => $company['name'],
         ':industry' => $company['industry'],
-        ':logo_path' => null,
+        ':logo_path' => $company['logo_path'] ?? null,
+        ':banner_path' => $company['banner_path'] ?? null,
         ':description' => $company['description'],
         ':website' => $company['website'],
         ':size' => $company['size'],
@@ -72,6 +73,13 @@ function insertCompany(PDO $pdo, array $company): int {
     ]);
 
     return (int)$pdo->lastInsertId();
+}
+
+function insertCompanyFollow(PDO $pdo, int $userId, int $companyId): void {
+    $stmt = $pdo->prepare(
+        'INSERT IGNORE INTO company_followers (company_id, user_id) VALUES (?, ?)'
+    );
+    $stmt->execute([$companyId, $userId]);
 }
 
 function insertConnection(PDO $pdo, int $a, int $b, string $status): void {
@@ -306,6 +314,18 @@ try {
             'phone' => '+91 90000 10006',
             'website' => 'https://sara.example.com',
         ],
+        ['full_name' => 'Priya Nair', 'email' => 'priya.nair@demo.pronetwork', 'role' => 'Professional', 'headline' => 'Product manager shipping B2B SaaS features', 'location' => 'Chennai, India', 'industry' => 'Product Management', 'bio' => 'Focused on roadmap planning and user research.', 'phone' => '+91 90000 10007', 'website' => 'https://priya.example.com'],
+        ['full_name' => 'Vikram Desai', 'email' => 'vikram.desai@demo.pronetwork', 'role' => 'Professional', 'headline' => 'DevOps engineer automating cloud deployments', 'location' => 'Pune, India', 'industry' => 'Cloud Infrastructure', 'bio' => 'CI/CD, Docker, and observability enthusiast.', 'phone' => '+91 90000 10008', 'website' => 'https://vikram.example.com'],
+        ['full_name' => 'Anita Rao', 'email' => 'anita.rao@demo.pronetwork', 'role' => 'Professional', 'headline' => 'QA lead building reliable release pipelines', 'location' => 'Bengaluru, India', 'industry' => 'Quality Assurance', 'bio' => 'Test automation and accessibility checks.', 'phone' => '+91 90000 10009', 'website' => 'https://anita.example.com'],
+        ['full_name' => 'Dev Patel', 'email' => 'dev.patel@demo.pronetwork', 'role' => 'Student', 'headline' => 'Mobile developer learning Flutter and APIs', 'location' => 'Ahmedabad, India', 'industry' => 'Mobile Development', 'bio' => 'Building cross-platform apps for campus projects.', 'phone' => '+91 90000 10010', 'website' => 'https://dev.example.com'],
+        ['full_name' => 'Isha Verma', 'email' => 'isha.verma@demo.pronetwork', 'role' => 'Professional', 'headline' => 'Content strategist for tech brands', 'location' => 'Jaipur, India', 'industry' => 'Marketing', 'bio' => 'Storytelling, SEO, and social campaigns.', 'phone' => '+91 90000 10011', 'website' => 'https://isha.example.com'],
+        ['full_name' => 'Arjun Malhotra', 'email' => 'arjun.malhotra@demo.pronetwork', 'role' => 'Professional', 'headline' => 'Cybersecurity analyst monitoring threat surfaces', 'location' => 'Gurgaon, India', 'industry' => 'Security', 'bio' => 'Incident response and secure SDLC practices.', 'phone' => '+91 90000 10012', 'website' => 'https://arjun.example.com'],
+        ['full_name' => 'Meera Joshi', 'email' => 'meera.joshi@demo.pronetwork', 'role' => 'Professional', 'headline' => 'HR partner hiring engineering talent', 'location' => 'Mumbai, India', 'industry' => 'Human Resources', 'bio' => 'Campus hiring and employer branding.', 'phone' => '+91 90000 10013', 'website' => 'https://meera.example.com'],
+        ['full_name' => 'Karan Mehta', 'email' => 'karan.mehta@demo.pronetwork', 'role' => 'Student', 'headline' => 'ML enthusiast exploring computer vision', 'location' => 'Indore, India', 'industry' => 'Machine Learning', 'bio' => 'Python, PyTorch, and dataset curation.', 'phone' => '+91 90000 10014', 'website' => 'https://karan.example.com'],
+        ['full_name' => 'Nina Kapoor', 'email' => 'nina.kapoor@demo.pronetwork', 'role' => 'Professional', 'headline' => 'Technical writer documenting developer tools', 'location' => 'Noida, India', 'industry' => 'Technical Writing', 'bio' => 'API docs, tutorials, and release notes.', 'phone' => '+91 90000 10015', 'website' => 'https://nina.example.com'],
+        ['full_name' => 'Rahul Choudhary', 'email' => 'rahul.choudhary@demo.pronetwork', 'role' => 'Professional', 'headline' => 'Solutions architect designing scalable systems', 'location' => 'Kolkata, India', 'industry' => 'Architecture', 'bio' => 'Microservices and integration patterns.', 'phone' => '+91 90000 10016', 'website' => 'https://rahul.example.com'],
+        ['full_name' => 'Zara Sheikh', 'email' => 'zara.sheikh@demo.pronetwork', 'role' => 'Student', 'headline' => 'Graphic designer crafting brand identities', 'location' => 'Lucknow, India', 'industry' => 'Design', 'bio' => 'Visual systems for startups and nonprofits.', 'phone' => '+91 90000 10017', 'website' => 'https://zara.example.com'],
+        ['full_name' => 'Omar Hassan', 'email' => 'omar.hassan@demo.pronetwork', 'role' => 'Professional', 'headline' => 'Sales engineer demoing data platforms', 'location' => 'Dubai, UAE', 'industry' => 'Sales', 'bio' => 'Helping teams evaluate analytics stacks.', 'phone' => '+971 50000 10018', 'website' => 'https://omar.example.com'],
     ] as $user) {
         $users[$user['email']] = insertUser($pdo, $user);
     }
@@ -315,6 +335,8 @@ try {
         [
             'name' => 'Nexa Analytics',
             'industry' => 'Data Analytics',
+            'logo_path' => 'logos/nexa.png',
+            'banner_path' => 'banners/nexa-analytics-banner.jpeg',
             'description' => 'Nexa Analytics helps businesses understand customer behavior through modern BI and machine learning workflows.',
             'website' => 'https://nexa-analytics.example.com',
             'size' => '201-500 employees',
@@ -324,6 +346,8 @@ try {
         [
             'name' => 'GreenGrid Labs',
             'industry' => 'Clean Technology',
+            'logo_path' => 'logos/greengrid.png',
+            'banner_path' => 'banners/greengrid-labs-banner.jpeg',
             'description' => 'GreenGrid Labs builds software for energy monitoring, smart buildings, and sustainability reporting.',
             'website' => 'https://greengrid.example.com',
             'size' => '51-200 employees',
@@ -378,6 +402,12 @@ try {
     insertConnection($pdo, $users['maya.kapoor@demo.pronetwork'], $users['kabir.khan@demo.pronetwork'], 'Accepted');
     insertConnection($pdo, $users['sara.thomas@demo.pronetwork'], $users['neha.sharma@demo.pronetwork'], 'Pending');
     insertConnection($pdo, $users['kabir.khan@demo.pronetwork'], $users['rohan.singh@demo.pronetwork'], 'Pending');
+
+    $aaravId = $users['aarav.mehta@demo.pronetwork'] ?? null;
+    if ($aaravId) {
+        insertCompanyFollow($pdo, $aaravId, $companyIds['Nexa Analytics']);
+        insertCompanyFollow($pdo, $aaravId, $companyIds['GreenGrid Labs']);
+    }
 
     $post1 = insertPost($pdo, $users['maya.kapoor@demo.pronetwork'], 'Finished a responsive dashboard redesign today. Small spacing decisions made the data much easier to scan.');
     $post2 = insertPost($pdo, $users['rohan.singh@demo.pronetwork'], 'Prepared statements and clean model methods make PHP MVC projects much easier to maintain.');

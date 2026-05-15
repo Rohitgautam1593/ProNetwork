@@ -10,12 +10,11 @@
     </div>
 
     <nav class="flex-1 px-4 space-y-1">
-        <?php $current_url = $_SERVER['REQUEST_URI']; ?>
-        <a href="<?php echo URLROOT; ?>/admin/dashboard" class="admin-nav-link flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/10 hover:text-white transition-colors <?php echo (strpos($current_url, 'dashboard') !== false) ? 'is-active text-white' : ''; ?>">
+        <a href="<?php echo URLROOT; ?>/admin/dashboard" class="admin-nav-link flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/10 hover:text-white transition-colors <?php echo pn_admin_nav_active('dashboard') ? 'is-active text-white' : ''; ?>">
             <span class="material-symbols-outlined text-[20px]">dashboard</span>
             <span class="text-sm font-medium">Dashboard</span>
         </a>
-        <a href="<?php echo URLROOT; ?>/admin/users" class="admin-nav-link flex items-center justify-between px-3 py-2.5 rounded-xl hover:bg-white/10 hover:text-white transition-colors <?php echo (strpos($current_url, 'users') !== false) ? 'is-active text-white' : ''; ?>">
+        <a href="<?php echo URLROOT; ?>/admin/users" class="admin-nav-link flex items-center justify-between px-3 py-2.5 rounded-xl hover:bg-white/10 hover:text-white transition-colors <?php echo pn_admin_nav_active('users') ? 'is-active text-white' : ''; ?>">
             <div class="flex items-center gap-3">
                 <span class="material-symbols-outlined text-[20px]">group</span>
                 <span class="text-sm font-medium">Users</span>
@@ -24,19 +23,19 @@
                 <span class="bg-amber-500 text-white text-[10px] font-black px-1.5 py-0.5 rounded-full"><?php echo $data['stats']['pending_users']; ?></span>
             <?php endif; ?>
         </a>
-        <a href="<?php echo URLROOT; ?>/admin/companies" class="admin-nav-link flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/10 hover:text-white transition-colors <?php echo (strpos($current_url, 'companies') !== false) ? 'is-active text-white' : ''; ?>">
+        <a href="<?php echo URLROOT; ?>/admin/companies" class="admin-nav-link flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/10 hover:text-white transition-colors <?php echo pn_admin_nav_active('companies') ? 'is-active text-white' : ''; ?>">
             <span class="material-symbols-outlined text-[20px]">business</span>
             <span class="text-sm font-medium">Companies</span>
         </a>
-        <a href="<?php echo URLROOT; ?>/admin/posts" class="admin-nav-link flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/10 hover:text-white transition-colors <?php echo (strpos($current_url, 'posts') !== false) ? 'is-active text-white' : ''; ?>">
+        <a href="<?php echo URLROOT; ?>/admin/posts" class="admin-nav-link flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/10 hover:text-white transition-colors <?php echo pn_admin_nav_active('posts') ? 'is-active text-white' : ''; ?>">
             <span class="material-symbols-outlined text-[20px]">dynamic_feed</span>
             <span class="text-sm font-medium">Posts</span>
         </a>
-        <a href="<?php echo URLROOT; ?>/admin/jobs" class="admin-nav-link flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/10 hover:text-white transition-colors <?php echo (strpos($current_url, 'jobs') !== false) ? 'is-active text-white' : ''; ?>">
+        <a href="<?php echo URLROOT; ?>/admin/jobs" class="admin-nav-link flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/10 hover:text-white transition-colors <?php echo pn_admin_nav_active('jobs') ? 'is-active text-white' : ''; ?>">
             <span class="material-symbols-outlined text-[20px]">work</span>
             <span class="text-sm font-medium">Jobs</span>
         </a>
-        <a href="<?php echo URLROOT; ?>/admin/reports" class="admin-nav-link flex items-center justify-between px-3 py-2.5 rounded-xl hover:bg-white/10 hover:text-white transition-colors <?php echo (strpos($current_url, 'reports') !== false) ? 'is-active text-white' : ''; ?>">
+        <a href="<?php echo URLROOT; ?>/admin/reports" class="admin-nav-link flex items-center justify-between px-3 py-2.5 rounded-xl hover:bg-white/10 hover:text-white transition-colors <?php echo pn_admin_nav_active('reports') ? 'is-active text-white' : ''; ?>">
             <div class="flex items-center gap-3">
                 <span class="material-symbols-outlined text-[20px]">report</span>
                 <span class="text-sm font-medium">Reports</span>

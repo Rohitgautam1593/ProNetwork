@@ -459,7 +459,17 @@ function initFeedComposer() {
       const result = await response.json();
       if (result.success) {
         showToast('Post created!', 'success');
-        location.reload();
+        if (typeof window.pnPrependFeedPost === 'function' && result.post) {
+          window.pnPrependFeedPost(result.post);
+        }
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+        if (mediaInput) mediaInput.value = '';
+        document.getElementById('post-event-section')?.classList.add('hidden');
+        document.getElementById('post-article-section')?.classList.add('hidden');
+        if (!result.post || typeof window.pnPrependFeedPost !== 'function') {
+          location.reload();
+        }
       } else {
         showToast(result.message || 'Failed to create post.', 'error');
       }

@@ -21,6 +21,8 @@ require_once '../app/core/Model.php';
 // Load helpers
 require_once '../app/helpers/session_helper.php';
 require_once '../app/helpers/MailHelper.php';
+require_once '../app/helpers/image_helper.php';
+require_once '../app/helpers/nav_helper.php';
 
 // Init Core App
 $app = new App();

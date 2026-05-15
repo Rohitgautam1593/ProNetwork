@@ -3,6 +3,13 @@ class CompanyController extends Controller {
     private $companyModel;
     private $jobModel;
     private $postModel;
+    private const MAX_LOGO_BYTES = 5242880;
+    private const ALLOWED_LOGO_TYPES = [
+        'image/jpeg' => 'jpg',
+        'image/png' => 'png',
+        'image/gif' => 'gif',
+        'image/webp' => 'webp'
+    ];
 
     public function __construct() {
         $this->companyModel = $this->model('Company');
@@ -11,9 +18,127 @@ class CompanyController extends Controller {
     }
 
     /**
-     * Employer registration (GET/POST).
+     * Public directory of all company pages.
      */
     public function index() {
+        $companies = $this->companyModel->getCompanies();
+        $this->view('company/index', [
+            'companies' => $companies
+        ]);
+    }
+
+    /**
+     * Show a specific company page
+     */
+    public function show($id) {
+        $company = $this->companyModel->getCompanyById($id);
+        if (!$company) {
+            header('Location: ' . URLROOT . '/company');
+            exit;
+        }
+
+        $isOwner = false;
+        if (isLoggedIn()) {
+            if (hasRole('Company') && $_SESSION['user_name'] === $company['company_name']) {
+                $isOwner = true;
+            } elseif ($company['user_id'] == $_SESSION['user_id']) {
+                $isOwner = true;
+            }
+        }
+
+        $isFollowing = false;
+        if (isLoggedIn() && !$isOwner) {
+            $isFollowing = $this->companyModel->isFollowing($id, $_SESSION['user_id']);
+        }
+
+        $this->view('company/dashboard', [
+            'company' => $company,
+            'jobs' => $this->jobModel->getJobsByCompany($id),
+            'posts' => $this->postModel->getPosts(),
+            'isOwner' => $isOwner,
+            'isFollowing' => $isFollowing
+        ]);
+    }
+
+    /**
+     * Create a new company page (for regular users)
+     */
+    public function create() {
+        if (!isLoggedIn()) {
+            header('Location: ' . URLROOT . '/auth/login');
+            exit;
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $data = [
+                'name' => trim($_POST['name'] ?? ''),
+                'industry' => trim($_POST['industry'] ?? ''),
+                'size' => trim($_POST['size'] ?? ''),
+                'website' => trim($_POST['website'] ?? ''),
+                'description' => trim($_POST['description'] ?? ''),
+                'user_id' => $_SESSION['user_id']
+            ];
+
+            if ($this->companyModel->createCompany($data)) {
+                $db = Database::getInstance();
+                $newCompanyId = $db->lastInsertId();
+                header('Location: ' . URLROOT . '/company/show/' . $newCompanyId);
+                exit;
+            }
+        }
+
+        $this->view('company/create');
+    }
+
+    /**
+     * Follow a company
+     */
+    public function follow($id) {
+        if (!isLoggedIn()) {
+            echo json_encode(['success' => false, 'message' => 'Unauthorized']);
+            exit;
+        }
+
+        if ($this->companyModel->addFollower($id, $_SESSION['user_id'])) {
+            echo json_encode(['success' => true]);
+        } else {
+            echo json_encode(['success' => false]);
+        }
+    }
+
+    /**
+     * Unfollow a company
+     */
+    public function unfollow($id) {
+        if (!isLoggedIn()) {
+            echo json_encode(['success' => false, 'message' => 'Unauthorized']);
+            exit;
+        }
+
+        if ($this->companyModel->removeFollower($id, $_SESSION['user_id'])) {
+            echo json_encode(['success' => true]);
+        } else {
+            echo json_encode(['success' => false]);
+        }
+    }
+
+    public function suggestions() {
+        if (!isLoggedIn()) {
+            echo json_encode(['success' => false, 'message' => 'Unauthorized']);
+            exit;
+        }
+
+        echo json_encode([
+            'success' => true,
+            'companies' => $this->companyModel->getFollowSuggestions($_SESSION['user_id'], 4)
+        ]);
+        exit;
+    }
+
+    /**
+     * Employer registration (GET/POST) - Enterprise Accounts
+     */
+    public function register() {
         if (isLoggedIn() && hasRole('Company')) {
             header('Location: ' . URLROOT . '/company/dashboard');
             exit;
@@ -76,8 +201,8 @@ class CompanyController extends Controller {
                             $newUserId = $db->lastInsertId();
 
                             $db->query(
-                                'INSERT INTO companies (name, industry, description, website, size, founded_year, followers) 
-                                 VALUES (:name, :industry, :description, :website, :size, :founded_year, 1)'
+                                'INSERT INTO companies (name, industry, description, website, size, founded_year, followers, user_id) 
+                                 VALUES (:name, :industry, :description, :website, :size, :founded_year, 1, :user_id)'
                             );
                             $db->bind(':name', $companyName);
                             $db->bind(':industry', $industry);
@@ -85,6 +210,7 @@ class CompanyController extends Controller {
                             $db->bind(':website', $website);
                             $db->bind(':size', $size);
                             $db->bind(':founded_year', date('Y'));
+                            $db->bind(':user_id', $newUserId);
                             $db->execute();
 
                             session_regenerate_id(true);
@@ -199,15 +325,15 @@ class CompanyController extends Controller {
             exit;
         }
 
-        $company = $this->companyModel->getPrimaryCompany();
-        $companyId = $company ? $company['company_id'] : 1;
-
-        $this->view('company/dashboard', [
-            'company' => $company,
-            'jobs' => $this->jobModel->getJobsByCompany($companyId),
-            'posts' => $this->postModel->getPosts(),
-            'isOwner' => hasRole('Company'),
-        ]);
+        $company = $this->companyModel->getCompanyForUser($_SESSION['user_id']);
+        if (!$company) {
+            header('Location: ' . URLROOT . '/company');
+            exit;
+        }
+        
+        // Redirect to standard show method for consistency
+        header('Location: ' . URLROOT . '/company/show/' . $company['company_id']);
+        exit;
     }
 
     public function update_profile() {
@@ -216,13 +342,20 @@ class CompanyController extends Controller {
             exit;
         }
 
-        if ($_SERVER['REQUEST_METHOD'] === 'POST' && hasRole('Company')) {
-            $company = $this->companyModel->getPrimaryCompany();
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $company = $this->companyModel->getCompanyForUser($_SESSION['user_id']);
             if ($company) {
-                $this->companyModel->updateCompanyDetails($company['company_id'], $_POST);
+                $data = $_POST;
+                if (!empty($_FILES['logo']['name'])) {
+                    $upload = $this->storeCompanyLogo($_FILES['logo']);
+                    if ($upload['success']) {
+                        $data['logo_path'] = $upload['fileName'];
+                    }
+                }
+                $this->companyModel->updateCompanyDetails($company['company_id'], $data);
+                header('Location: ' . URLROOT . '/company/show/' . $company['company_id']);
+                exit;
             }
-            header('Location: ' . URLROOT . '/company/dashboard');
-            exit;
         }
         header('Location: ' . URLROOT . '/company/dashboard');
     }
@@ -233,7 +366,7 @@ class CompanyController extends Controller {
             exit;
         }
 
-        if ($_SERVER['REQUEST_METHOD'] === 'POST' && hasRole('Company')) {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $status = $_POST['status'] ?? 'Live';
             $limit = $_POST['applicant_limit'] ?? '';
             $this->jobModel->updateJobSettings($job_id, $status, $limit);
@@ -249,12 +382,9 @@ class CompanyController extends Controller {
             exit;
         }
 
-        if (hasRole('Company')) {
-            $applicants = $this->jobModel->getApplicantsForJob($job_id);
-            echo json_encode(['success' => true, 'applicants' => $applicants]);
-            exit;
-        }
-        echo json_encode(['success' => false]);
+        $applicants = $this->jobModel->getApplicantsForJob($job_id);
+        echo json_encode(['success' => true, 'applicants' => $applicants]);
+        exit;
     }
 
     public function add_job() {
@@ -263,15 +393,42 @@ class CompanyController extends Controller {
             exit;
         }
 
-        if ($_SERVER['REQUEST_METHOD'] === 'POST' && hasRole('Company')) {
-            $company = $this->companyModel->getPrimaryCompany();
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $company = $this->companyModel->getCompanyForUser($_SESSION['user_id']);
             if ($company) {
                 $_POST['company_id'] = $company['company_id'];
                 $this->jobModel->addJob($_POST);
+                header('Location: ' . URLROOT . '/company/show/' . $company['company_id']);
+                exit;
             }
-            header('Location: ' . URLROOT . '/company/dashboard');
-            exit;
         }
         header('Location: ' . URLROOT . '/company/dashboard');
+    }
+
+    private function storeCompanyLogo($file) {
+        if ($file['error'] !== UPLOAD_ERR_OK) {
+            return ['success' => false, 'message' => 'Logo upload failed.'];
+        }
+
+        if ($file['size'] > self::MAX_LOGO_BYTES) {
+            return ['success' => false, 'message' => 'Logo must be 5 MB or smaller.'];
+        }
+
+        $mimeType = mime_content_type($file['tmp_name']);
+        if (!isset(self::ALLOWED_LOGO_TYPES[$mimeType])) {
+            return ['success' => false, 'message' => 'Unsupported logo type.'];
+        }
+
+        $uploadDir = 'uploads/companies/logos/';
+        if (!is_dir($uploadDir)) {
+            mkdir($uploadDir, 0755, true);
+        }
+
+        $fileName = time() . '_company_' . bin2hex(random_bytes(8)) . '.' . self::ALLOWED_LOGO_TYPES[$mimeType];
+        if (!move_uploaded_file($file['tmp_name'], $uploadDir . $fileName)) {
+            return ['success' => false, 'message' => 'Logo upload failed.'];
+        }
+
+        return ['success' => true, 'fileName' => 'logos/' . $fileName];
     }
 }

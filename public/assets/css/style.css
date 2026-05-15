@@ -650,6 +650,10 @@ body { font-family: Inter, Manrope, "Segoe UI", sans-serif; }
     box-shadow 0.22s ease;
 }
 
+.pn-nav-item.is-active {
+  color: #0a66c2;
+}
+
 .pn-nav-item:hover {
   transform: translateY(-1px);
 }
@@ -682,4 +686,532 @@ body { font-family: Inter, Manrope, "Segoe UI", sans-serif; }
   .pn-feed-card:hover .pn-feed-post-media {
     transform: none;
   }
+}
+
+/* Employer hub — job listing cards */
+.company-job-card {
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.25s ease,
+    border-color 0.2s ease;
+}
+
+.company-job-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 18px 40px -14px rgba(79, 70, 229, 0.35);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .company-job-card:hover {
+    transform: none;
+    box-shadow: none;
+  }
+}
+
+/* Jobs page */
+.jobs-nav-item {
+  cursor: pointer;
+}
+
+.jobs-nav-item:focus-visible {
+  outline: 2px solid #0a66c2;
+  outline-offset: -2px;
+}
+
+.jobs-filter-chip {
+  padding: 0.35rem 0.85rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #475569;
+  background: #f1f5f9;
+  border: 1px solid transparent;
+  border-radius: 9999px;
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
+  cursor: pointer;
+}
+
+.jobs-filter-chip:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+.jobs-filter-chip.is-active {
+  background: #0a66c2;
+  color: #fff;
+  border-color: #0a66c2;
+}
+
+.jobs-filter-chip:focus-visible {
+  outline: 2px solid #0a66c2;
+  outline-offset: 2px;
+}
+
+.jobs-list-card {
+  position: relative;
+  padding: 1rem 1.15rem;
+  cursor: pointer;
+  background: #fff;
+  border-bottom: 1px solid #e2e8f0;
+  transition: background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.jobs-list-card:hover {
+  background: #f8fafc;
+}
+
+.jobs-list-card.is-active {
+  background: rgba(10, 102, 194, 0.06);
+  box-shadow: inset 0 0 0 1px rgba(10, 102, 194, 0.12);
+}
+
+.jobs-list-card__indicator {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: #0a66c2;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.25s ease;
+}
+
+.jobs-list-card.is-active .jobs-list-card__indicator,
+.jobs-list-card:hover .jobs-list-card__indicator {
+  transform: scaleX(1);
+}
+
+.jobs-save-btn.is-saved {
+  color: #d97706;
+}
+
+.jobs-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 3rem 1.5rem;
+}
+
+.jobs-detail-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #475569;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+}
+
+.jobs-detail-pill--salary {
+  color: #047857;
+  background: #ecfdf5;
+  border-color: #a7f3d0;
+}
+
+.jobs-detail-cta:disabled {
+  opacity: 0.7;
+  transform: none !important;
+}
+
+.jobs-detail-icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 9999px;
+  border: 1px solid #e2e8f0;
+  color: #64748b;
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+  cursor: pointer;
+}
+
+.jobs-detail-icon-btn:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+  color: #0f172a;
+}
+
+.jobs-detail-icon-btn--danger:hover {
+  background: #fef2f2;
+  border-color: #fecaca;
+  color: #dc2626;
+}
+
+.jobs-mobile-drawer.is-open {
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .jobs-list-card,
+  .jobs-list-card__indicator,
+  .jobs-filter-chip,
+  .jobs-detail-icon-btn {
+    transition: none !important;
+  }
+}
+
+/* Messaging */
+.msg-conv-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.85rem 1rem;
+  cursor: pointer;
+  border-bottom: 1px solid #f1f5f9;
+  position: relative;
+  transition: background 0.2s ease;
+}
+
+.msg-conv-row::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: #0a66c2;
+  transform: scaleY(0);
+  transition: transform 0.2s ease;
+}
+
+.msg-conv-row:hover,
+.msg-conv-row.is-active {
+  background: rgba(10, 102, 194, 0.06);
+}
+
+.msg-conv-row.is-active::before,
+.msg-conv-row:hover::before {
+  transform: scaleY(1);
+}
+
+.msg-empty-sidebar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  text-align: center;
+}
+
+.msg-header-btn,
+.msg-toolbar-btn {
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #64748b;
+  transition: background 0.2s, color 0.2s;
+  cursor: pointer;
+}
+
+.msg-header-btn:hover,
+.msg-toolbar-btn:hover {
+  background: #eff6ff;
+  color: #0a66c2;
+}
+
+.msg-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.5rem 1rem;
+  text-align: left;
+  color: #334155;
+  transition: background 0.15s;
+}
+
+.msg-menu-item:hover {
+  background: #f8fafc;
+}
+
+.msg-row {
+  display: flex;
+  gap: 0.35rem;
+  max-width: 78%;
+}
+
+.msg-row--mine {
+  align-self: flex-end;
+  flex-direction: row-reverse;
+  margin-left: auto;
+}
+
+.msg-row--theirs {
+  align-self: flex-start;
+}
+
+.msg-bubble {
+  padding: 0.65rem 1rem;
+  border-radius: 1rem;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+}
+
+.msg-bubble--mine {
+  background: linear-gradient(135deg, #0a66c2, #1d4ed8);
+  color: #fff;
+  border-bottom-right-radius: 0.25rem;
+}
+
+.msg-bubble--theirs {
+  background: #fff;
+  color: #1e293b;
+  border: 1px solid #e2e8f0;
+  border-bottom-left-radius: 0.25rem;
+}
+
+.msg-bubble--deleted {
+  background: #f1f5f9 !important;
+  color: #94a3b8 !important;
+  font-style: italic;
+  border: 1px dashed #cbd5e1 !important;
+}
+
+.msg-meta {
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: #94a3b8;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-top: 0.2rem;
+}
+
+.msg-meta--mine {
+  justify-content: flex-end;
+}
+
+.msg-file-link {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  background: rgba(0, 0, 0, 0.08);
+  border-radius: 0.5rem;
+  margin-bottom: 0.25rem;
+  font-size: 0.8rem;
+}
+
+.msg-bubble--mine .msg-file-link {
+  color: #fff;
+}
+
+.msg-gif-item {
+  cursor: pointer;
+  padding: 0;
+  border: none;
+  background: none;
+}
+
+.msg-emoji-btn {
+  cursor: pointer;
+  border: none;
+  background: transparent;
+}
+
+.msg-chat-history {
+  scroll-behavior: smooth;
+}
+
+.msg-picker-panel {
+  animation: msgPickerIn 0.15s ease;
+}
+
+@keyframes msgPickerIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Notifications */
+.notif-filter-btn {
+  padding: 0.4rem 1rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #64748b;
+  border-radius: 0.5rem;
+  transition: background 0.2s, color 0.2s;
+  cursor: pointer;
+}
+
+.notif-filter-btn:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+.notif-filter-btn.is-active {
+  background: #1e293b;
+  color: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+}
+
+.notif-pref-btn.is-active {
+  background: rgba(10, 102, 194, 0.08);
+  color: #0a66c2;
+  font-weight: 700;
+}
+
+.notif-card {
+  position: relative;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.75rem;
+  padding: 1rem;
+  cursor: pointer;
+  transition: border-color 0.2s, box-shadow 0.2s, transform 0.15s;
+}
+
+.notif-card:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.08);
+  transform: translateY(-1px);
+}
+
+.notif-card--unread {
+  background: rgba(10, 102, 194, 0.04);
+  border-color: rgba(10, 102, 194, 0.2);
+}
+
+.notif-card__dot {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: #0a66c2;
+  border-radius: 0.75rem 0 0 0.75rem;
+}
+
+.notif-card__type-badge {
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  width: 1.35rem;
+  height: 1.35rem;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 0 3px #fff;
+}
+
+.notif-dismiss-btn {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #94a3b8;
+  opacity: 0;
+  transition: opacity 0.2s, background 0.2s, color 0.2s;
+}
+
+.notif-card:hover .notif-dismiss-btn,
+.notif-dismiss-btn:focus-visible {
+  opacity: 1;
+}
+
+.notif-dismiss-btn:hover {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.notif-toggle-row:hover {
+  background: #f8fafc;
+}
+
+.notif-actor-link {
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+}
+
+.notif-actor-link:hover img {
+  opacity: 0.92;
+}
+
+.notif-actor-link.notif-actor-name,
+a.notif-actor-link.font-bold {
+  position: relative;
+  z-index: 1;
+}
+
+.settings-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.5rem;
+  transition: background-color 0.2s;
+}
+
+.settings-row:hover {
+  background: #f8fafc;
+}
+
+.settings-row > div {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.settings-row-copy {
+  color: #64748b;
+  font-size: 0.875rem;
+  line-height: 1.35;
+}
+
+.settings-link {
+  flex-shrink: 0;
+  border-radius: 9999px;
+  color: #0a66c2;
+  font-size: 0.875rem;
+  font-weight: 700;
+  padding: 0.25rem 0.75rem;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.settings-link:hover {
+  background: #eff6ff;
+  text-decoration: underline;
+}
+
+body.pn-theme-dark .user-page-shell {
+  background: #0f172a;
+  color: #e2e8f0;
+}
+
+body.pn-theme-dark .user-page-shell .bg-white {
+  background: #111827 !important;
+  border-color: #334155 !important;
+}
+
+body.pn-theme-dark .user-page-shell .text-gray-500,
+body.pn-theme-dark .user-page-shell .text-gray-600,
+body.pn-theme-dark .user-page-shell .settings-row-copy {
+  color: #94a3b8 !important;
+}
+
+body.pn-theme-dark .user-page-shell .text-on-surface,
+body.pn-theme-dark .user-page-shell .text-slate-900,
+body.pn-theme-dark .user-page-shell h2 {
+  color: #e2e8f0 !important;
 }

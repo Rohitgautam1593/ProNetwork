@@ -60,10 +60,10 @@
     if (strpos($url, 'user/feed') !== false || strpos($url, 'post/show') !== false) echo '<script src="' . URLROOT . '/assets/js/feed.js?v=' . time() . '"></script>';
     if (strpos($url, 'user/settings') !== false) echo '<script src="' . URLROOT . '/assets/js/settings.js?v=' . time() . '"></script>';
     if (strpos($url, 'user/profile') !== false) echo '<script src="' . URLROOT . '/assets/js/profile.js?v=' . time() . '"></script>';
-    if (strpos($url, 'network') !== false) echo '<script src="' . URLROOT . '/assets/js/network.js?v=' . time() . '"></script>';
+    if (strpos($url, 'network') !== false || strpos($url, 'user/network') !== false) echo '<script src="' . URLROOT . '/assets/js/network.js?v=' . time() . '"></script>';
     if (strpos($url, 'message') !== false || strpos($url, 'messaging') !== false) echo '<script src="' . URLROOT . '/assets/js/messaging.js?v=' . time() . '"></script>';
     if (strpos($url, 'notification') !== false) echo '<script src="' . URLROOT . '/assets/js/notifications.js?v=' . time() . '"></script>';
-    if (strpos($url, 'job') !== false) echo '<script src="' . URLROOT . '/assets/js/jobs.js?v=' . time() . '"></script>';
+    if (strpos($url, 'job') !== false || strpos($url, 'user/jobs') !== false) echo '<script src="' . URLROOT . '/assets/js/jobs.js?v=' . time() . '"></script>';
   ?>
 </body>
 </html>

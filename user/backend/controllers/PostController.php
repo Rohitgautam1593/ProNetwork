@@ -21,7 +21,7 @@ class PostController extends Controller {
     // Endpoint for GET and POST on /post
     public function index() {
         if($_SERVER['REQUEST_METHOD'] == 'GET') {
-            $posts = $this->postModel->getPosts();
+            $posts = $this->postModel->getPosts($_SESSION['user_id'] ?? null);
             echo json_encode(['success' => true, 'posts' => $posts]);
         } else if($_SERVER['REQUEST_METHOD'] == 'POST') {
             $this->create();
@@ -61,7 +61,7 @@ class PostController extends Controller {
         $postId = $this->postModel->addPost($postData);
 
         if($postId) {
-            $newPost = $this->postModel->getPostById($postId);
+            $newPost = $this->postModel->getPostById($postId, (int) $_SESSION['user_id']);
             echo json_encode(['success' => true, 'message' => 'Post created!', 'post' => $newPost]);
         } else {
             echo json_encode(['success' => false, 'message' => 'Failed to save post']);
@@ -87,11 +87,12 @@ class PostController extends Controller {
             if ($post && $post['user_id'] != $_SESSION['user_id']) {
                 $userName = $_SESSION['user_name'] ?? 'Someone';
                 $this->notificationModel->addNotification(
-                    $post['user_id'], 
-                    'Like', 
+                    $post['user_id'],
+                    'Like',
                     "$userName liked your post",
                     $post_id,
-                    'post'
+                    'post',
+                    (int)$_SESSION['user_id']
                 );
             }
 
@@ -232,7 +233,8 @@ class PostController extends Controller {
                     'Comment',
                     $userName . ' commented: ' . $preview,
                     $post_id,
-                    'post'
+                    'post',
+                    (int)$_SESSION['user_id']
                 );
             }
 
@@ -241,6 +243,36 @@ class PostController extends Controller {
         }
 
         echo json_encode(['success' => false, 'message' => 'Method not allowed.']);
+    }
+
+    public function detail($post_id) {
+        if(!isLoggedIn()) {
+            echo json_encode(['success' => false, 'message' => 'Unauthorized']);
+            return;
+        }
+        $post = $this->postModel->getPostById((int) $post_id, (int) ($_SESSION['user_id'] ?? 0));
+        if($post) {
+            echo json_encode(['success' => true, 'post' => $post]);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Post not found']);
+        }
+    }
+
+    /**
+     * GET /post/reactions/{id} — users who reacted (feed modal)
+     */
+    public function reactions($post_id) {
+        if (!isLoggedIn()) {
+            echo json_encode(['success' => false, 'message' => 'Unauthorized']);
+            return;
+        }
+        $post_id = (int) $post_id;
+        if ($post_id <= 0) {
+            echo json_encode(['success' => false, 'message' => 'Invalid post']);
+            return;
+        }
+        $reactions = $this->postModel->getReactionsForPost($post_id);
+        echo json_encode(['success' => true, 'reactions' => $reactions]);
     }
 
     /**
@@ -253,12 +285,53 @@ class PostController extends Controller {
             exit;
         }
         $post_id = (int) $post_id;
-        $post = $this->postModel->getPostById($post_id);
+        $post = $this->postModel->getPostById($post_id, (int) ($_SESSION['user_id'] ?? 0));
         if(!$post) {
             header('Location: ' . URLROOT . '/user/feed');
             exit;
         }
         $this->view('users/post_view', ['post' => $post]);
+    }
+
+    /**
+     * POST /post/deleteComment/{id}
+     * Authorized for the comment author OR the parent post owner
+     */
+    public function deleteComment($comment_id) {
+        if (!isLoggedIn()) {
+            echo json_encode(['success' => false, 'message' => 'Unauthorized']);
+            return;
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            echo json_encode(['success' => false, 'message' => 'Invalid method']);
+            return;
+        }
+
+        $comment = $this->postModel->getCommentById($comment_id);
+        if (!$comment) {
+            echo json_encode(['success' => false, 'message' => 'Comment not found']);
+            return;
+        }
+
+        $post = $this->postModel->getPostById($comment['post_id']);
+        $currentUserId = (int) $_SESSION['user_id'];
+        
+        // Allowed if user authored the comment OR if user owns the parent post
+        $isCommentor = ((int) $comment['user_id'] === $currentUserId);
+        $isPostOwner = ($post && (int) $post['user_id'] === $currentUserId);
+
+        if (!$isCommentor && !$isPostOwner) {
+            echo json_encode(['success' => false, 'message' => 'Not authorized to delete this comment.']);
+            return;
+        }
+
+        if ($this->postModel->deleteComment($comment_id)) {
+            $count = $this->postModel->getCommentCount($comment['post_id']);
+            echo json_encode(['success' => true, 'count' => $count]);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Failed to delete comment']);
+        }
     }
 
     private function storeUploadedMedia($file, $uploadDir) {

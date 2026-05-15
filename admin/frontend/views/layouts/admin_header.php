@@ -20,4 +20,4 @@
 </head>
 <body class="admin-body">
 <div id="admin-sidebar-overlay" class="admin-sidebar-overlay fixed inset-0 z-[80] bg-slate-950/45 backdrop-blur-sm opacity-0 pointer-events-none lg:hidden transition-opacity"></div>
-<div class="admin-shell flex min-h-screen">
+<div class="admin-shell flex h-screen w-full overflow-hidden">

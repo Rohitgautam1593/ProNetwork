@@ -19,8 +19,45 @@ class JobController extends Controller {
             echo json_encode(['success' => false]);
             exit;
         }
-        $jobs = $this->jobModel->getJobs();
-        echo json_encode(['success' => true, 'jobs' => $jobs]);
+        $filters = [];
+        $q = trim($_GET['q'] ?? '');
+        if ($q !== '') {
+            $filters['q'] = $q;
+        }
+        $jobType = trim($_GET['job_type'] ?? '');
+        if ($jobType !== '') {
+            $filters['job_type'] = $jobType;
+        }
+        if (!empty($_GET['with_salary'])) {
+            $filters['with_salary'] = true;
+        }
+        if (!empty($_GET['applied_only'])) {
+            $filters['applied_user_id'] = $_SESSION['user_id'];
+        }
+        if (!empty($_GET['ids'])) {
+            $ids = array_filter(array_map('intval', explode(',', $_GET['ids'])));
+            if ($ids) {
+                $filters['job_ids'] = $ids;
+            }
+        }
+
+        $jobs = $this->jobModel->getJobs($filters);
+        $userId = $_SESSION['user_id'];
+        foreach ($jobs as &$job) {
+            $job['has_applied'] = $this->jobModel->hasApplied($job['job_id'], $userId);
+        }
+        unset($job);
+
+        echo json_encode(['success' => true, 'jobs' => $jobs, 'count' => count($jobs)]);
+    }
+
+    public function applications() {
+        if(!isLoggedIn()) {
+            echo json_encode(['success' => false]);
+            exit;
+        }
+        $apps = $this->jobModel->getMyApplications($_SESSION['user_id']);
+        echo json_encode(['success' => true, 'applications' => $apps]);
     }
 
     public function detail($id) {

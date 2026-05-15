@@ -33,7 +33,7 @@
               <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
               <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
             </span>
-            <span class="leading-tight">Looking to onboard a new firm? Explore the standalone <a href="<?php echo URLROOT; ?>/company/index" class="text-primary font-semibold hover:underline">Enterprise Setup Gateway</a>.</span>
+            <span class="leading-tight">Hiring for your company? <a href="<?php echo URLROOT; ?>/company/index" class="text-primary font-semibold hover:underline">Create an employer workspace</a> — it takes a minute.</span>
           </div>
         </div>
         <div class="relative">
@@ -44,8 +44,8 @@
             class="absolute -bottom-10 -left-10 w-64 h-64 bg-tertiary-fixed rounded-full mix-blend-multiply filter blur-3xl opacity-30">
           </div>
           <img class="rounded-xl shadow-2xl relative z-10 w-full aspect-[4/3] object-cover"
-            data-alt="Group of diverse young professionals collaborating in a bright, modern open-plan office with glass walls and natural light"
-            src="https://lh3.googleusercontent.com/aida-public/AB6AXuDoIQZTEpOASOuRcRC-6ZxKWVf2R3hCdoH48j5SLB0BB1K2l4Fm6DEUwNeWvRx1cruMoEy6frBoiZL3NEub6O_UxBNGkKK5JCEYjZrc7te3yzDQOewFFlV9mX7r7J4mdPS-XYeUTiujNdiAiVBmhMd8h2LuexNzlVXuIqI8xOM4s0Jxe84x2gWl2jjC6pCE4_mfWXYf_yN_HzxRj3r7xAHkJu-Yg1C19vzbznMq2ukTlzAiaPowCh7n8BgGE-7ubMoe7cqsgv9LiPAq" />
+            data-alt="Professional workspace cover"
+            src="<?php echo pn_cover_image_url(); ?>" />
         </div>
       </div>
     </section>
@@ -56,23 +56,23 @@
         </p>
         <div class="flex flex-wrap justify-center md:justify-between items-center gap-8 opacity-60 grayscale">
           <div class="flex items-center gap-2">
-            <span class="material-symbols-outlined text-4xl" data-icon="corporate_fare">corporate_fare</span>
-            <span class="font-title-lg">GlobalTech</span>
+            <img class="w-10 h-10 object-contain" src="<?php echo pn_upload_url('companies', 'logos/nexa.png'); ?>" alt="">
+            <span class="font-title-lg">Nexa Analytics</span>
           </div>
           <div class="flex items-center gap-2">
-            <span class="material-symbols-outlined text-4xl" data-icon="rocket_launch">rocket_launch</span>
-            <span class="font-title-lg">AstroSystems</span>
+            <img class="w-10 h-10 object-contain" src="<?php echo pn_upload_url('companies', 'logos/cloudscale.png'); ?>" alt="">
+            <span class="font-title-lg">CloudScale</span>
           </div>
           <div class="flex items-center gap-2">
-            <span class="material-symbols-outlined text-4xl" data-icon="eco">eco</span>
-            <span class="font-title-lg">BioSphere</span>
+            <img class="w-10 h-10 object-contain" src="<?php echo pn_upload_url('companies', 'logos/greengrid.png'); ?>" alt="">
+            <span class="font-title-lg">GreenGrid</span>
           </div>
           <div class="flex items-center gap-2">
-            <span class="material-symbols-outlined text-4xl" data-icon="cloud">cloud</span>
+            <img class="w-10 h-10 object-contain" src="<?php echo pn_upload_url('companies', 'logos/cloudscale.png'); ?>" alt="">
             <span class="font-title-lg">CloudNexus</span>
           </div>
           <div class="flex items-center gap-2">
-            <span class="material-symbols-outlined text-4xl" data-icon="bolt">bolt</span>
+            <img class="w-10 h-10 object-contain" src="<?php echo pn_upload_url('companies', 'logos/nexa.png'); ?>" alt="">
             <span class="font-title-lg">VoltDrive</span>
           </div>
         </div>
@@ -103,8 +103,8 @@
                 Messaging</span>
             </div>
             <img class="absolute -right-10 bottom-0 w-1/2 rounded-tl-xl object-cover shadow-lg hidden md:block"
-              data-alt="Close up of two professionals shaking hands across a conference table in a sun-drenched office setting"
-              src="https://lh3.googleusercontent.com/aida-public/AB6AXuCpv19LTrU6f9UScNf7TH5jJ0qPX76OvlShsQDBrlx2fAN9RSwk0ejblatSejhkN5NYKURTOP4bva1rcAPgZn2EAXAtKLifl48pEfOtfNGIcF8EONauG0RIXY3GLf1Am2SlbyM_qe4bdrf8tnh27OYj2nfrVkxmcaAS7xfgmS37eQ7NwK6ny6f-FU6cWQafzrjcn5q_10-nV3pZr-MdVKJMw4HxVzcPVEuGSYfz3Hd-rLP2N2_Oxshk07UHFuGRp0iGyWeS_fsGM_wK" />
+              data-alt="Professional networking image"
+              src="<?php echo pn_upload_url('posts', '1778244004_IMG-20240307-WA00139.jpg'); ?>" />
           </div>
           <!-- Growth Card -->
           <div
@@ -135,14 +135,14 @@
             </div>
             <div class="flex -space-x-4">
               <img class="w-12 h-12 rounded-full border-2 border-white object-cover"
-                data-alt="Portrait headshot of a smiling professional man"
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuCuN_qbvJKhwrag6ktKWvTMaXvu1voAVx4zZTb43jLj1Bm47z8jONeAoBNm8BAuE4a5o0UnlRBNJHu9zI1E9yAJ6zx1HZecCgBffEfEfIePMRDBHEVxqNlXhGb5BP4t78dgMFlR5OSmCqcl7MFkQmXpOq6Vp3Fd7cDwTaO3Qmd9HMQTEm9G5bjupFEbIMx6AMNfeT9JprqMueBu-TIZZHMsTfRDYw9zr1mxZcntE6XINJ0RLk8C-ItRITBm4S7y7HDPkFhVKOh8Qy6N" />
+                data-alt="Portrait headshot of a professional"
+                src="<?php echo pn_upload_url('profiles', '1778246058_IMG-20240915-WA0040.jpg'); ?>" />
               <img class="w-12 h-12 rounded-full border-2 border-white object-cover"
-                data-alt="Portrait headshot of a smiling professional woman"
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuDPHcxWyrhZXpL8YM7S_s-0xH_fFvZz-QOxcecX3Vc3UUdhWgJclqhnjOEHqtqGYb15L0Rh6B_oGtWQd5eEmWQNsjgpNVJuRH-TGYU0Xu-0uV6yVGohmYmlFt0WeYjSQX4krc9QxACEybSgxF4BHnb7-IPgPar2quJl7pUKh07gE7BDt6QH_xcQOA1aZsbixj39aTdk8PBfFjdrhfeYJ4Fk3xSG0_Pwkbp5WsCwHKwgZbIsZ461L6KcZ_f-BtIgzMZ5-4Bao-Oz1dfp" />
+                data-alt="Portrait headshot of a professional"
+                src="<?php echo pn_upload_url('profiles', '1778650251_46eeb713fe06f091.jpg'); ?>" />
               <img class="w-12 h-12 rounded-full border-2 border-white object-cover"
-                data-alt="Portrait headshot of a professional man with glasses"
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuB-MXBn8JCVRAWM66-d8-v-_p0fUq96npTInMGYYlPNWxbuLWH3YAnvufCl0-QBsh3RT0ZmRPpie0fC7_QQ44Tola7renSw6dIJ-J4kD803SC46qMnwBCOPd34qymKaum8rTP6Gc52Eyn53gbkJekPt7Gh5tzBzhHAuhrxWRr6TncY3WzkEv_baU5Z34chRID4yGnrjbUCTeVSXgKZCMhX9Lligb1knpjs43IpPaC1TJfVDdf08Z00DNM-Q59UFRCmpknJV5SLOoneR" />
+                data-alt="Portrait headshot of a professional"
+                src="<?php echo pn_upload_url('profiles', '1778245058_IMG_20240111_163428.jpg'); ?>" />
               <div
                 class="w-12 h-12 rounded-full border-2 border-white bg-primary text-white flex items-center justify-center font-label-md">
                 +2k</div>
@@ -160,8 +160,8 @@
           <div class="p-8 rounded-xl bg-surface-container-low border border-outline-variant/20 ambient-shadow">
             <div class="flex items-center gap-4 mb-6">
               <img class="w-16 h-16 rounded-full object-cover"
-                data-alt="Professional man in a suit smiling confidently, executive setting"
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuA152EHvAo4rES34bebRISi0lkWONn5b0IlLonUTyCX8k3Rq7z0BW79ErPin5-SnMg0ATW1VgKp15ZqwLPrdHBTB7GDnz5qslELl2lXlXZXxumaYfAnQJxWar31HsJdZjg1WSyEQThl94lwZNZEuPkSQeC6jY-sQHICT5CCfFxi25qsoFUdQ6aXqtgWX5Qy4Qt_sjni11Kmb45yX9UQBXIZMUyYmQtDJlRi3pLtQeBO8ISY7wshOJpyK_s79awqN0thBceEFVSeAlE7" />
+                data-alt="Professional headshot"
+                src="<?php echo pn_upload_url('profiles', '1778246058_IMG-20240915-WA0040.jpg'); ?>" />
               <div>
                 <p class="font-title-md">Marcus Chen</p>
                 <p class="text-xs text-secondary uppercase font-label-md">Senior Architect</p>
@@ -176,8 +176,8 @@
           <div class="p-8 rounded-xl bg-surface-container-low border border-outline-variant/20 ambient-shadow">
             <div class="flex items-center gap-4 mb-6">
               <img class="w-16 h-16 rounded-full object-cover"
-                data-alt="Professional woman looking focused and friendly in a modern office background"
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuBrA-DIl2RqA6Hz6nvYot4wlj9tkdcU-NL-YFnHItUnmF3qcblmnhGkxIEBvHy7rkmWG_o9l9508-8lTKiNfsBaw4y4V2ySD0BS6vSXqqFixHiHs-qwNR2-cf2dFafnrVtCYBDQWShqbKXhdgFS5n-JusKWmMEOUDPQXU9DKFG4OPWxy1qubmaOR5rUg3-bIwEkiqnkKqzzpDWUZ68oNnNXoZIivtoSH2hprOnDBS0QCAZsxEdXak1Bo7U15jCkPmptfktgI6y724Q-" />
+                data-alt="Professional headshot"
+                src="<?php echo pn_upload_url('profiles', '1778650251_46eeb713fe06f091.jpg'); ?>" />
               <div>
                 <p class="font-title-md">Sarah Jenkins</p>
                 <p class="text-xs text-secondary uppercase font-label-md">Product Lead</p>
@@ -192,8 +192,8 @@
           <div class="p-8 rounded-xl bg-surface-container-low border border-outline-variant/20 ambient-shadow">
             <div class="flex items-center gap-4 mb-6">
               <img class="w-16 h-16 rounded-full object-cover"
-                data-alt="Young professional man working on a laptop in a trendy cafe environment"
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuD-Fd7Azkd_p250h0lkNA6NAeRmSru6AGEWAbU5BsCVNYWppiaOCtdiDtDmOUTWtt72l9__ISJa7fwGK2M74NIIlZUbkrM5c9UFnfTKxGACmFUttrshZSds9or2S4zy9IykEN-tOzd9R5JiJeDu5t9wVgnSUNaOuDJOQQi2kuUbM_ESkJQomlR5pnZfiBLq8OHiKO2w35AfPiiqh0gT5-XksyPN58097YdqgR0mYeYYS1UgAyv48J7Z8I1zac1MG82J5xxpYkSvQG2m" />
+                data-alt="Professional headshot"
+                src="<?php echo pn_upload_url('profiles', '1778245058_IMG_20240111_163428.jpg'); ?>" />
               <div>
                 <p class="font-title-md">David Miller</p>
                 <p class="text-xs text-secondary uppercase font-label-md">Freelance Specialist</p>

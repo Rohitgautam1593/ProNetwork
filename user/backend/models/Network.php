@@ -1,16 +1,24 @@
 <?php
 class Network extends Model {
-    // Get connection suggestions (users not already connected)
-    public function getSuggestions($user_id) {
-        $this->db->query("SELECT user_id, full_name, headline, profile_pic FROM users 
-                          WHERE user_id != :user_id 
+    /**
+     * Users to suggest (no existing connection row in either direction).
+     */
+    public function getSuggestions($user_id, int $limit = 12) {
+        $limit = max(1, min(50, $limit));
+        $this->db->query("SELECT user_id, full_name, headline, profile_pic, industry, location
+                          FROM users
+                          WHERE user_id != :uid
                           AND user_id NOT IN (
-                              SELECT receiver_id FROM connections WHERE sender_id = :user_id
+                              SELECT receiver_id FROM connections WHERE sender_id = :uid_as_sender
                               UNION
-                              SELECT sender_id FROM connections WHERE receiver_id = :user_id
+                              SELECT sender_id FROM connections WHERE receiver_id = :uid_as_receiver
                           )
-                          LIMIT 10");
-        $this->db->bind(':user_id', $user_id);
+                          ORDER BY user_id DESC
+                          LIMIT :result_limit");
+        $this->db->bind(':uid', $user_id);
+        $this->db->bind(':uid_as_sender', $user_id);
+        $this->db->bind(':uid_as_receiver', $user_id);
+        $this->db->bind(':result_limit', $limit, PDO::PARAM_INT);
         return $this->db->resultSet();
     }
 
@@ -82,5 +90,45 @@ class Network extends Model {
         $this->db->bind(':user_id', $user_id);
         $this->db->bind(':other_user_id', $other_user_id);
         return (bool)$this->db->single();
+    }
+
+    public function getConnectionStatus($user_id, $other_user_id) {
+        if ((int)$user_id === (int)$other_user_id) {
+            return ['state' => 'self', 'direction' => 'self'];
+        }
+
+        $this->db->query("SELECT sender_id, receiver_id, status FROM connections
+                          WHERE (sender_id = :user_id AND receiver_id = :other_user_id)
+                          OR (sender_id = :other_user_id AND receiver_id = :user_id)
+                          LIMIT 1");
+        $this->db->bind(':user_id', $user_id);
+        $this->db->bind(':other_user_id', $other_user_id);
+        $row = $this->db->single();
+
+        if (!$row) {
+            return ['state' => 'none', 'direction' => 'none'];
+        }
+
+        $direction = ((int)$row['sender_id'] === (int)$user_id) ? 'sent' : 'received';
+        return ['state' => $row['status'], 'direction' => $direction];
+    }
+
+    // Get company pages followed by user
+    public function getFollowedPages($user_id) {
+        $this->db->query("SELECT c.company_id, c.name as company_name, c.industry, c.logo_path
+                          FROM companies c
+                          JOIN company_followers f ON c.company_id = f.company_id
+                          WHERE f.user_id = :user_id
+                          ORDER BY c.name ASC");
+        $this->db->bind(':user_id', $user_id);
+        return $this->db->resultSet();
+    }
+
+    // Reject/Ignore connection request
+    public function rejectRequest($sender_id, $receiver_id) {
+        $this->db->query("DELETE FROM connections WHERE sender_id = :sender_id AND receiver_id = :receiver_id AND status = 'Pending'");
+        $this->db->bind(':sender_id', $sender_id);
+        $this->db->bind(':receiver_id', $receiver_id);
+        return $this->db->execute();
     }
 }

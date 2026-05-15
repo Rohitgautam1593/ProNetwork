@@ -6,7 +6,7 @@
 <section class="hidden md:flex flex-1 relative bg-primary items-center justify-center p-xl overflow-hidden">
 <!-- Decorative Background Element -->
 <div class="absolute inset-0 z-0 opacity-20">
-<img alt="Professionals collaborating" class="w-full h-full object-cover" data-alt="Modern office setting with diverse group of professionals collaborating over laptops in a bright, airy workspace with large windows" src="https://lh3.googleusercontent.com/aida-public/AB6AXuApE5iKuPsiIbUnV-kAIRcKBFMJ7AnCGK0wW_3Br4UAZtcllnqkHxEZzSH2RWrj5a2h7Bqi2exY0BvMdDfqUvHLVdRYWyJ3GTQ2-nQEvMvXbZ8hN7SFlGMZ-BOEHKq_U7ZjpGs9tJV56XzQMiK4G-ibkD3n3OMD4ofM6v2Gq6pomJYL_t9Jk0mqoMrL_uZM6uZYR2Z70wfPuN7Nby3ClrmePJwfVzJUiogH78n-PPUfylYDNRhPNZaW-eiZ7rQTYAC7bRGxL9ibK_th"/>
+<img alt="Professionals collaborating" class="w-full h-full object-cover" data-alt="Modern office setting with professionals collaborating" src="<?php echo pn_cover_image_url(); ?>"/>
 </div>
 <div class="absolute inset-0 bg-gradient-to-br from-primary via-primary/90 to-on-primary-fixed-variant z-10"></div>
 <div class="relative z-20 max-w-md text-on-primary text-center">
@@ -81,7 +81,7 @@
 <!-- Social Logins -->
 <div class="grid grid-cols-2 gap-md">
 <button type="button" data-provider="google" class="flex items-center justify-center space-x-sm h-[48px] border border-outline-variant rounded-full hover:bg-surface-container transition-colors">
-<img alt="Google" class="w-5 h-5" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCfYPn-amQylsKcsrH_GdjxyGIoGG6pLK_V_tDfIjXUXxAMYBh4a_uwV9YgJM6qIt_amrnOQZi2aQ3dm35JkFIQJzqYv-FYDrCkn1rtDgYcrpt6y71mSWEbEzeYu_zrjwyRByq3Mtc4nRkdPQM_3GqmyJmg4x0eFy19AJ9P42IUILmzV5JTvpJwb0TMlLGp1CPzC_-w4ZfIZDTkeAVWYX0ilmyyGjakQwhOZhIqI0YwPBRy1OofHM5xjT_KZjXaLGtMyHQGEoM8EQiG"/>
+<span class="material-symbols-outlined text-[#0A66C2] text-[20px]">account_circle</span>
 <span class="font-label-lg">Google</span>
 </button>
 <button type="button" data-provider="linkedin" class="flex items-center justify-center space-x-sm h-[48px] border border-outline-variant rounded-full hover:bg-surface-container transition-colors">

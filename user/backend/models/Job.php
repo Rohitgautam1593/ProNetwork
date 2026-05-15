@@ -1,18 +1,68 @@
 <?php
 class Job extends Model {
-    public function getJobs() {
-        $this->db->query("SELECT j.*, c.name as company_name, c.logo_path as logo FROM jobs j JOIN companies c ON j.company_id = c.company_id ORDER BY j.posted_at DESC");
+    public function getJobs($filters = []) {
+        $sql = "SELECT j.*, c.name as company_name, c.logo_path as logo, c.banner_path as banner
+                FROM jobs j JOIN companies c ON j.company_id = c.company_id WHERE 1=1";
+        $params = [];
+
+        if (!empty($filters['q'])) {
+            $sql .= " AND (j.title LIKE :q OR j.location LIKE :q OR c.name LIKE :q OR j.description LIKE :q)";
+            $params[':q'] = '%' . $filters['q'] . '%';
+        }
+        if (!empty($filters['job_type'])) {
+            $sql .= " AND j.job_type = :job_type";
+            $params[':job_type'] = $filters['job_type'];
+        }
+        if (!empty($filters['with_salary'])) {
+            $sql .= " AND j.salary_range IS NOT NULL AND TRIM(j.salary_range) <> ''";
+        }
+        if (!empty($filters['job_ids']) && is_array($filters['job_ids'])) {
+            $ids = array_values(array_filter(array_map('intval', $filters['job_ids'])));
+            if ($ids) {
+                $placeholders = [];
+                foreach ($ids as $i => $id) {
+                    $key = ':jid' . $i;
+                    $placeholders[] = $key;
+                    $params[$key] = $id;
+                }
+                $sql .= ' AND j.job_id IN (' . implode(',', $placeholders) . ')';
+            } else {
+                return [];
+            }
+        }
+        if (!empty($filters['applied_user_id'])) {
+            $sql .= " AND j.job_id IN (SELECT job_id FROM applications WHERE user_id = :applied_user_id)";
+            $params[':applied_user_id'] = (int)$filters['applied_user_id'];
+        }
+
+        $sql .= " ORDER BY j.posted_at DESC";
+        $this->db->query($sql);
+        foreach ($params as $key => $val) {
+            $this->db->bind($key, $val);
+        }
+        return $this->db->resultSet();
+    }
+
+    public function getMyApplications($user_id) {
+        $this->db->query("SELECT a.*, j.title, j.location, j.job_type, j.status as job_status, j.posted_at,
+                          c.name as company_name, c.logo_path as logo, c.company_id
+                          FROM applications a
+                          JOIN jobs j ON a.job_id = j.job_id
+                          JOIN companies c ON j.company_id = c.company_id
+                          WHERE a.user_id = :user_id
+                          ORDER BY a.applied_at DESC");
+        $this->db->bind(':user_id', $user_id);
         return $this->db->resultSet();
     }
 
     public function getJobById($id) {
-        $this->db->query("SELECT j.*, c.name as company_name, c.logo_path as logo, c.description as company_description FROM jobs j JOIN companies c ON j.company_id = c.company_id WHERE j.job_id = :job_id");
+        $this->db->query("SELECT j.*, c.name as company_name, c.logo_path as logo, c.banner_path as banner, c.description as company_description FROM jobs j JOIN companies c ON j.company_id = c.company_id WHERE j.job_id = :job_id");
         $this->db->bind(':job_id', $id);
         return $this->db->single();
     }
 
     public function searchJobs($query) {
-        $this->db->query("SELECT j.*, c.name as company_name, c.logo_path as logo FROM jobs j JOIN companies c ON j.company_id = c.company_id 
+        $this->db->query("SELECT j.*, c.name as company_name, c.logo_path as logo, c.banner_path as banner FROM jobs j JOIN companies c ON j.company_id = c.company_id 
                           WHERE j.title LIKE :query OR j.location LIKE :query OR c.name LIKE :query
                           ORDER BY j.posted_at DESC");
         $this->db->bind(':query', '%' . $query . '%');
@@ -65,7 +115,7 @@ class Job extends Model {
     }
 
     public function getJobsByCompany($company_id) {
-        $this->db->query("SELECT j.*, c.name as company_name, c.logo_path as logo FROM jobs j JOIN companies c ON j.company_id = c.company_id WHERE j.company_id = :company_id ORDER BY j.posted_at DESC");
+        $this->db->query("SELECT j.*, c.name as company_name, c.logo_path as logo, c.banner_path as banner FROM jobs j JOIN companies c ON j.company_id = c.company_id WHERE j.company_id = :company_id ORDER BY j.posted_at DESC");
         $this->db->bind(':company_id', $company_id);
         return $this->db->resultSet();
     }

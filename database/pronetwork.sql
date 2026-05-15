@@ -74,14 +74,36 @@ CREATE TABLE `companies` (
   `name` varchar(150) COLLATE utf8mb4_unicode_ci NOT NULL,
   `industry` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `logo_path` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `banner_path` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `description` text COLLATE utf8mb4_unicode_ci,
   `website` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `size` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `founded_year` year DEFAULT NULL,
   `followers` int NOT NULL DEFAULT '0',
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`company_id`)
+  `user_id` int DEFAULT NULL,
+  PRIMARY KEY (`company_id`),
+  KEY `idx_company_user` (`user_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `company_followers`
+--
+
+DROP TABLE IF EXISTS `company_followers`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `company_followers` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `company_id` int NOT NULL,
+  `user_id` int NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_company_follower` (`company_id`,`user_id`),
+  KEY `idx_company_followers_user` (`user_id`),
+  CONSTRAINT `fk_company_followers_company` FOREIGN KEY (`company_id`) REFERENCES `companies` (`company_id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -144,14 +166,35 @@ CREATE TABLE `messages` (
   `sender_id` int NOT NULL,
   `receiver_id` int NOT NULL,
   `message_text` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `media_path` varchar(500) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `is_read` tinyint(1) NOT NULL DEFAULT '0',
+  `is_edited` tinyint(1) NOT NULL DEFAULT '0',
+  `is_deleted` tinyint(1) NOT NULL DEFAULT '0',
   `sent_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`message_id`),
   KEY `fk_msg_sender` (`sender_id`),
   KEY `fk_msg_receiver` (`receiver_id`),
   CONSTRAINT `fk_msg_receiver` FOREIGN KEY (`receiver_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `fk_msg_sender` FOREIGN KEY (`sender_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Table structure for table `blocked_users`
+--
+
+DROP TABLE IF EXISTS `blocked_users`;
+CREATE TABLE `blocked_users` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `blocker_id` int NOT NULL,
+  `blocked_id` int NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_block_pair` (`blocker_id`,`blocked_id`),
+  KEY `idx_blocked` (`blocked_id`),
+  CONSTRAINT `fk_block_blocker` FOREIGN KEY (`blocker_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_block_blocked` FOREIGN KEY (`blocked_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -164,6 +207,7 @@ DROP TABLE IF EXISTS `notifications`;
 CREATE TABLE `notifications` (
   `notification_id` int NOT NULL AUTO_INCREMENT,
   `user_id` int NOT NULL,
+  `actor_id` int DEFAULT NULL,
   `type` enum('Like','Comment','Connection_Request','Connection_Accepted','Job_Alert','Application_Update') COLLATE utf8mb4_unicode_ci NOT NULL,
   `source_id` int DEFAULT NULL,
   `source_type` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,

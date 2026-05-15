@@ -5,6 +5,8 @@
  */
 'use strict';
 
+window.FEED_SORT_MODE = window.FEED_SORT_MODE || 'recent';
+
 document.addEventListener('DOMContentLoaded', () => {
     const feedList = document.getElementById('feed-container');
     if (feedList) {
@@ -12,43 +14,132 @@ document.addEventListener('DOMContentLoaded', () => {
         initSuggestions();
         initFeedStats();
         initFeedCommentsAndShare();
+        initFeedSortBar();
+        initTrendingInfoBtn();
+        initReactionsModalUi();
+        initBigPostModalDismiss();
     }
 });
 
 async function initFeedStats() {
     try {
-        const res = await fetch(`${URLROOT}/network/connections`);
-        const data = await res.json();
-        if (data.success) {
+        const [connRes, pendRes] = await Promise.all([
+            fetch(`${URLROOT}/network/connections`),
+            fetch(`${URLROOT}/network/pending`)
+        ]);
+        const connData = await connRes.json();
+        const pendData = await pendRes.json();
+        if (connData.success) {
             const countEl = document.getElementById('user-connections-count');
-            if (countEl) countEl.textContent = data.connections.length;
+            if (countEl) countEl.textContent = connData.connections.length;
         }
-        
-        const viewsEl = document.getElementById('user-views-count');
-        if (viewsEl) viewsEl.textContent = '—';
-    } catch(e) {}
+        const pendEl = document.getElementById('user-pending-count');
+        if (pendEl && pendData.success && Array.isArray(pendData.requests)) {
+            pendEl.textContent = pendData.requests.length;
+        }
+    } catch (e) {}
 }
 
 async function initSuggestions() {
     const sugCont = document.getElementById('suggestions-container');
     if (!sugCont) return;
     try {
-        const res = await fetch(`${URLROOT}/network/suggestions`);
-        const data = await res.json();
-        if (data.success) {
-            sugCont.innerHTML = '';
-            if (data.suggestions.length === 0) {
-                sugCont.innerHTML = '<p class="text-xs text-slate-500">No suggestions right now.</p>';
-                return;
-            }
-            data.suggestions.slice(0,3).forEach(u => {
-                const picUrl = u.profile_pic ? (u.profile_pic.startsWith('http') ? u.profile_pic : `${URLROOT}/uploads/profiles/` + u.profile_pic) : '';
-                const picHtml = picUrl ? `<img src="${picUrl}" class="w-10 h-10 rounded-full object-cover">` : `<div class="w-10 h-10 rounded-full bg-slate-200 flex items-center justify-center"><span class="material-symbols-outlined text-slate-400 text-xl">person</span></div>`;
+        const [companyRes, peopleRes] = await Promise.all([
+            fetch(`${URLROOT}/company/suggestions`),
+            fetch(`${URLROOT}/network/suggestions`)
+        ]);
+        const companyData = await companyRes.json();
+        const peopleData = await peopleRes.json();
+        sugCont.innerHTML = '';
+
+        if (companyData.success && companyData.companies?.length) {
+            companyData.companies.slice(0, 3).forEach(company => {
+                const logo = pnCompanyLogoUrl(company);
                 sugCont.innerHTML += `
-<div class="flex items-start justify-between"><div class="flex items-center space-x-3">${picHtml}<div><h4 class="text-sm font-bold text-slate-900">${escapeHtml(u.full_name)}</h4><p class="text-[11px] text-slate-500 leading-tight">${escapeHtml(u.headline||'Professional')}</p><button class="mt-1 border border-slate-500 rounded-full px-3 py-1 text-slate-600 text-[11px] font-bold hover:bg-slate-50 flex items-center space-x-1"><span class="material-symbols-outlined text-[14px]">add</span><span>Follow</span></button></div></div></div>
-`;
+<div class="flex items-start justify-between gap-3">
+  <div class="flex items-center space-x-3 min-w-0">
+    <img src="${logo}" class="w-10 h-10 rounded-lg object-contain bg-white border border-slate-100">
+    <div class="min-w-0">
+      <h4 class="text-sm font-bold text-slate-900 truncate">${escapeHtml(company.company_name)}</h4>
+      <p class="text-[11px] text-slate-500 leading-tight truncate">${escapeHtml(company.industry || 'Company page')}</p>
+      <button class="company-follow-suggestion mt-1 border border-slate-500 rounded-full px-3 py-1 text-slate-600 text-[11px] font-bold hover:bg-slate-50 flex items-center space-x-1" data-company-id="${company.company_id}">
+        <span class="material-symbols-outlined text-[14px]">add</span><span>Follow</span>
+      </button>
+    </div>
+  </div>
+</div>`;
             });
         }
+
+        if (peopleData.success && peopleData.suggestions?.length) {
+            peopleData.suggestions.slice(0, Math.max(0, 3 - (companyData.companies?.length || 0))).forEach(u => {
+                const picUrl = pnProfilePicUrl(u);
+                const picHtml = `<img src="${picUrl}" alt="" class="w-10 h-10 rounded-full object-cover">`;
+                const uid = escapeHtml(String(u.user_id));
+                const profileUrl = `${URLROOT}/user/profile?id=${uid}`;
+                sugCont.innerHTML += `
+<div class="flex items-start justify-between gap-2">
+  <div class="flex items-center space-x-3 min-w-0 flex-1">
+    <a href="${profileUrl}" class="shrink-0 rounded-full ring-1 ring-slate-200 hover:ring-[#0A66C2]/40">${picHtml}</a>
+    <div class="min-w-0">
+      <a href="${profileUrl}" class="block min-w-0"><h4 class="text-sm font-bold text-slate-900 truncate hover:text-[#0A66C2] hover:underline">${escapeHtml(u.full_name)}</h4></a>
+      <p class="text-[11px] text-slate-500 leading-tight truncate">${escapeHtml(u.headline || 'Professional')}</p>
+      <button type="button" class="person-connect-suggestion mt-1 border border-slate-500 rounded-full px-3 py-1 text-slate-600 text-[11px] font-bold hover:bg-slate-50 flex items-center space-x-1" data-user-id="${uid}">
+        <span class="material-symbols-outlined text-[14px]">person_add</span><span>Connect</span>
+      </button>
+    </div>
+  </div>
+</div>`;
+            });
+        }
+        if (!sugCont.innerHTML.trim()) {
+            sugCont.innerHTML = '<p class="text-xs text-slate-500">No suggestions right now.</p>';
+        }
+        sugCont.querySelectorAll('.company-follow-suggestion').forEach(btn => {
+            btn.addEventListener('click', async ev => {
+                ev.preventDefault();
+                ev.stopPropagation();
+                const id = btn.getAttribute('data-company-id');
+                btn.disabled = true;
+                const res = await fetch(`${URLROOT}/company/follow/${id}`, { method: 'POST' });
+                const data = await res.json();
+                if (data.success) {
+                    btn.innerHTML = '<span class="material-symbols-outlined text-[14px]">check</span><span>Following</span>';
+                    setTimeout(() => initFeed(), 250);
+                } else {
+                    btn.disabled = false;
+                    feedToast(data.message || 'Could not follow company.', 'error');
+                }
+            });
+        });
+        sugCont.querySelectorAll('.person-connect-suggestion').forEach(btn => {
+            btn.addEventListener('click', async ev => {
+                ev.preventDefault();
+                ev.stopPropagation();
+                const id = btn.getAttribute('data-user-id');
+                if (!id) return;
+                btn.disabled = true;
+                try {
+                    const res = await fetch(`${URLROOT}/network/send_request`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ user_id: Number(id) })
+                    });
+                    const data = await res.json();
+                    if (data.success) {
+                        btn.innerHTML = '<span class="material-symbols-outlined text-[14px]">send</span><span>Sent</span>';
+                        feedToast('Connection request sent.', 'success');
+                        initFeedStats();
+                    } else {
+                        btn.disabled = false;
+                        feedToast(data.message || 'Could not send request.', 'error');
+                    }
+                } catch (e) {
+                    btn.disabled = false;
+                    feedToast('Server error.', 'error');
+                }
+            });
+        });
     } catch(e){}
 }
 
@@ -71,22 +162,169 @@ async function initFeed() {
         const result = await response.json();
 
         if (result.success) {
-            // Clear static placeholders if any
-            feedList.innerHTML = '';
-            
-            if (result.posts.length === 0) {
-                feedList.innerHTML = '<div class="pn-feed-empty bg-white p-10 text-center rounded-xl border border-slate-200 shadow-sm"><p class="text-slate-600 font-medium">No posts yet. Be the first to share something!</p></div>';
-            } else {
-                result.posts.forEach((post, i) => {
-                    renderPostCard(post, false, i);
-                });
-                scrollToPostFromHash();
-            }
+            window.FEED_POSTS_RAW = Array.isArray(result.posts) ? result.posts.slice() : [];
+            applyFeedSortAndRender();
         }
     } catch (err) {
         console.error('Failed to load feed:', err);
     }
 }
+
+function sortFeedPosts(posts, mode) {
+    const arr = (posts || []).slice();
+    if (mode === 'top') {
+        arr.sort((a, b) => {
+            const sb = (Number(b.reaction_count) || 0) + (Number(b.comment_count) || 0);
+            const sa = (Number(a.reaction_count) || 0) + (Number(a.comment_count) || 0);
+            if (sb !== sa) return sb - sa;
+            return (new Date(b.created_at).getTime()) - (new Date(a.created_at).getTime());
+        });
+    } else {
+        arr.sort((a, b) => (new Date(b.created_at).getTime()) - (new Date(a.created_at).getTime()));
+    }
+    return arr;
+}
+
+function applyFeedSortAndRender() {
+    const feedList = document.getElementById('feed-container');
+    if (!feedList || window.IS_SINGLE_POST) return;
+    const raw = window.FEED_POSTS_RAW || [];
+    window.FEED_POSTS_CACHE = sortFeedPosts(raw, window.FEED_SORT_MODE || 'recent');
+    feedList.innerHTML = '';
+
+    if (window.FEED_POSTS_CACHE.length === 0) {
+        feedList.innerHTML = '<div class="pn-feed-empty bg-white p-10 text-center rounded-xl border border-slate-200 shadow-sm"><p class="text-slate-600 font-medium">No posts yet. Be the first to share something!</p></div>';
+    } else {
+        window.FEED_POSTS_CACHE.forEach((post, i) => {
+            renderPostCard(post, false, i);
+        });
+        scrollToPostFromHash();
+    }
+}
+
+function initFeedSortBar() {
+    const trigger = document.getElementById('feed-sort-trigger');
+    const menu = document.getElementById('feed-sort-menu');
+    const label = document.getElementById('feed-sort-label');
+    if (!trigger || !menu || !label) return;
+
+    function closeMenu() {
+        menu.classList.add('hidden');
+        trigger.setAttribute('aria-expanded', 'false');
+    }
+
+    function openMenu() {
+        menu.classList.remove('hidden');
+        trigger.setAttribute('aria-expanded', 'true');
+    }
+
+    trigger.addEventListener('click', ev => {
+        ev.stopPropagation();
+        if (menu.classList.contains('hidden')) openMenu();
+        else closeMenu();
+    });
+
+    menu.querySelectorAll('.feed-sort-opt').forEach(btn => {
+        btn.addEventListener('click', ev => {
+            ev.stopPropagation();
+            const mode = btn.getAttribute('data-sort') || 'recent';
+            window.FEED_SORT_MODE = mode;
+            label.textContent = mode === 'top' ? 'Top' : 'Recent';
+            closeMenu();
+            applyFeedSortAndRender();
+        });
+    });
+
+    document.addEventListener('click', () => closeMenu());
+    menu.addEventListener('click', ev => ev.stopPropagation());
+
+    label.textContent = (window.FEED_SORT_MODE || 'recent') === 'top' ? 'Top' : 'Recent';
+}
+
+function initTrendingInfoBtn() {
+    const btn = document.getElementById('feed-trending-info');
+    if (!btn) return;
+    btn.addEventListener('click', () => {
+        feedToast('Trending topics are ranked from recent post engagement (reactions and comments).', 'info');
+    });
+}
+
+function closeReactionsModal() {
+    const modal = document.getElementById('reactions-list-modal');
+    if (!modal) return;
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+}
+
+function initReactionsModalUi() {
+    const modal = document.getElementById('reactions-list-modal');
+    const closeBtn = document.getElementById('reactions-modal-close');
+    if (closeBtn) closeBtn.addEventListener('click', () => closeReactionsModal());
+    if (modal) {
+        modal.addEventListener('click', ev => {
+            if (ev.target === modal) closeReactionsModal();
+        });
+    }
+}
+
+function initBigPostModalDismiss() {
+    const modal = document.getElementById('big-post-view-modal');
+    if (!modal) return;
+    modal.addEventListener('click', ev => {
+        if (ev.target === modal) {
+            modal.classList.add('hidden');
+        }
+    });
+    document.addEventListener('keydown', ev => {
+        if (ev.key !== 'Escape') return;
+        closeReactionsModal();
+        if (!modal.classList.contains('hidden')) {
+            modal.classList.add('hidden');
+        }
+    });
+}
+
+function pnPostMediaMarkup(post) {
+    if (!post.post_image) return '';
+    const fn = String(post.post_image).replace(/^.*[\\/]/, '');
+    const ext = (fn.split('.').pop() || '').toLowerCase();
+    const url = `${URLROOT}/uploads/posts/${encodeURIComponent(fn)}`;
+    if (['mp4', 'webm', 'ogv'].includes(ext)) {
+        return `
+                    <div class="mt-3 -mx-4 overflow-hidden rounded-lg">
+                        <video src="${url}" class="pn-feed-post-media w-full max-h-[500px] object-contain bg-black border-y border-slate-50 dark:border-slate-800 group-hover/pb:opacity-95 transition-opacity" controls playsinline preload="metadata"></video>
+                    </div>`;
+    }
+    return `
+                    <div class="mt-3 -mx-4 overflow-hidden rounded-lg">
+                        <img src="${url}" alt="" class="pn-feed-post-media w-full max-h-[500px] object-cover border-y border-slate-50 dark:border-slate-800 group-hover/pb:opacity-95 transition-opacity" decoding="async">
+                    </div>`;
+}
+
+function pnBigPostLeftMediaMarkup(postObj) {
+    const isCompany = postObj.is_company_activity;
+    if (isCompany) {
+        const banner = pnCompanyBannerUrl(postObj);
+        return `<img src="${banner}" class="w-full h-full object-contain select-none animate-fade-in">`;
+    }
+    if (postObj.post_image) {
+        const fn = String(postObj.post_image).replace(/^.*[\\/]/, '');
+        const ext = (fn.split('.').pop() || '').toLowerCase();
+        const url = `${URLROOT}/uploads/posts/${encodeURIComponent(fn)}`;
+        if (['mp4', 'webm', 'ogv'].includes(ext)) {
+            return `<video src="${url}" class="w-full h-full max-h-full object-contain select-none animate-fade-in bg-black" controls playsinline preload="metadata"></video>`;
+        }
+        return `<img src="${url}" class="w-full h-full object-contain select-none animate-fade-in">`;
+    }
+    return '';
+}
+
+window.pnPrependFeedPost = function (post) {
+    if (!post || window.IS_SINGLE_POST) return;
+    if (!window.FEED_POSTS_RAW) window.FEED_POSTS_RAW = [];
+    window.FEED_POSTS_RAW.unshift(post);
+    applyFeedSortAndRender();
+};
 
 /**
  * Ripple + motion helpers for feed actions
@@ -144,6 +382,11 @@ function bumpLikeCount(el) {
  * @param {Number} staggerIndex Staggered entrance order
  */
 function renderPostCard(post, prepend = false, staggerIndex = 0) {
+    if (post.is_company_activity) {
+        renderCompanyActivityCard(post, prepend, staggerIndex);
+        return;
+    }
+
     const feedList = document.getElementById('feed-container');
     if (!feedList) return;
 
@@ -161,14 +404,11 @@ function renderPostCard(post, prepend = false, staggerIndex = 0) {
         <div class="p-4">
             <div class="flex justify-between items-start mb-3">
                 <div class="flex items-center space-x-3">
-                    <div class="w-12 h-12 rounded-full border border-slate-100 overflow-hidden bg-slate-50">
-                        ${post.profile_pic ? 
-                            `<img src="${post.profile_pic.startsWith('http') ? post.profile_pic : `${URLROOT}/uploads/profiles/` + post.profile_pic}" alt="${escapeHtml(post.full_name)}" class="w-full h-full object-cover">` : 
-                            `<div class="w-full h-full flex items-center justify-center bg-slate-200"><span class="material-symbols-outlined text-slate-400 text-3xl">person</span></div>`
-                        }
+                    <div class="w-12 h-12 rounded-full border border-slate-100 overflow-hidden bg-slate-50 cursor-pointer shrink-0" onclick="window.location.href='${post.is_company_activity || post.user_role === 'Company' || post.user_role === 'Company Page' ? `${URLROOT}/company/show/${post.company_id || post.user_id}` : `${URLROOT}/user/profile?id=${post.user_id}`}'">
+                        <img src="${pnProfilePicUrl(post)}" alt="${escapeHtml(post.full_name)}" class="w-full h-full object-cover">
                     </div>
-                    <div>
-                        <h4 class="font-bold text-[14px] text-slate-900 dark:text-white hover:text-[#0A66C2] transition-colors cursor-pointer">${escapeHtml(post.full_name)}</h4>
+                    <div class="min-w-0">
+                        <h4 class="font-bold text-[14px] text-slate-900 dark:text-white hover:underline transition-colors cursor-pointer truncate" onclick="window.location.href='${post.is_company_activity || post.user_role === 'Company' || post.user_role === 'Company Page' ? `${URLROOT}/company/show/${post.company_id || post.user_id}` : `${URLROOT}/user/profile?id=${post.user_id}`}'">${escapeHtml(post.full_name)}</h4>
                         <p class="text-[11px] text-slate-500 line-clamp-1">${escapeHtml(post.user_role || 'Member')}</p>
                         <p class="text-[10px] text-slate-400 flex items-center gap-1 mt-0.5">
                             ${timeAgo} • <span class="material-symbols-outlined text-[12px]">public</span>
@@ -184,7 +424,7 @@ function renderPostCard(post, prepend = false, staggerIndex = 0) {
                             <span class="material-symbols-outlined text-[20px] text-slate-400">flag</span>
                             Report this post
                         </button>
-                        ${post.user_id == (window.CURRENT_USER_ID || 0) ? `
+                        ${post.user_id == (typeof CURRENT_USER_ID !== 'undefined' ? CURRENT_USER_ID : 0) ? `
                         <div class="h-[1px] bg-slate-100 mx-2 my-1"></div>
                         <button type="button" class="delete-own-post-btn w-full flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50 transition-colors" data-post-id="${post.post_id}">
                             <span class="material-symbols-outlined text-[20px]">delete</span>
@@ -195,18 +435,16 @@ function renderPostCard(post, prepend = false, staggerIndex = 0) {
                 </div>
             </div>
             
-            <div class="post-body-content text-[14px] text-slate-800 dark:text-slate-200 leading-normal whitespace-pre-wrap">
-                ${escapeHtml(post.content)}
+            <div class="clickable-post-body cursor-pointer group/pb transition-all">
+                <div class="post-body-content text-[14px] text-slate-800 dark:text-slate-200 leading-normal whitespace-pre-wrap group-hover/pb:text-slate-900 dark:group-hover/pb:text-white">
+                    ${escapeHtml(post.content)}
+                </div>
+
+                ${pnPostMediaMarkup(post)}
             </div>
 
-            ${post.post_image ? `
-                <div class="mt-3 -mx-4 overflow-hidden rounded-lg">
-                    <img src="${URLROOT}/uploads/posts/${post.post_image}" alt="" class="pn-feed-post-media w-full max-h-[500px] object-cover border-y border-slate-50 dark:border-slate-800">
-                </div>
-            ` : ''}
-
             <div class="mt-4 flex items-center justify-between text-[12px] text-slate-500 border-b border-slate-50 dark:border-slate-800 pb-2 px-1">
-                <div class="flex items-center gap-1.5">
+                <div class="flex items-center gap-1.5 cursor-pointer hover:underline reaction-count-toggle" data-post-id="${post.post_id}">
                     <div class="flex -space-x-1">
                         <div class="w-4 h-4 rounded-full bg-blue-500 flex items-center justify-center border border-white"><span class="material-symbols-outlined text-white text-[10px] fill-current">thumb_up</span></div>
                         <div class="w-4 h-4 rounded-full bg-red-500 flex items-center justify-center border border-white"><span class="material-symbols-outlined text-white text-[10px] fill-current">favorite</span></div>
@@ -247,6 +485,7 @@ function renderPostCard(post, prepend = false, staggerIndex = 0) {
     `;
 
     const likeBtn = card.querySelector('.like-btn');
+    if (likeBtn && Number(post.user_has_liked) > 0) likeBtn.classList.add('is-liked');
     likeBtn.addEventListener('click', async ev => {
         addRipple(likeBtn, ev.clientX, ev.clientY);
         try {
@@ -261,15 +500,84 @@ function renderPostCard(post, prepend = false, staggerIndex = 0) {
                 likeBtn.classList.toggle('is-liked');
                 triggerIconPop(likeBtn);
                 triggerActionBump(likeBtn);
+                const pid = post.post_id;
+                [window.FEED_POSTS_RAW, window.FEED_POSTS_CACHE].forEach(arr => {
+                    if (!Array.isArray(arr)) return;
+                    const p = arr.find(x => x.post_id == pid);
+                    if (p) {
+                        p.reaction_count = data.count;
+                        p.user_has_liked = likeBtn.classList.contains('is-liked') ? 1 : 0;
+                    }
+                });
             }
         } catch (e) {}
     });
+
+    const postBodyClickEl = card.querySelector('.clickable-post-body');
+    if (postBodyClickEl) {
+        postBodyClickEl.addEventListener('click', () => {
+            openBigPostView(post);
+        });
+    }
 
     if (prepend) {
         feedList.prepend(card);
     } else {
         feedList.appendChild(card);
     }
+}
+
+function renderCompanyActivityCard(post, prepend = false, staggerIndex = 0) {
+    const feedList = document.getElementById('feed-container');
+    if (!feedList) return;
+
+    const card = document.createElement('article');
+    card.id = String(post.post_id);
+    card.className = 'pn-feed-card bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-[0px_2px_8px_rgba(0,0,0,0.04)] overflow-hidden mb-4';
+    card.style.setProperty('--pn-stagger', String(staggerIndex));
+    const logo = pnCompanyLogoUrl(post);
+    const banner = pnCompanyBannerUrl(post);
+    const postDate = new Date(post.created_at);
+    const timeAgo = formatTimeAgo(postDate);
+    const isJob = post.activity_type === 'job';
+
+    card.innerHTML = `
+        <div class="p-4">
+            <div class="flex items-center justify-between mb-3">
+                <a href="${URLROOT}/company/show/${post.company_id}" class="flex items-center space-x-3 min-w-0">
+                    <div class="w-12 h-12 rounded-lg border border-slate-100 overflow-hidden bg-white shrink-0">
+                        <img src="${logo}" alt="${escapeHtml(post.company_name)}" class="w-full h-full object-contain">
+                    </div>
+                    <div class="min-w-0">
+                        <h4 class="font-bold text-[14px] text-slate-900 hover:text-[#0A66C2] transition-colors truncate">${escapeHtml(post.company_name)}</h4>
+                        <p class="text-[11px] text-slate-500 line-clamp-1">${escapeHtml(isJob ? 'Job update from a page you follow' : 'Page you follow')}</p>
+                        <p class="text-[10px] text-slate-400 flex items-center gap-1 mt-0.5">${timeAgo} • <span class="material-symbols-outlined text-[12px]">public</span></p>
+                    </div>
+                </a>
+                <span class="text-[11px] px-2 py-1 rounded-full bg-blue-50 text-[#0A66C2] font-bold">${isJob ? 'Hiring' : 'Update'}</span>
+            </div>
+            <div class="clickable-post-body cursor-pointer group/pb transition-all">
+                <p class="text-[14px] text-slate-800 leading-normal group-hover/pb:text-slate-900">${escapeHtml(post.content)}</p>
+                <div class="mt-3 -mx-4">
+                    <img src="${banner}" alt="" class="w-full max-h-[260px] object-cover border-y border-slate-50 group-hover/pb:opacity-95 transition-opacity">
+                </div>
+            </div>
+            <div class="mt-4 flex gap-2">
+                <a href="${URLROOT}/company/show/${post.company_id}" class="px-4 py-2 rounded-full border border-[#0A66C2] text-[#0A66C2] text-sm font-bold hover:bg-blue-50 transition-colors">View page</a>
+                ${isJob ? `<a href="${URLROOT}/user/jobs?id=${post.job_id}" class="px-4 py-2 rounded-full bg-[#0A66C2] text-white text-sm font-bold hover:bg-[#004182] transition-colors">View job</a>` : ''}
+            </div>
+        </div>
+    `;
+
+    const postBodyClickEl = card.querySelector('.clickable-post-body');
+    if (postBodyClickEl) {
+        postBodyClickEl.addEventListener('click', () => {
+            openBigPostView(post);
+        });
+    }
+
+    if (prepend) feedList.prepend(card);
+    else feedList.appendChild(card);
 }
 
 function scrollToPostFromHash() {
@@ -279,6 +587,260 @@ function scrollToPostFromHash() {
         const el = document.getElementById('post-' + m[1]);
         if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
     });
+}
+
+function openBigPostView(postObjOrId) {
+    if (!postObjOrId) return;
+
+    if (typeof postObjOrId === 'string' || typeof postObjOrId === 'number') {
+        const cached = window.FEED_POSTS_CACHE?.find(p => p.post_id == postObjOrId);
+        if (cached) {
+            renderBigPostOverlay(cached);
+        } else {
+            const modal = document.getElementById('big-post-view-modal');
+            const leftBay = document.getElementById('big-post-modal-left');
+            const rightBay = document.getElementById('big-post-modal-right');
+            if (modal && leftBay && rightBay) {
+                leftBay.innerHTML = '<div class="flex items-center justify-center h-full w-full"><span class="text-white text-xs">Loading media canvas...</span></div>';
+                rightBay.innerHTML = '<div class="flex items-center justify-center h-full w-full p-8"><span class="text-slate-400 text-xs">Loading authentic live database thread data...</span></div>';
+                modal.classList.remove('hidden');
+            }
+            fetch(`${URLROOT}/post/detail/${postObjOrId}`)
+                .then(r => r.json())
+                .then(d => {
+                    if (d.success && d.post) {
+                        if (!window.FEED_POSTS_CACHE) window.FEED_POSTS_CACHE = [];
+                        window.FEED_POSTS_CACHE.push(d.post);
+                        renderBigPostOverlay(d.post);
+                    } else if (window.FEED_POSTS_CACHE?.[0]) {
+                        renderBigPostOverlay(window.FEED_POSTS_CACHE[0]);
+                    }
+                }).catch(() => {
+                    if (window.FEED_POSTS_CACHE?.[0]) renderBigPostOverlay(window.FEED_POSTS_CACHE[0]);
+                });
+        }
+        return;
+    }
+
+    renderBigPostOverlay(postObjOrId);
+}
+
+function renderBigPostOverlay(postObj) {
+    const modal = document.getElementById('big-post-view-modal');
+    const leftBay = document.getElementById('big-post-modal-left');
+    const rightBay = document.getElementById('big-post-modal-right');
+    if (!modal || !leftBay || !rightBay) return;
+
+    const isCompany = postObj.is_company_activity;
+    const logo = isCompany ? pnCompanyLogoUrl(postObj) : pnProfilePicUrl(postObj);
+    const title = escapeHtml(postObj.company_name || postObj.full_name || 'Member');
+    const role = escapeHtml(postObj.user_role || (isCompany ? 'Company Page' : 'Professional'));
+    const timeAgo = formatTimeAgo(new Date(postObj.created_at || Date.now()));
+    const targetUrl = (isCompany || postObj.user_role === 'Company' || postObj.user_role === 'Company Page') 
+        ? `${URLROOT}/company/show/${postObj.company_id || postObj.user_id}` 
+        : `${URLROOT}/user/profile?id=${postObj.user_id}`;
+
+    const leftMediaHtml = pnBigPostLeftMediaMarkup(postObj);
+    if (leftMediaHtml) {
+        leftBay.innerHTML = leftMediaHtml;
+    } else {
+        leftBay.innerHTML = `
+            <div class="p-8 text-center flex flex-col items-center justify-center max-w-lg select-none">
+                <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center shadow-lg mb-4">
+                    <span class="material-symbols-outlined text-white text-3xl">format_quote</span>
+                </div>
+                <p class="text-white text-lg font-bold leading-relaxed line-clamp-6 italic">"${escapeHtml(postObj.content || title)}"</p>
+                <span class="text-xs text-slate-500 font-semibold mt-4 tracking-widest uppercase">• ProNetwork Feed Update •</span>
+            </div>
+        `;
+    }
+
+    const likeActionsHtml = isCompany
+        ? `<a href="${targetUrl}" class="flex-1 flex items-center justify-center gap-1.5 py-2 text-slate-600 dark:text-slate-400 font-bold text-xs hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-colors">
+                    <span class="material-symbols-outlined text-[18px]">domain</span>
+                    <span>Page</span>
+                </a>`
+        : `<button type="button" onclick="triggerBigPostLike(${postObj.post_id})" class="flex-1 flex items-center justify-center gap-1.5 py-2 text-slate-600 dark:text-slate-400 font-bold text-xs hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-colors">
+                    <span class="material-symbols-outlined text-[18px]">thumb_up</span>
+                    <span>Like</span>
+                </button>`;
+    rightBay.innerHTML = `
+        <!-- Sticky Author Header + Close Button -->
+        <div class="flex items-center justify-between px-4 py-3 border-b border-slate-100 dark:border-slate-800 shrink-0 bg-white dark:bg-slate-900 z-10">
+            <div class="flex items-center space-x-3 min-w-0">
+                <img src="${logo}" class="w-10 h-10 rounded-full object-cover border border-slate-200 dark:border-slate-800 shrink-0 cursor-pointer" onclick="window.location.href='${targetUrl}'">
+                <div class="min-w-0">
+                    <h4 class="font-bold text-sm text-slate-900 dark:text-white hover:underline cursor-pointer truncate block leading-tight" onclick="window.location.href='${targetUrl}'">${title}</h4>
+                    <p class="text-[11px] text-slate-500 truncate block leading-tight">${role}</p>
+                    <p class="text-[10px] text-slate-400 mt-0.5 block leading-tight">${timeAgo} • <span class="material-symbols-outlined text-[10px] align-middle">public</span></p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-1 shrink-0">
+                <button onclick="window.location.href='${targetUrl}'" class="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full text-slate-400 hover:text-[#0A66C2] transition-colors" title="Go to profile">
+                    <span class="material-symbols-outlined text-[18px]">open_in_new</span>
+                </button>
+                <button onclick="document.getElementById('big-post-view-modal').classList.add('hidden')" class="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors" title="Close modal">
+                    <span class="material-symbols-outlined text-[20px]">close</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Scrollable Thread Content & Comments -->
+        <div class="flex-1 overflow-y-auto flex flex-col min-h-0">
+            <!-- Post Paragraph Content -->
+            <div class="p-4 text-sm text-slate-800 dark:text-slate-200 leading-normal whitespace-pre-wrap shrink-0 border-b border-slate-50 dark:border-slate-800/50">
+                ${escapeHtml(postObj.content || '')}
+            </div>
+
+            <!-- Stats Counts -->
+            <div class="px-4 py-2 flex items-center justify-between text-[12px] text-slate-500 border-b border-slate-50 dark:border-slate-800 shrink-0">
+                <div class="flex items-center gap-1 font-semibold text-[#0A66C2]">
+                    <span class="material-symbols-outlined text-[14px]">thumb_up</span>
+                    <span id="big-post-like-count">${postObj.reaction_count || 0}</span>
+                </div>
+                <div class="font-semibold text-slate-500">
+                    <span id="big-post-comment-count">${postObj.comment_count || 0} comments</span>
+                </div>
+            </div>
+
+            <!-- Interactive Feed Actions Bar -->
+            <div class="flex px-2 py-1 border-b border-slate-100 dark:border-slate-800 shrink-0 select-none">
+                ${likeActionsHtml}
+                <button type="button" onclick="focusBigPostCommentInput()" class="flex-1 flex items-center justify-center gap-1.5 py-2 text-slate-600 dark:text-slate-400 font-bold text-xs hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-colors">
+                    <span class="material-symbols-outlined text-[18px]">chat_bubble</span>
+                    <span>Comment</span>
+                </button>
+                <button type="button" onclick="window.location.href='${targetUrl}'" class="flex-1 flex items-center justify-center gap-1.5 py-2 text-slate-600 dark:text-slate-400 font-bold text-xs hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-colors">
+                    <span class="material-symbols-outlined text-[18px]">person</span>
+                    <span>Author</span>
+                </button>
+            </div>
+
+            <!-- Comments Output List -->
+            <div id="big-post-comments-container" class="flex-1 p-4 space-y-3 overflow-y-auto text-sm min-h-[100px]">
+                <div class="flex items-center justify-center py-6 text-slate-400 text-xs">Loading live community thread...</div>
+            </div>
+        </div>
+
+        <!-- Sticky Comment Input Form -->
+        <div class="p-3 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/90 shrink-0">
+            <form id="big-post-comment-form" onsubmit="submitBigPostComment(event, ${postObj.post_id})" class="flex gap-2 items-center">
+                <input id="big-post-comment-input" type="text" autocomplete="off" class="flex-1 min-w-0 rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 py-2 text-xs text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0A66C2]" maxlength="2000" placeholder="Add a comment…" required />
+                <button type="submit" class="rounded-full bg-[#0A66C2] hover:bg-[#004182] text-white px-4 py-2 text-xs font-bold shrink-0 transition-colors">Post</button>
+            </form>
+        </div>
+    `;
+
+    modal.classList.remove('hidden');
+
+    const rawPid = postObj.post_id;
+    const isNumericMemberPost =
+        !postObj.is_company_activity &&
+        (typeof rawPid === 'number' || (typeof rawPid === 'string' && /^\d+$/.test(String(rawPid))));
+
+    if (!isNumericMemberPost) {
+        const c = document.getElementById('big-post-comments-container');
+        if (c) {
+            c.innerHTML =
+                '<div class="text-center py-6 text-slate-400 text-xs">Member comments are not available for this company update. Use Page or Author to continue.</div>';
+        }
+        const wrap = document.getElementById('big-post-comment-form')?.closest('div.p-3');
+        if (wrap) wrap.classList.add('hidden');
+        return;
+    }
+
+    // Fetch and populate actual comments live!
+    if (postObj.post_id) {
+        fetch(`${URLROOT}/post/comments/${postObj.post_id}`)
+            .then(r => r.json())
+            .then(d => {
+                const container = document.getElementById('big-post-comments-container');
+                if (!container) return;
+                if (d.success && d.comments?.length) {
+                    container.innerHTML = d.comments.map(renderCommentHtml).join('');
+                } else {
+                    container.innerHTML = '<div class="text-center py-6 text-slate-400 text-xs">No comments yet. Be the first to start the conversation!</div>';
+                }
+            })
+            .catch(() => {
+                const container = document.getElementById('big-post-comments-container');
+                if (container) container.innerHTML = '<div class="text-center py-6 text-red-500 text-xs">Failed to load comments</div>';
+            });
+    }
+}
+
+async function triggerBigPostLike(postId) {
+    try {
+        const res = await fetch(`${URLROOT}/post/react/${postId}`, { method: 'POST' });
+        const data = await res.json();
+        if (data.success) {
+            const likeCntEl = document.getElementById('big-post-like-count');
+            if (likeCntEl) likeCntEl.textContent = data.count;
+            
+            const cardLikeCntEl = document.querySelector(`#post-${postId} .like-count`);
+            if (cardLikeCntEl) cardLikeCntEl.textContent = data.count;
+
+            const feedLikeBtn = document.querySelector(`#post-${postId} .like-btn`);
+            if (feedLikeBtn) {
+                feedLikeBtn.classList.toggle('is-liked');
+                triggerIconPop(feedLikeBtn);
+            }
+
+            [window.FEED_POSTS_RAW, window.FEED_POSTS_CACHE].forEach(arr => {
+                if (!Array.isArray(arr)) return;
+                const p = arr.find(x => x.post_id == postId);
+                if (p) {
+                    p.reaction_count = data.count;
+                    if (feedLikeBtn) p.user_has_liked = feedLikeBtn.classList.contains('is-liked') ? 1 : 0;
+                }
+            });
+        }
+    } catch(e) {}
+}
+
+function focusBigPostCommentInput() {
+    const inp = document.getElementById('big-post-comment-input');
+    if (inp) inp.focus();
+}
+
+async function submitBigPostComment(ev, postId) {
+    ev.preventDefault();
+    const inp = document.getElementById('big-post-comment-input');
+    if (!inp || !inp.value.trim()) return;
+
+    const contentString = inp.value.trim();
+    inp.disabled = true;
+
+    try {
+        const fd = new FormData();
+        fd.append('content', contentString);
+        const res = await fetch(`${URLROOT}/post/comments/${postId}`, { method: 'POST', body: fd });
+        const data = await res.json();
+        
+        inp.disabled = false;
+        if (data.success) {
+            inp.value = '';
+            fetch(`${URLROOT}/post/comments/${postId}`)
+                .then(r => r.json())
+                .then(d => {
+                    const container = document.getElementById('big-post-comments-container');
+                    if (container && d.success && d.comments?.length) {
+                        container.innerHTML = d.comments.map(renderCommentHtml).join('');
+                    }
+                });
+
+            const countEl = document.getElementById('big-post-comment-count');
+            if (countEl) countEl.textContent = `${data.count} comments`;
+
+            const cardEl = document.getElementById('post-' + postId);
+            if (cardEl) updateCommentCountLabel(cardEl, data.count);
+
+            const cached = window.FEED_POSTS_CACHE?.find(p => p.post_id == postId);
+            if (cached) cached.comment_count = data.count;
+        }
+    } catch(e) {
+        inp.disabled = false;
+    }
 }
 
 function updateCommentCountLabel(card, count) {
@@ -293,23 +855,52 @@ function updateCommentCountLabel(card, count) {
 
 function renderCommentHtml(c) {
     const when = formatTimeAgo(new Date(c.created_at));
-    const pic = c.profile_pic
-        ? (c.profile_pic.startsWith('http') ? c.profile_pic : `${URLROOT}/uploads/profiles/${c.profile_pic}`)
-        : '';
-    const avatar = pic
-        ? `<img src="${escapeHtml(pic)}" alt="" class="w-9 h-9 rounded-full object-cover bg-slate-100 shrink-0">`
-        : `<div class="w-9 h-9 rounded-full bg-slate-200 flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-slate-500 text-[20px]">person</span></div>`;
+    const pic = pnProfilePicUrl(c);
+    const targetUrl = c.user_role === 'Company' ? `${URLROOT}/company/show/${c.user_id}` : `${URLROOT}/user/profile?id=${c.user_id}`;
+    const avatar = `<img src="${escapeHtml(pic)}" alt="" class="w-9 h-9 rounded-full object-cover bg-slate-100 shrink-0 cursor-pointer" onclick="window.location.href='${targetUrl}'">`;
+    const currUid = typeof CURRENT_USER_ID !== 'undefined' ? CURRENT_USER_ID : 0;
+    const canDelete = (c.user_id == currUid || c.post_owner_id == currUid);
+    const delBtn = canDelete ? `<button type="button" onclick="deleteCommentNode(this, ${c.comment_id}, ${c.post_id})" class="text-slate-400 hover:text-red-600 transition-colors p-0.5 rounded hover:bg-red-50 shrink-0" title="Delete comment"><span class="material-symbols-outlined text-[15px]">delete</span></button>` : '';
+
     return `
-        <div class="pn-comment-item flex gap-2 items-start" data-comment-id="${c.comment_id}">
+        <div class="pn-comment-item flex gap-2 items-start group/cmt" data-comment-id="${c.comment_id}">
             ${avatar}
             <div class="min-w-0 flex-1">
-                <div class="flex flex-wrap items-baseline gap-x-2 gap-y-0">
-                    <span class="font-semibold text-slate-900 dark:text-white text-[13px]">${escapeHtml(c.full_name || 'Member')}</span>
-                    <span class="text-[11px] text-slate-400">${when}</span>
+                <div class="flex items-baseline justify-between gap-x-2">
+                    <div class="flex flex-wrap items-baseline gap-x-2 gap-y-0 min-w-0">
+                        <span class="font-semibold text-slate-900 dark:text-white text-[13px] cursor-pointer hover:underline truncate" onclick="window.location.href='${targetUrl}'">${escapeHtml(c.full_name || 'Member')}</span>
+                        <span class="text-[11px] text-slate-400">${when}</span>
+                    </div>
+                    ${delBtn}
                 </div>
                 <p class="text-[13px] text-slate-700 dark:text-slate-200 mt-0.5 whitespace-pre-wrap break-words">${escapeHtml(c.content)}</p>
             </div>
         </div>`;
+}
+
+async function deleteCommentNode(btn, commentId, postId) {
+    if (!commentId || btn.disabled) return;
+    const confirmed = confirm('Delete this comment?');
+    if (!confirmed) return;
+
+    btn.disabled = true;
+    try {
+        const res = await fetch(`${URLROOT}/post/deleteComment/${commentId}`, { method: 'POST' });
+        const data = await res.json();
+        if (data.success) {
+            const item = btn.closest('.pn-comment-item');
+            if (item) item.remove();
+            const card = document.getElementById('post-' + postId);
+            if (card) updateCommentCountLabel(card, data.count);
+            feedToast('Comment deleted.', 'success');
+        } else {
+            feedToast(data.message || 'Failed to delete comment.', 'error');
+            btn.disabled = false;
+        }
+    } catch(e) {
+        feedToast('Server error.', 'error');
+        btn.disabled = false;
+    }
 }
 
 async function loadCommentsInto(wrap, postId) {
@@ -478,14 +1069,20 @@ function initFeedCommentsAndShare() {
     window.addEventListener('hashchange', scrollToPostFromHash);
 }
 
-// Event Delegation for Post Menus
+// Event Delegation for Post Menus and Reactions
 document.addEventListener('click', (e) => {
     const toggle = e.target.closest('.post-menu-toggle');
     const reportBtn = e.target.closest('.report-post-btn');
     const deleteBtn = e.target.closest('.delete-own-post-btn');
     const menu = e.target.closest('.post-menu');
+    const rxnToggle = e.target.closest('.reaction-count-toggle');
 
-    if (reportBtn) {
+    if (rxnToggle) {
+        e.preventDefault();
+        e.stopPropagation();
+        showReactionsModal(rxnToggle.dataset.postId);
+        return;
+    } else if (reportBtn) {
         e.preventDefault();
         e.stopPropagation();
         reportPost(reportBtn);
@@ -509,6 +1106,42 @@ document.addEventListener('click', (e) => {
         document.querySelectorAll('.post-menu').forEach(m => m.classList.add('hidden'));
     }
 });
+
+async function showReactionsModal(postId) {
+    const modal = document.getElementById('reactions-list-modal');
+    const list = document.getElementById('reactions-modal-list');
+    if (!modal || !list || !postId || !/^\d+$/.test(String(postId))) return;
+    
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+    list.innerHTML = '<p class="text-xs text-slate-500 py-4 text-center">Loading reactions…</p>';
+    
+    try {
+        const res = await fetch(`${URLROOT}/post/reactions/${postId}`);
+        const data = await res.json();
+        if (data.success && data.reactions?.length) {
+            list.innerHTML = data.reactions.map(r => {
+                const pic = pnProfilePicUrl(r);
+                const targetUrl = r.user_role === 'Company' ? `${URLROOT}/company/show/${r.user_id}` : `${URLROOT}/user/profile?id=${r.user_id}`;
+                return `
+                <div class="flex items-center justify-between p-2 hover:bg-slate-50 rounded-lg transition-colors">
+                    <div class="flex items-center space-x-3 cursor-pointer min-w-0 flex-1" onclick="window.location.href='${targetUrl}'">
+                        <img src="${escapeHtml(pic)}" class="w-10 h-10 rounded-full object-cover border border-slate-100 bg-slate-50 shrink-0">
+                        <div class="min-w-0 flex-1">
+                            <h4 class="text-sm font-bold text-slate-900 hover:underline truncate">${escapeHtml(r.full_name)}</h4>
+                            <p class="text-xs text-slate-500 truncate">${escapeHtml(r.headline || 'Professional')}</p>
+                        </div>
+                    </div>
+                    <span class="material-symbols-outlined text-blue-500 text-[16px] bg-blue-50 p-1.5 rounded-full ml-2 shrink-0">thumb_up</span>
+                </div>`;
+            }).join('');
+        } else {
+            list.innerHTML = '<p class="text-xs text-slate-500 py-4 text-center">No reactions yet.</p>';
+        }
+    } catch(e) {
+        list.innerHTML = '<p class="text-xs text-red-600 py-4 text-center">Could not load reactions.</p>';
+    }
+}
 
 async function reportPost(reportBtn) {
     const postId = reportBtn.dataset.postId;

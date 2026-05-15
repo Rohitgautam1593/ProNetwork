@@ -24,7 +24,7 @@ $activityStyles = [
 </div>
 
 <!-- Key Metrics -->
-<div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-4 lg:gap-5 mb-8">
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 lg:gap-5 mb-8">
     <div class="admin-stat-card admin-stat-card-blue bg-white p-5 rounded-2xl shadow-sm border border-white">
         <div class="flex items-center justify-between mb-4">
             <div
@@ -114,7 +114,7 @@ $activityStyles = [
     </div>
 <?php endif; ?>
 
-<div class="grid grid-cols-1 xl:grid-cols-[1.15fr_0.85fr] gap-6 lg:gap-8">
+<div class="grid grid-cols-1 lg:grid-cols-[1.15fr_0.85fr] gap-6 lg:gap-8">
     <!-- Recent Activity -->
     <div class="admin-panel bg-white rounded-2xl shadow-sm border border-white overflow-hidden">
         <div class="p-6 border-b border-slate-100 flex justify-between items-center">
@@ -161,7 +161,7 @@ $activityStyles = [
 
     <!-- Quick Actions -->
     <div
-        class="admin-panel admin-actions-panel bg-white rounded-2xl shadow-sm border border-white p-6 flex flex-col justify-between">
+        class="admin-panel admin-actions-panel bg-white rounded-2xl shadow-sm border border-white p-6 flex flex-col justify-between self-start">
         <div class="text-center pt-3">
             <div
                 class="w-16 h-16 rounded-3xl bg-slate-950 text-cyan-200 flex items-center justify-center mb-4 mx-auto shadow-lg shadow-slate-950/25">
@@ -216,7 +216,7 @@ $activityStyles = [
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
 
         <!-- USERS CARD -->
-        <div class="bg-white rounded-2xl border border-blue-100 shadow-sm overflow-hidden">
+        <div class="bg-white rounded-2xl border border-blue-100 shadow-sm overflow-hidden self-start">
             <div class="px-5 py-3.5 bg-gradient-to-r from-blue-600 to-blue-500 flex items-center justify-between">
                 <span class="text-xs font-black text-white uppercase tracking-widest flex items-center gap-2">
                     <span class="material-symbols-outlined text-[16px]">group</span> Registered Users
@@ -259,7 +259,7 @@ $activityStyles = [
         </div>
 
         <!-- COMPANIES CARD -->
-        <div class="bg-white rounded-2xl border border-rose-100 shadow-sm overflow-hidden">
+        <div class="bg-white rounded-2xl border border-rose-100 shadow-sm overflow-hidden self-start">
             <div class="px-5 py-3.5 bg-gradient-to-r from-rose-600 to-pink-500 flex items-center justify-between">
                 <span class="text-xs font-black text-white uppercase tracking-widest flex items-center gap-2">
                     <span class="material-symbols-outlined text-[16px]">business</span> Companies
@@ -302,7 +302,7 @@ $activityStyles = [
         </div>
 
         <!-- POSTS CARD -->
-        <div class="bg-white rounded-2xl border border-emerald-100 shadow-sm overflow-hidden">
+        <div class="bg-white rounded-2xl border border-emerald-100 shadow-sm overflow-hidden self-start">
             <div class="px-5 py-3.5 bg-gradient-to-r from-emerald-600 to-teal-500 flex items-center justify-between">
                 <span class="text-xs font-black text-white uppercase tracking-widest flex items-center gap-2">
                     <span class="material-symbols-outlined text-[16px]">article</span> Community Posts
@@ -341,7 +341,7 @@ $activityStyles = [
         </div>
 
         <!-- JOBS CARD -->
-        <div class="bg-white rounded-2xl border border-cyan-100 shadow-sm overflow-hidden">
+        <div class="bg-white rounded-2xl border border-cyan-100 shadow-sm overflow-hidden self-start">
             <div class="px-5 py-3.5 bg-gradient-to-r from-cyan-600 to-sky-500 flex items-center justify-between">
                 <span class="text-xs font-black text-white uppercase tracking-widest flex items-center gap-2">
                     <span class="material-symbols-outlined text-[16px]">work</span> Active Jobs

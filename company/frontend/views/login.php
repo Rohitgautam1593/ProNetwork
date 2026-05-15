@@ -1,128 +1,71 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ProNetwork Enterprise — Identity Sign-In</title>
-    <!-- Tailwind CSS Engine -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts Framework -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
-    <!-- Google Material Symbols Icons -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                        display: ['Manrope', 'sans-serif'],
-                    }
-                }
-            }
-        }
-    </script>
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f8fafc;
-        }
-    </style>
-</head>
-<body class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-x-hidden">
+<?php require USERROOT . '/frontend/views/layouts/header.php'; ?>
+<?php require USERROOT . '/frontend/views/layouts/navbar.php'; ?>
 
-    <!-- Ambient floating network light rings -->
-    <div class="absolute top-1/4 right-1/3 translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-indigo-600/10 rounded-full blur-[120px] pointer-events-none animate-pulse duration-1000"></div>
-    <div class="absolute bottom-1/4 left-1/3 -translate-x-1/2 translate-y-1/2 w-80 h-80 bg-blue-600/10 rounded-full blur-[100px] pointer-events-none"></div>
+<main class="bg-surface-container-low min-h-screen py-12">
+    <div class="max-w-4xl mx-auto px-4 flex flex-col lg:flex-row gap-12 items-center">
+        <!-- Brand column -->
+        <div class="flex-1 space-y-6">
+            <div class="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary-fixed/30 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-primary">
+                <span class="h-1.5 w-1.5 rounded-full bg-primary"></span>
+                Employer workspace
+            </div>
+            <h1 class="text-4xl font-display-md text-on-surface leading-tight">
+                Welcome back to your hiring console.
+            </h1>
+            <p class="text-base font-body-lg text-on-surface-variant max-w-md">
+                Access your candidate pipeline, adjust job listings, and respond to talent directly from your company dashboard.
+            </p>
+        </div>
 
-    <!-- Centered Single-Column Premium Expanded Sign-In Frame -->
-    <div class="w-full max-w-lg bg-white rounded-3xl shadow-2xl border border-slate-100 overflow-hidden relative z-10 my-4 animate-in fade-in zoom-in-95 duration-300">
-        
-        <!-- Integrated Secure Header Block -->
-        <div class="bg-gradient-to-r from-slate-900 via-indigo-950 to-blue-950 px-8 py-6 text-white relative">
-            <div class="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_70%_70%,white_1px,transparent_1px)] bg-[size:16px_16px]"></div>
-            
-            <div class="relative z-10 flex items-center justify-between">
-                <div class="flex items-center gap-2.5">
-                    <div class="w-9 h-9 rounded-xl bg-indigo-600 flex items-center justify-center font-display font-extrabold text-sm text-white shadow-md shadow-indigo-600/30">
-                        PN
+        <!-- Form column -->
+        <div class="w-full max-w-md">
+            <div class="bg-white rounded-2xl border border-outline-variant/30 ambient-shadow p-8">
+                <h2 class="text-2xl font-display-md text-on-surface mb-2">Sign in</h2>
+                <p class="text-sm font-body-md text-on-surface-variant mb-6 border-b border-outline-variant/20 pb-4">Stay updated on your professional world.</p>
+
+                <?php if (!empty($data['error'])): ?>
+                    <div class="mb-6 flex gap-3 rounded-xl border border-error/30 bg-error-container p-4 text-sm text-on-error-container" role="alert">
+                        <span class="material-symbols-outlined shrink-0 text-error">error</span>
+                        <div><?php echo htmlspecialchars($data['error']); ?></div>
+                    </div>
+                <?php endif; ?>
+
+                <?php if (!empty($data['successMessage'])): ?>
+                    <div class="mb-6 flex gap-3 rounded-xl border border-[#0d592f]/30 bg-[#e6f4ea] p-4 text-sm font-medium text-[#0d592f]">
+                        <span class="material-symbols-outlined shrink-0 animate-spin text-[#0d592f]">progress_activity</span>
+                        <div><?php echo htmlspecialchars($data['successMessage']); ?></div>
+                    </div>
+                    <script>
+                        setTimeout(() => { window.location.href = "<?php echo URLROOT; ?>/company/dashboard"; }, 1400);
+                    </script>
+                <?php endif; ?>
+
+                <form action="<?php echo URLROOT; ?>/company/login" method="POST" class="space-y-4" <?php echo !empty($data['successMessage']) ? 'style="opacity:0.45;pointer-events:none;"' : ''; ?>>
+                    <div>
+                        <label class="block font-label-md text-on-surface mb-1" for="email">Work email</label>
+                        <input id="email" type="email" name="email" required placeholder="Email address"
+                               value="<?php echo htmlspecialchars($_POST['email'] ?? ''); ?>"
+                               class="w-full h-10 px-3 rounded-md border border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary text-sm font-body-md bg-white">
                     </div>
                     <div>
-                        <span class="font-display font-extrabold text-base tracking-tight text-white block">ProNetwork</span>
-                        <span class="text-[9px] text-indigo-300 block uppercase tracking-widest font-black">Enterprise Access</span>
+                        <label class="block font-label-md text-on-surface mb-1" for="password">Password</label>
+                        <input id="password" type="password" name="password" required placeholder="Password"
+                               class="w-full h-10 px-3 rounded-md border border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary text-sm font-body-md bg-white">
                     </div>
-                </div>
 
-                <a href="<?php echo URLROOT; ?>/company/index" class="text-xs text-indigo-300 hover:text-white font-bold bg-white/10 hover:bg-white/20 border border-white/10 px-3 py-1.5 rounded-xl transition-all backdrop-blur-md flex items-center gap-1">
-                    <span>Register Company</span>
-                    <span class="material-symbols-outlined text-[14px]">domain_add</span>
-                </a>
-            </div>
+                    <div class="pt-2">
+                        <button type="submit" class="w-full bg-primary text-white font-label-lg px-6 py-3 rounded-full hover:bg-[#004182] transition-colors shadow-sm flex items-center justify-center gap-2">
+                            Sign in
+                        </button>
+                    </div>
 
-            <div class="relative z-10 mt-4">
-                <h1 class="text-lg font-display font-bold text-white tracking-tight">Operator Node Authorization</h1>
-                <p class="text-xs text-slate-300 font-normal mt-0.5">Enter terminal clearance identifiers to resume telemetry control.</p>
+                    <p class="text-center font-body-md text-xs text-secondary mt-4">
+                        New to ProNetwork Enterprise? <a href="<?php echo URLROOT; ?>/company/register" class="font-semibold text-primary hover:underline">Create an account</a>
+                    </p>
+                </form>
             </div>
         </div>
-
-        <!-- Premium Sign-In Form Fields Stack -->
-        <div class="px-8 py-6">
-
-            <?php if (!empty($data['error'])): ?>
-                <div class="mb-4 p-3 bg-rose-50 border border-rose-100 rounded-xl text-xs text-rose-700 font-medium flex items-center gap-2">
-                    <span class="material-symbols-outlined text-[16px] text-rose-600 shrink-0">error</span>
-                    <div class="leading-tight"><?php echo htmlspecialchars($data['error']); ?></div>
-                </div>
-            <?php endif; ?>
-
-            <?php if (!empty($data['successMessage'])): ?>
-                <div class="mb-4 p-3 bg-emerald-50 border border-emerald-100 rounded-xl text-xs text-emerald-800 font-bold flex items-center gap-2 shadow-2xs">
-                    <span class="material-symbols-outlined text-[16px] text-emerald-600 shrink-0 animate-spin">autorenew</span>
-                    <div><?php echo htmlspecialchars($data['successMessage']); ?></div>
-                </div>
-                <script>
-                    setTimeout(() => {
-                        window.location.href = "<?php echo URLROOT; ?>/company/dashboard";
-                    }, 1400);
-                </script>
-            <?php endif; ?>
-
-            <form action="<?php echo URLROOT; ?>/company/login" method="POST" class="space-y-4" <?php echo !empty($data['successMessage']) ? 'style="opacity:0.4; pointer-events:none;"' : ''; ?>>
-                
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">Official Operator Email <span class="text-rose-500">*</span></label>
-                    <input type="email" name="email" value="<?php echo htmlspecialchars($_POST['email'] ?? ''); ?>" required placeholder="hr@company.com" 
-                           class="w-full text-xs bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-slate-900 font-medium placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:bg-white transition-all">
-                </div>
-
-                <div>
-                    <div class="flex items-center justify-between mb-1">
-                        <label class="block text-xs font-bold text-slate-700">Security Clearance Key <span class="text-rose-500">*</span></label>
-                        <a href="<?php echo URLROOT; ?>/auth/forgot" class="text-[10px] text-indigo-600 hover:underline font-medium">Forgot key?</a>
-                    </div>
-                    <input type="password" name="password" required placeholder="••••••••" 
-                           class="w-full text-xs bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-slate-900 font-medium placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:bg-white transition-all">
-                </div>
-
-                <div class="pt-2">
-                    <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs py-3 rounded-xl shadow-md transition-all flex items-center justify-center gap-1.5 group">
-                        <span>Authorize Terminal Clearance</span>
-                        <span class="material-symbols-outlined text-[16px] transform group-hover:translate-x-1 transition-transform">lock_open</span>
-                    </button>
-                </div>
-
-                <div class="pt-4 border-t border-slate-100 flex items-center justify-center gap-1 text-[11px] text-slate-500">
-                    <span>Not provisioned yet?</span>
-                    <a href="<?php echo URLROOT; ?>/company/index" class="text-indigo-600 font-bold hover:underline">Deploy an account node</a>
-                </div>
-
-            </form>
-
-        </div>
-
     </div>
+</main>
 
-</body>
-</html>
+<?php require USERROOT . '/frontend/views/layouts/footer.php'; ?>

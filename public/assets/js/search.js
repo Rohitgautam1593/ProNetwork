@@ -56,10 +56,10 @@ function renderSearchResults(results) {
     if (results.people?.length > 0) {
         html += `<div class="px-4 py-2 text-xs font-bold text-slate-500 uppercase tracking-wider">People</div>`;
         results.people.forEach(p => {
-            const pic = p.profile_pic ? (p.profile_pic.startsWith('http') ? p.profile_pic : `${URLROOT}/uploads/profiles/` + p.profile_pic) : '';
+            const pic = pnProfilePicUrl(p);
             html += `
-            <a href="${URLROOT}/user/profile/${p.user_id}" class="flex items-center gap-3 px-4 py-2 hover:bg-slate-50 transition-colors">
-                ${pic ? `<img src="${pic}" class="w-10 h-10 rounded-full object-cover">` : `<div class="w-10 h-10 rounded-full bg-slate-200 flex items-center justify-center"><span class="material-symbols-outlined text-slate-400">person</span></div>`}
+            <a href="${URLROOT}/user/profile?id=${p.user_id}" class="flex items-center gap-3 px-4 py-2 hover:bg-slate-50 transition-colors">
+                <img src="${pic}" class="w-10 h-10 rounded-full object-cover shrink-0">
                 <div class="flex-1 min-w-0">
                     <p class="text-sm font-bold text-slate-900 truncate">${escapeHtml(p.full_name)}</p>
                     <p class="text-xs text-slate-500 truncate">${escapeHtml(p.headline || '')}</p>
@@ -73,10 +73,39 @@ function renderSearchResults(results) {
         results.jobs.forEach(j => {
             html += `
             <a href="${URLROOT}/user/jobs?id=${j.job_id}" class="flex items-center gap-3 px-4 py-2 hover:bg-slate-50 transition-colors">
-                <div class="w-10 h-10 rounded bg-slate-100 flex items-center justify-center"><span class="material-symbols-outlined text-slate-400">work</span></div>
+                <div class="w-10 h-10 rounded bg-slate-100 flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-slate-400">work</span></div>
                 <div class="flex-1 min-w-0">
                     <p class="text-sm font-bold text-slate-900 truncate">${escapeHtml(j.title)}</p>
                     <p class="text-xs text-slate-500 truncate">${escapeHtml(j.company_name)} • ${escapeHtml(j.location)}</p>
+                </div>
+            </a>`;
+        });
+    }
+
+    if (results.companies?.length > 0) {
+        html += `<div class="px-4 py-2 mt-2 text-xs font-bold text-slate-500 uppercase tracking-wider border-t border-slate-100 pt-3">Companies</div>`;
+        results.companies.forEach(c => {
+            const logo = pnCompanyLogoUrl(c);
+            html += `
+            <a href="${URLROOT}/company/show/${c.company_id}" class="flex items-center gap-3 px-4 py-2 hover:bg-slate-50 transition-colors">
+                <img src="${logo}" class="w-10 h-10 rounded object-cover border border-slate-100 shrink-0">
+                <div class="flex-1 min-w-0">
+                    <p class="text-sm font-bold text-slate-900 truncate">${escapeHtml(c.company_name)}</p>
+                    <p class="text-xs text-slate-500 truncate">${escapeHtml(c.industry || 'Company')}</p>
+                </div>
+            </a>`;
+        });
+    }
+
+    if (results.posts?.length > 0) {
+        html += `<div class="px-4 py-2 mt-2 text-xs font-bold text-slate-500 uppercase tracking-wider border-t border-slate-100 pt-3">Posts</div>`;
+        results.posts.forEach(pt => {
+            html += `
+            <a href="${URLROOT}/user/feed" class="flex items-center gap-3 px-4 py-2 hover:bg-slate-50 transition-colors">
+                <div class="w-10 h-10 rounded bg-slate-50 flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-slate-400">article</span></div>
+                <div class="flex-1 min-w-0">
+                    <p class="text-xs font-bold text-slate-700 truncate">${escapeHtml(pt.full_name)}</p>
+                    <p class="text-xs text-slate-500 truncate">${escapeHtml(pt.content)}</p>
                 </div>
             </a>`;
         });

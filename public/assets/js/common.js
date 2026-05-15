@@ -39,15 +39,105 @@ function hydrateUserState() {
     if (u) populateUserData(u);
 }
 
+function pnAssetUrl(path) {
+    return `${URLROOT}/${String(path).replace(/^\/+/, '')}`;
+}
+
+function pnUiAvatarUrl(name, options = {}) {
+    const bg = options.background || '0A66C2';
+    const color = options.color || 'fff';
+    const size = options.size || 128;
+    const label = encodeURIComponent(String(name || 'User').trim() || 'User');
+    return `https://ui-avatars.com/api/?name=${label}&background=${bg}&color=${color}&size=${size}&bold=true`;
+}
+
+function pnProfilePicUrl(user = {}) {
+    const pic = user.profile_pic || '';
+    if (pic) {
+        return pic.startsWith('http') ? pic : `${URLROOT}/uploads/profiles/${pic.replace(/^\/+/, '')}`;
+    }
+    return pnUiAvatarUrl(user.full_name);
+}
+
+function pnUserProfileUrl(userId) {
+    return `${URLROOT}/user/profile?id=${encodeURIComponent(userId)}`;
+}
+
+function pnAvatarImg(user = {}, className = '', extraAttrs = '') {
+    const src = pnProfilePicUrl(user);
+    const fallback = pnUiAvatarUrl(user.full_name);
+    const alt = escapeHtml(user.full_name || 'User');
+    return `<img src="${src}" alt="${alt}" class="${className}" loading="lazy" onerror="this.onerror=null;this.src='${fallback}'" ${extraAttrs}>`;
+}
+
+function pnCoverImageUrl(user = {}) {
+    const cover = user.cover_image || '';
+    if (cover) {
+        return cover.startsWith('http') ? cover : `${URLROOT}/uploads/covers/${cover}`;
+    }
+    return pnAssetUrl('uploads/covers/1778246066_IMG-20240915-WA0002.jpg');
+}
+
+function pnCompanyLogoFile(companyName = '') {
+    const name = String(companyName).toLowerCase();
+    if (name.includes('amazon')) return 'logos/amazon-com-inc-logo.jpeg';
+    if (name.includes('apple')) return 'logos/apple-inc-logo.jpeg';
+    if (name.includes('armani')) return 'logos/armani-logo.jpeg';
+    if (name.includes('flipkart')) return 'logos/flipkart-logo.jpeg';
+    if (name.includes('google')) return 'logos/google-llc-logo.jpeg';
+    if (name.includes('infosys')) return 'logos/infosys-limited-logo.jpeg';
+    if (name.includes('microsoft')) return 'logos/microsoft-corporation-logo.jpeg';
+    if (name.includes('tata')) return 'logos/tata-consultancy-services-logo.jpeg';
+    if (name.includes('tesla')) return 'logos/tesla-inc-logo.jpeg';
+    if (name.includes('green')) return 'logos/greengrid.png';
+    if (name.includes('cloud')) return 'logos/cloudscale.png';
+    return 'logos/nexa.png';
+}
+
+function pnCompanyLogoUrl(company = {}) {
+    const logo = (company.logo || company.logo_path || '').trim();
+    if (logo.startsWith('http')) {
+        return logo;
+    }
+    if (logo) {
+        return `${URLROOT}/uploads/companies/${logo.replace(/^\/+/, '')}`;
+    }
+    return pnUiAvatarUrl(company.company_name || company.name || 'Company', { background: '6366f1' });
+}
+
+function pnCompanyLogoImg(company = {}, className = '') {
+    const src = pnCompanyLogoUrl(company);
+    const fallback = pnUiAvatarUrl(company.company_name || company.name || 'Company', { background: '6366f1' });
+    const alt = escapeHtml(company.company_name || company.name || 'Company');
+    return `<img src="${src}" alt="${alt}" class="${className}" loading="lazy" onerror="this.onerror=null;this.src='${fallback}'">`;
+}
+
+function pnCompanyBannerFile(companyName = '') {
+    const name = String(companyName).toLowerCase();
+    if (name.includes('amazon')) return 'banners/amazon-com-inc-banner.jpeg';
+    if (name.includes('apple')) return 'banners/apple-inc-banner.jpeg';
+    if (name.includes('armani')) return 'banners/armani-banner.jpeg';
+    if (name.includes('cloud')) return 'banners/cloudscale-systems-banner.jpeg';
+    if (name.includes('flipkart')) return 'banners/flipkart-banner.jpeg';
+    if (name.includes('google')) return 'banners/google-llc-banner.jpeg';
+    if (name.includes('green')) return 'banners/greengrid-labs-banner.jpeg';
+    if (name.includes('infosys')) return 'banners/infosys-limited-banner.jpeg';
+    if (name.includes('microsoft')) return 'banners/microsoft-corporation-banner.jpeg';
+    if (name.includes('tata')) return 'banners/tata-consultancy-services-banner.jpeg';
+    if (name.includes('tesla')) return 'banners/tesla-inc-banner.jpeg';
+    return 'banners/nexa-analytics-banner.jpeg';
+}
+
+function pnCompanyBannerUrl(company = {}) {
+    const banner = company.banner || company.banner_path || '';
+    if (banner && !banner.startsWith('http')) {
+        return `${URLROOT}/uploads/companies/${banner}`;
+    }
+    return `${URLROOT}/uploads/companies/${pnCompanyBannerFile(company.company_name || company.name || '')}`;
+}
+
 function populateUserData(u) {
     if (!u) return;
-    const placeholderAvatar =
-        'data:image/svg+xml,' +
-        encodeURIComponent(
-            '<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128"><rect fill="#e2e8f0" width="128" height="128"/><text x="50%" y="54%" dominant-baseline="middle" text-anchor="middle" fill="#64748b" font-family="system-ui,sans-serif" font-size="40" font-weight="600">' +
-                String((u.full_name || '?').trim().charAt(0) || '?').toUpperCase() +
-                '</text></svg>'
-        );
 
     document.querySelectorAll('[data-user-name="full"]').forEach(el => { el.textContent = u.full_name || ''; });
     document.querySelectorAll('[data-user-headline]').forEach(el => { el.textContent = u.headline || 'Add a headline'; });
@@ -64,9 +154,7 @@ function populateUserData(u) {
         el.textContent = parts.length ? parts.join(' · ') : 'Complete your profile to stand out.';
     });
 
-    const picUrl = u.profile_pic
-        ? (u.profile_pic.startsWith('http') ? u.profile_pic : `${URLROOT}/uploads/profiles/${u.profile_pic}`)
-        : placeholderAvatar;
+    const picUrl = pnProfilePicUrl(u);
     document.querySelectorAll('img[data-user-pic="true"]').forEach(img => {
         img.src = picUrl;
         img.alt = u.full_name ? `${u.full_name} profile photo` : 'Profile photo';
@@ -79,14 +167,8 @@ function populateUserData(u) {
     });
 
     document.querySelectorAll('img[data-user-cover="true"]').forEach(img => {
-        if (u.cover_image) {
-            const coverUrl = u.cover_image.startsWith('http') ? u.cover_image : `${URLROOT}/uploads/covers/${u.cover_image}`;
-            img.src = coverUrl;
-            img.classList.remove('hidden');
-        } else {
-            img.removeAttribute('src');
-            img.classList.add('hidden');
-        }
+        img.src = pnCoverImageUrl(u);
+        img.classList.remove('hidden');
     });
 }
 
@@ -172,25 +254,25 @@ function initGlobalSearch() {
 
         results.innerHTML = [
             renderSection('People', people.map(person => ({
-                icon: person.profile_pic ? imageUrl('profiles', person.profile_pic) : '',
+                icon: pnProfilePicUrl(person),
                 fallback: 'person',
                 title: person.full_name,
                 subtitle: [person.headline || 'Professional', person.location || ''].filter(Boolean).join(' · '),
-                href: `${URLROOT}/user/messaging?chat=${person.user_id}`
+                href: `${URLROOT}/user/profile?id=${person.user_id}`
             }))),
             renderSection('Jobs', jobs.map(job => ({
-                icon: job.logo ? imageUrl('companies', job.logo) : '',
+                icon: pnCompanyLogoUrl(job),
                 fallback: 'work',
                 title: job.title,
                 subtitle: [job.company_name, job.location || job.job_type || ''].filter(Boolean).join(' · '),
                 href: `${URLROOT}/user/jobs`
             }))),
             renderSection('Companies', companies.map(company => ({
-                icon: company.logo ? imageUrl('companies', company.logo) : '',
+                icon: pnCompanyLogoUrl(company),
                 fallback: 'business',
                 title: company.company_name,
                 subtitle: company.industry || 'Company',
-                href: `${URLROOT}/company/dashboard`
+                href: `${URLROOT}/company/show/${company.company_id}`
             }))),
             renderSection('Posts', posts.map(post => ({
                 icon: '',
@@ -284,7 +366,7 @@ window.pnModal = function(options = {}) {
                     ${isPrompt ? `<textarea class="pn-modal-input" placeholder="${safePlaceholder}" rows="3">${safeDefaultValue}</textarea>` : ''}
                 </div>
                 <div class="pn-modal-footer">
-                    <button class="pn-modal-btn pn-modal-btn-secondary" id="pn-modal-cancel">${safeCancelText}</button>
+                    ${safeCancelText ? `<button class="pn-modal-btn pn-modal-btn-secondary" id="pn-modal-cancel">${safeCancelText}</button>` : ''}
                     <button class="pn-modal-btn ${isDanger ? 'pn-modal-btn-danger' : 'pn-modal-btn-primary'}" id="pn-modal-confirm">${safeConfirmText}</button>
                 </div>
             </div>
@@ -321,11 +403,45 @@ window.pnModal = function(options = {}) {
             }
         };
 
-        backdrop.querySelector('#pn-modal-cancel').onclick = () => close(isPrompt ? null : false);
+        const cancelBtn = backdrop.querySelector('#pn-modal-cancel');
+        if (cancelBtn) cancelBtn.onclick = () => close(isPrompt ? null : false);
         
         // Close on backdrop click
         backdrop.onclick = (e) => {
             if (e.target === backdrop) close(isPrompt ? null : false);
         };
+    });
+};
+
+// Override standard native blocking dialogs globally with premium ProNetwork UI Modals
+window.alert = function(message) {
+    return window.pnModal({
+        title: 'ProNetwork Alert',
+        message: String(message),
+        type: 'info',
+        confirmText: 'OK',
+        cancelText: ''
+    });
+};
+
+window.confirm = function(message) {
+    return window.pnModal({
+        title: 'Confirmation Required',
+        message: String(message),
+        type: 'warning',
+        confirmText: 'Yes, Confirm',
+        cancelText: 'Cancel'
+    });
+};
+
+window.prompt = function(message, defaultValue = '') {
+    return window.pnModal({
+        title: 'Input Required',
+        message: String(message),
+        type: 'info',
+        isPrompt: true,
+        defaultValue: String(defaultValue),
+        confirmText: 'Submit',
+        cancelText: 'Cancel'
     });
 };

@@ -4,7 +4,9 @@
     $company = $data['company'] ?? [];
     $jobs = $data['jobs'] ?? [];
     $isOwner = $data['isOwner'] ?? false;
+    $isFollowing = $data['isFollowing'] ?? false;
     
+    $companyId = $company['company_id'] ?? 0;
     $companyName = $company['company_name'] ?? 'Company';
     $industry = $company['industry'] ?? 'Industry not set';
     $description = $company['description'] ?? 'No company description available.';
@@ -12,638 +14,442 @@
     $size = $company['size'] ?? 'Size not set';
     $founded = $company['founded_year'] ?? 'N/A';
     $followers = (int)($company['followers'] ?? 0);
-    $logo = !empty($company['logo']) ? URLROOT . '/uploads/companies/' . $company['logo'] : 'https://ui-avatars.com/api/?name=' . urlencode($companyName);
+    $logo = pn_company_logo_url($company);
+    $banner = pn_company_banner_url($company);
 ?>
-<!-- Dedicated Enterprise Employer Console Main Wrapper -->
-<main class="pt-16 pb-24 bg-slate-900 min-h-screen text-slate-100 font-sans selection:bg-indigo-500 selection:text-white relative overflow-x-hidden">
 
-    <!-- Ambient Glowing Accents -->
-    <div class="absolute top-0 left-1/3 w-96 h-96 bg-indigo-500/10 rounded-full blur-[150px] pointer-events-none"></div>
-    <div class="absolute top-1/2 right-10 w-96 h-96 bg-blue-500/10 rounded-full blur-[150px] pointer-events-none"></div>
-
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 relative z-10">
+<main class="bg-surface-container-low min-h-screen pt-4 pb-12">
+    <div class="max-w-[1128px] mx-auto px-4">
         
-        <!-- Stunning Premium Hero Banner -->
-        <div class="bg-slate-800/90 backdrop-blur-xl rounded-3xl overflow-hidden shadow-2xl border border-slate-700/60 mb-8 transition-all">
+        <!-- Premium Hero Banner -->
+        <div class="bg-white rounded-xl border border-outline-variant/30 ambient-shadow overflow-hidden mb-6">
             
-            <!-- Cover Header Canvas -->
-            <div class="relative h-60 w-full bg-gradient-to-r from-slate-950 via-indigo-950 to-slate-950 overflow-hidden flex items-center justify-center">
-                <div class="absolute inset-0 opacity-20 bg-[radial-gradient(circle_at_40%_40%,#6366f1_1px,transparent_1px)] bg-[size:24px_24px]"></div>
-                <div class="absolute top-1/2 left-1/3 -translate-y-1/2 w-80 h-80 bg-indigo-500/20 rounded-full blur-3xl animate-pulse duration-1000"></div>
-
-                <!-- Live Tag Floating inside banner -->
-                <div class="absolute top-4 right-4 bg-white/10 backdrop-blur-md border border-white/10 px-3 py-1.5 rounded-full text-[11px] font-medium tracking-wide text-indigo-200 flex items-center gap-1.5 shadow-inner">
-                    <span class="flex h-1.5 w-1.5 rounded-full bg-emerald-400"></span>
-                    <span>Employer Console Active</span>
-                </div>
-
-                <!-- Embedded Logo Shell Frame -->
-                <div class="absolute -bottom-12 left-8 p-2 bg-slate-800 rounded-3xl shadow-xl border border-slate-700/80">
-                    <div class="w-28 h-28 sm:w-32 sm:h-32 bg-white flex items-center justify-center rounded-2xl overflow-hidden shadow-inner">
-                        <img alt="<?php echo htmlspecialchars($companyName); ?> Logo" class="w-full h-full object-contain p-2 transform hover:scale-105 transition-transform duration-300" src="<?php echo htmlspecialchars($logo); ?>"/>
-                    </div>
-                </div>
+            <!-- Cover Photo -->
+            <div class="h-48 md:h-64 bg-surface-variant relative overflow-hidden">
+                <img src="<?php echo htmlspecialchars($banner); ?>" alt="" class="absolute inset-0 w-full h-full object-cover">
+                <div class="absolute inset-0 bg-gradient-to-tr from-black/55 via-black/10 to-white/20"></div>
+                <img src="<?php echo htmlspecialchars($logo); ?>" alt="" class="absolute right-8 top-1/2 -translate-y-1/2 w-28 h-28 md:w-40 md:h-40 object-contain opacity-90 drop-shadow-xl">
             </div>
 
-            <!-- Header Content Stack Stack -->
-            <div class="pt-16 pb-8 px-8">
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6">
+            <!-- Header Content -->
+            <div class="relative px-6 pb-6">
+                <!-- Logo -->
+                <div class="absolute -top-16 md:-top-20 p-1.5 bg-white rounded-lg shadow-sm">
+                    <div class="w-24 h-24 md:w-32 md:h-32 bg-white flex items-center justify-center rounded overflow-hidden border border-outline-variant/30">
+                        <img alt="<?php echo htmlspecialchars($companyName); ?> Logo" class="w-full h-full object-cover" src="<?php echo htmlspecialchars($logo); ?>"/>
+                    </div>
+                </div>
+
+                <div class="pt-12 md:pt-16 flex flex-col md:flex-row justify-between items-start gap-4">
                     <div class="space-y-2">
-                        <div class="flex flex-wrap items-center gap-2.5">
-                            <h1 class="text-3xl font-black text-white tracking-tight"><?php echo htmlspecialchars($companyName); ?></h1>
-                            <span class="bg-indigo-500/20 text-indigo-300 text-xs font-bold px-3 py-0.5 rounded-full border border-indigo-500/30 flex items-center gap-1 shadow-2xs">
-                                <span class="material-symbols-outlined text-[13px] text-indigo-400">verified</span> Verified Firm Workspace
-                            </span>
-                        </div>
-                        <p class="text-xs sm:text-sm text-slate-300 max-w-3xl line-clamp-2 leading-relaxed font-normal"><?php echo htmlspecialchars($description); ?></p>
+                        <h1 class="text-2xl font-display-md text-on-surface tracking-tight"><?php echo htmlspecialchars($companyName); ?></h1>
+                        <p class="text-sm font-body-md text-on-surface-variant max-w-2xl line-clamp-2"><?php echo htmlspecialchars($description); ?></p>
                         
-                        <div class="flex flex-wrap items-center gap-3 text-xs text-slate-400 pt-1 font-medium">
-                            <span class="flex items-center gap-1 text-indigo-400 font-bold">
-                                <span class="material-symbols-outlined text-[14px]">category</span> <?php echo htmlspecialchars($industry); ?>
-                            </span>
-                            <span>&bull;</span>
-                            <span class="flex items-center gap-1">
-                                <span class="material-symbols-outlined text-[14px]">groups</span> <?php echo number_format($followers); ?> followers
-                            </span>
-                            <span>&bull;</span>
-                            <span class="flex items-center gap-1">
-                                <span class="material-symbols-outlined text-[14px]">domain</span> <?php echo htmlspecialchars($size); ?>
-                            </span>
+                        <div class="flex flex-wrap items-center gap-2 text-sm text-secondary pt-1 font-body-md">
+                            <span><?php echo htmlspecialchars($industry); ?></span>
+                            <span class="text-outline-variant">&bull;</span>
+                            <span class="font-semibold text-on-surface"><?php echo number_format($followers); ?> followers</span>
+                            <span class="text-outline-variant">&bull;</span>
+                            <span><?php echo htmlspecialchars($size); ?></span>
                         </div>
                     </div>
 
-                    <!-- Direct Action Elements -->
-                    <div class="flex flex-wrap items-center gap-3 shrink-0 w-full sm:w-auto justify-start sm:justify-end">
+                    <div class="flex flex-wrap items-center gap-3 shrink-0">
                         <?php if ($isOwner): ?>
-                            <button onclick="openEditCompanyModal()" class="w-full sm:w-auto bg-slate-700/80 hover:bg-slate-700 text-white px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 border border-slate-600/80 shadow-sm active:scale-95">
-                                <span class="material-symbols-outlined text-[16px] text-indigo-400">edit_square</span>
-                                <span>Edit Profile Info</span>
+                            <button onclick="openEditCompanyModal()" class="text-primary font-label-md px-5 py-2 rounded-full border border-primary hover:bg-primary-fixed hover:border-primary-container transition-colors flex items-center gap-1.5">
+                                <span class="material-symbols-outlined text-[18px]">edit</span>
+                                Edit Page
                             </button>
-                            
-                            <button onclick="openAddJobModal()" class="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 shadow-md shadow-indigo-600/20 active:scale-95">
-                                <span class="material-symbols-outlined text-[16px]">add_circle</span>
-                                <span>Post New Job Opening</span>
+                            <button onclick="openAddJobModal()" class="bg-primary text-white font-label-md px-5 py-2 rounded-full hover:bg-[#004182] transition-colors shadow-sm flex items-center gap-1.5">
+                                <span class="material-symbols-outlined text-[18px]">add</span>
+                                Post Job
+                            </button>
+                        <?php else: ?>
+                            <button id="follow-btn" data-id="<?php echo $companyId; ?>" class="flex items-center justify-center gap-1.5 px-6 py-2 rounded-full font-label-lg transition-all duration-300 shadow-sm <?php echo $isFollowing ? 'border-2 border-outline text-secondary hover:border-outline-variant hover:bg-surface-variant' : 'bg-primary text-white hover:bg-[#004182]'; ?>">
+                                <span class="material-symbols-outlined text-lg"><?php echo $isFollowing ? 'check' : 'add'; ?></span>
+                                <span id="follow-text"><?php echo $isFollowing ? 'Following' : 'Follow'; ?></span>
                             </button>
                         <?php endif; ?>
                     </div>
                 </div>
 
-                <!-- Sleek Navigation Tabs Layout -->
-                <div class="mt-8 pt-4 border-t border-slate-700/60 flex gap-2 overflow-x-auto pb-2 custom-scrollbar">
-                    <button data-tab="home" class="px-5 py-2.5 text-xs font-bold bg-indigo-600 text-white rounded-full shrink-0 transition-all flex items-center gap-1.5 shadow-md shadow-indigo-600/20">
-                        <span class="material-symbols-outlined text-[16px]">home</span> Primary Portal
+                <!-- Navigation Tabs -->
+                <div class="mt-6 border-t border-outline-variant/30 flex gap-1 overflow-x-auto pt-2">
+                    <button type="button" data-tab="home" class="tab-btn px-4 py-3 text-sm font-label-lg text-primary border-b-2 border-primary transition-all whitespace-nowrap">
+                        Home
                     </button>
-                    <button data-tab="about" class="px-5 py-2.5 text-xs font-bold text-slate-400 hover:text-slate-200 hover:bg-slate-700/50 rounded-full shrink-0 transition-all flex items-center gap-1.5">
-                        <span class="material-symbols-outlined text-[16px]">info</span> Detailed Spec
+                    <button type="button" data-tab="about" class="tab-btn px-4 py-3 text-sm font-label-lg text-secondary hover:text-on-surface hover:bg-surface-container transition-all border-b-2 border-transparent rounded-t-lg whitespace-nowrap">
+                        About
                     </button>
-                    <button data-tab="jobs" class="px-5 py-2.5 text-xs font-bold text-slate-400 hover:text-slate-200 hover:bg-slate-700/50 rounded-full shrink-0 transition-all flex items-center gap-1.5">
-                        <span class="material-symbols-outlined text-[16px]">work</span> Managed Positions 
-                        <span class="ml-1 bg-slate-700 text-indigo-300 px-2 py-0.5 text-[10px] rounded-full font-black"><?php echo count($jobs); ?></span>
+                    <button type="button" data-tab="jobs" class="tab-btn px-4 py-3 text-sm font-label-lg text-secondary hover:text-on-surface hover:bg-surface-container transition-all border-b-2 border-transparent rounded-t-lg flex items-center gap-1.5 whitespace-nowrap">
+                        Jobs
+                        <span class="bg-surface-container-high text-on-surface-variant px-2 py-0.5 text-xs rounded-full font-medium"><?php echo count($jobs); ?></span>
                     </button>
-
                     <?php if ($isOwner): ?>
-                        <button data-tab="portal" class="px-5 py-2.5 text-xs font-black bg-indigo-500/10 text-indigo-400 hover:bg-indigo-500/20 border border-indigo-500/30 rounded-full shrink-0 transition-all flex items-center gap-1.5 ml-auto">
-                            <span class="material-symbols-outlined text-[16px]">admin_panel_settings</span>
-                            <span>Applicant Control Center</span>
+                        <button type="button" data-tab="portal" class="tab-btn px-4 py-3 text-sm font-label-lg text-secondary hover:text-on-surface hover:bg-surface-container transition-all border-b-2 border-transparent rounded-t-lg flex items-center gap-1.5 whitespace-nowrap">
+                            <span class="material-symbols-outlined text-[18px]">admin_panel_settings</span>
+                            Hiring Desk
                         </button>
                     <?php endif; ?>
                 </div>
             </div>
         </div>
 
-        <!-- Structure Sectioning Layout -->
-        <div class="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-8">
+        <div class="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-6">
             
-            <!-- Core Work Viewports -->
-            <div class="min-w-0">
+            <!-- Left Content Column -->
+            <div class="min-w-0 space-y-6">
 
-                <!-- ════ TAB 1: HOME PORTAL VIEWPORT ════ -->
-                <div id="tab-home" class="tab-content block space-y-6 animate-in fade-in duration-300">
-                    
-                    <!-- Quick About Summary Block -->
-                    <div class="bg-slate-800/80 backdrop-blur-md p-6 rounded-2xl shadow-xl border border-slate-700/60 relative overflow-hidden">
-                        <div class="absolute top-0 right-0 p-8 opacity-5 text-white pointer-events-none">
-                            <span class="material-symbols-outlined text-8xl">corporate_fare</span>
-                        </div>
-                        <h2 class="text-xs font-black uppercase tracking-widest text-indigo-400 mb-3 flex items-center gap-2">
-                            <span class="material-symbols-outlined text-[16px]">corporate_fare</span> Corporate Profile Core
-                        </h2>
-                        <p class="text-xs sm:text-sm text-slate-300 leading-relaxed font-normal whitespace-pre-wrap relative z-10"><?php echo htmlspecialchars($description); ?></p>
-                        <button data-tab-link="about" class="mt-4 text-xs font-bold text-indigo-400 hover:text-indigo-300 inline-flex items-center gap-1 transition-colors group">
-                            <span>Inspect Complete Attributes Scope</span>
-                            <span class="material-symbols-outlined text-[14px] group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                <!-- TAB: HOME -->
+                <div id="tab-home" class="tab-content block space-y-6">
+                    <div class="bg-white p-6 rounded-xl border border-outline-variant/30 ambient-shadow">
+                        <h2 class="text-xl font-title-lg text-on-surface mb-4">Overview</h2>
+                        <p class="text-sm font-body-lg text-on-surface-variant leading-relaxed whitespace-pre-wrap"><?php echo htmlspecialchars($description); ?></p>
+                        <button data-tab-link="about" class="mt-4 text-sm font-label-lg text-primary hover:underline flex items-center gap-1">
+                            See all details <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
                         </button>
                     </div>
 
-                    <!-- Direct Quick Add Callout Strip -->
-                    <?php if ($isOwner): ?>
-                        <div class="bg-gradient-to-r from-indigo-900 via-indigo-950 to-slate-900 rounded-2xl p-6 text-white shadow-xl border border-indigo-500/30 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 relative overflow-hidden">
-                            <div class="absolute -right-10 -top-10 w-40 h-40 bg-indigo-500/20 rounded-full blur-2xl pointer-events-none"></div>
-                            <div class="space-y-1 relative z-10 min-w-0 flex-1">
-                                <span class="bg-indigo-400/20 text-indigo-300 text-[10px] font-black tracking-widest uppercase px-2.5 py-0.5 rounded-md border border-indigo-400/30 inline-block">Direct Sourcing Pipeline</span>
-                                <h3 class="text-base font-bold tracking-tight text-white mt-1">Accelerate talent intake operations</h3>
-                                <p class="text-xs text-indigo-200/80">Configure structured recruitment listings directly over platform pipelines without proxy delay overheads.</p>
-                            </div>
-                            <button onclick="openAddJobModal()" class="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs px-5 py-3 rounded-xl transition-all shrink-0 shadow-md shadow-indigo-600/20 active:scale-95 text-center relative z-10 flex items-center justify-center gap-1.5">
-                                <span class="material-symbols-outlined text-[16px]">add</span>
-                                <span>Create New Listing</span>
-                            </button>
-                        </div>
-                    <?php endif; ?>
-
-                    <!-- Indexed Listings Shortlist Row -->
-                    <div class="space-y-3">
-                        <div class="flex items-center justify-between px-1">
-                            <h3 class="text-xs font-black uppercase tracking-wider text-slate-400">Recently Authored Openings</h3>
-                            <button data-tab-link="jobs" class="text-[11px] font-bold text-indigo-400 hover:underline">View complete roster (<?php echo count($jobs); ?>)</button>
+                    <div class="bg-white p-6 rounded-xl border border-outline-variant/30 ambient-shadow">
+                        <div class="flex items-center justify-between mb-4 border-b border-outline-variant/20 pb-3">
+                            <h2 class="text-xl font-title-lg text-on-surface">Recently posted jobs</h2>
+                            <button data-tab-link="jobs" class="text-sm font-label-lg text-secondary hover:bg-surface-container px-3 py-1.5 rounded transition-colors">See all jobs</button>
                         </div>
                         
                         <?php if (!empty($jobs)): ?>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <?php foreach (array_slice($jobs, 0, 4) as $job): ?>
-                                    <div class="bg-slate-800/60 p-4 rounded-xl border border-slate-700/50 hover:border-slate-600 transition-all flex flex-col justify-between gap-3">
-                                        <div>
-                                            <div class="flex items-center justify-between gap-2 mb-1">
-                                                <span class="text-[10px] font-black uppercase px-2 py-0.5 rounded bg-slate-900 text-indigo-300 border border-slate-700/80"><?php echo htmlspecialchars($job['job_type']); ?></span>
-                                                <span class="text-[10px] text-slate-400 font-medium"><?php echo htmlspecialchars($job['experience_level']); ?> level</span>
-                                            </div>
-                                            <h4 class="text-xs font-bold text-white line-clamp-1"><?php echo htmlspecialchars($job['title']); ?></h4>
-                                            <p class="text-[11px] text-slate-400 mt-1 line-clamp-2"><?php echo htmlspecialchars($job['description']); ?></p>
+                            <div class="space-y-4">
+                                <?php foreach (array_slice($jobs, 0, 3) as $job): ?>
+                                    <div class="flex gap-4 p-3 rounded-lg hover:bg-surface-container-low transition-colors group">
+                                        <div class="w-12 h-12 rounded bg-surface-variant flex items-center justify-center shrink-0">
+                                            <img src="<?php echo htmlspecialchars($logo); ?>" alt="" class="w-full h-full object-contain p-1.5">
                                         </div>
-                                        <div class="pt-2 border-t border-slate-700/40 flex items-center justify-between text-[11px] text-slate-400">
-                                            <span class="flex items-center gap-1 truncate max-w-[140px]"><span class="material-symbols-outlined text-[12px] text-indigo-400">location_on</span> <?php echo htmlspecialchars($job['location'] ?? 'Remote'); ?></span>
-                                            <strong class="text-indigo-400"><?php echo (int)($job['applicant_count'] ?? 0); ?> Applicants</strong>
+                                        <div class="flex-1 min-w-0">
+                                            <a href="<?php echo URLROOT; ?>/job/apply/<?php echo $job['job_id']; ?>" class="block font-title-md text-primary hover:underline truncate"><?php echo htmlspecialchars($job['title']); ?></a>
+                                            <p class="font-body-sm text-on-surface-variant text-sm mt-0.5 truncate"><?php echo htmlspecialchars($companyName); ?></p>
+                                            <p class="font-body-sm text-secondary text-xs mt-1 flex items-center gap-1">
+                                                <span><?php echo htmlspecialchars($job['location'] ?? 'Remote'); ?></span>
+                                                <span>&bull;</span>
+                                                <span><?php echo htmlspecialchars($job['job_type']); ?></span>
+                                            </p>
                                         </div>
                                     </div>
                                 <?php endforeach; ?>
                             </div>
                         <?php else: ?>
-                            <div class="bg-slate-800/40 rounded-2xl p-8 text-center border border-slate-700/40">
-                                <p class="text-xs text-slate-500 italic">No job openings created to broadcast yet.</p>
+                            <div class="text-center py-6">
+                                <p class="text-sm font-body-md text-secondary">No job openings at the moment.</p>
                             </div>
                         <?php endif; ?>
                     </div>
                 </div>
 
-                <!-- ════ TAB 2: DETAILED SPECIFICATION VIEWPORT ════ -->
-                <div id="tab-about" class="tab-content hidden space-y-6 animate-in fade-in duration-300">
-                    <div class="bg-slate-800/80 backdrop-blur-md p-6 rounded-2xl shadow-xl border border-slate-700/60 space-y-6">
-                        <div>
-                            <h3 class="text-xs font-black uppercase tracking-wider text-indigo-400 mb-2">Scope Identification Specifications</h3>
-                            <p class="text-xs sm:text-sm text-slate-300 leading-relaxed font-normal whitespace-pre-wrap"><?php echo htmlspecialchars($description); ?></p>
-                        </div>
+                <!-- TAB: ABOUT -->
+                <div id="tab-about" class="tab-content hidden space-y-6">
+                    <div class="bg-white p-6 rounded-xl border border-outline-variant/30 ambient-shadow">
+                        <h2 class="text-xl font-title-lg text-on-surface mb-6">About</h2>
+                        <p class="text-sm font-body-lg text-on-surface-variant leading-relaxed whitespace-pre-wrap mb-8"><?php echo htmlspecialchars($description); ?></p>
 
-                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4 border-t border-slate-700/60">
-                            <div class="bg-slate-900/60 p-3.5 rounded-xl border border-slate-700/40">
-                                <span class="text-[10px] font-black uppercase tracking-wider text-slate-500 block">External Target Link</span>
-                                <a href="<?php echo htmlspecialchars($website); ?>" target="_blank" class="text-xs font-bold text-indigo-400 hover:underline truncate block mt-0.5"><?php echo htmlspecialchars(str_replace(['https://','http://'], '', $website)); ?></a>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-y-6 gap-x-8 border-t border-outline-variant/20 pt-6">
+                            <div>
+                                <h3 class="text-sm font-label-lg text-on-surface mb-1">Website</h3>
+                                <a href="<?php echo htmlspecialchars($website); ?>" target="_blank" class="text-sm font-body-md text-primary hover:underline break-all"><?php echo htmlspecialchars($website); ?></a>
                             </div>
-                            <div class="bg-slate-900/60 p-3.5 rounded-xl border border-slate-700/40">
-                                <span class="text-[10px] font-black uppercase tracking-wider text-slate-500 block">Industry Node</span>
-                                <span class="text-xs font-bold text-slate-200 truncate block mt-0.5"><?php echo htmlspecialchars($industry); ?></span>
+                            <div>
+                                <h3 class="text-sm font-label-lg text-on-surface mb-1">Industry</h3>
+                                <p class="text-sm font-body-md text-on-surface-variant"><?php echo htmlspecialchars($industry); ?></p>
                             </div>
-                            <div class="bg-slate-900/60 p-3.5 rounded-xl border border-slate-700/40">
-                                <span class="text-[10px] font-black uppercase tracking-wider text-slate-500 block">Headcount Volume</span>
-                                <span class="text-xs font-bold text-slate-200 truncate block mt-0.5"><?php echo htmlspecialchars($size); ?></span>
+                            <div>
+                                <h3 class="text-sm font-label-lg text-on-surface mb-1">Company size</h3>
+                                <p class="text-sm font-body-md text-on-surface-variant"><?php echo htmlspecialchars($size); ?></p>
                             </div>
-                            <div class="bg-slate-900/60 p-3.5 rounded-xl border border-slate-700/40">
-                                <span class="text-[10px] font-black uppercase tracking-wider text-slate-500 block">Founded Flag</span>
-                                <span class="text-xs font-bold text-slate-200 truncate block mt-0.5"><?php echo htmlspecialchars($founded); ?></span>
+                            <div>
+                                <h3 class="text-sm font-label-lg text-on-surface mb-1">Founded</h3>
+                                <p class="text-sm font-body-md text-on-surface-variant"><?php echo htmlspecialchars($founded); ?></p>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- ════ TAB 3: MANAGED POSITIONS ROSTER VIEWPORT ════ -->
-                <div id="tab-jobs" class="tab-content hidden space-y-4 animate-in fade-in duration-300">
-                    <div class="flex items-center justify-between pb-2 border-b border-slate-700/60 px-1">
-                        <h3 class="text-xs font-black uppercase tracking-wider text-slate-400">Indexed Managed Targets (<?php echo count($jobs); ?>)</h3>
-                        <?php if ($isOwner): ?>
-                            <button onclick="openAddJobModal()" class="text-xs font-bold text-indigo-400 hover:underline flex items-center gap-1">
-                                <span class="material-symbols-outlined text-[14px]">add_circle</span> Post Opening
-                            </button>
-                        <?php endif; ?>
-                    </div>
-
-                    <?php if (!empty($jobs)): ?>
-                        <div class="space-y-3.5">
-                            <?php foreach ($jobs as $job): ?>
-                                <?php 
-                                    $isClosed = ($job['status'] === 'Closed');
-                                    $hasLimit = !empty($job['applicant_limit']);
-                                    $count = (int)($job['applicant_count'] ?? 0);
-                                    $limit = (int)($job['applicant_limit'] ?? 0);
-                                    $limitReached = ($hasLimit && $count >= $limit);
-                                ?>
-                                <div class="bg-slate-800/80 backdrop-blur-md p-5 rounded-2xl shadow-xl border border-slate-700/60 hover:border-slate-500/60 transition-all flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                                    <div class="space-y-2 min-w-0 flex-1">
-                                        <div class="flex flex-wrap items-center gap-2">
-                                            <h4 class="text-sm font-bold text-white truncate"><?php echo htmlspecialchars($job['title']); ?></h4>
-                                            
-                                            <?php if ($isClosed || $limitReached): ?>
-                                                <span class="bg-rose-500/10 text-rose-400 text-[10px] font-black px-2 py-0.5 rounded border border-rose-500/20 uppercase tracking-widest">Closed / Full</span>
-                                            <?php else: ?>
-                                                <span class="bg-emerald-500/10 text-emerald-400 text-[10px] font-black px-2 py-0.5 rounded border border-emerald-500/20 uppercase tracking-widest">Actively Sourcing</span>
-                                            <?php endif; ?>
-
-                                            <span class="bg-slate-900 text-indigo-300 text-[10px] font-bold px-2.5 py-0.5 rounded-md border border-slate-700"><?php echo htmlspecialchars($job['job_type']); ?></span>
-                                        </div>
-
-                                        <p class="text-xs text-slate-300 line-clamp-2 leading-relaxed font-normal"><?php echo htmlspecialchars($job['description']); ?></p>
-                                        
-                                        <div class="flex flex-wrap items-center gap-4 text-[11px] text-slate-400 pt-1 font-medium">
-                                            <span class="flex items-center gap-1 text-slate-300"><span class="material-symbols-outlined text-[14px] text-indigo-400">location_on</span> <?php echo htmlspecialchars($job['location'] ?? 'Remote Area'); ?></span>
-                                            <span class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px] text-indigo-400">payments</span> <?php echo htmlspecialchars($job['salary_range'] ?? 'Competitive spec'); ?></span>
-                                            <span class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px] text-indigo-400">school</span> <?php echo htmlspecialchars($job['experience_level']); ?> spec</span>
-                                        </div>
-                                    </div>
-
-                                    <div class="flex flex-col items-stretch sm:items-end gap-2 shrink-0 w-full sm:w-auto pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-700/40 sm:border-transparent">
-                                        <?php if ($hasLimit && !$isClosed): ?>
-                                            <span class="text-[10px] text-slate-400 font-bold text-right block">
-                                                Intake Volume: <strong class="text-indigo-400"><?php echo $count; ?> / <?php echo $limit; ?></strong> caps
-                                            </span>
-                                        <?php else: ?>
-                                            <span class="text-[10px] text-slate-400 font-bold text-right block">
-                                                Total Intakes: <strong class="text-indigo-400"><?php echo $count; ?></strong> logged
-                                            </span>
-                                        <?php endif; ?>
-
-                                        <?php if ($isOwner): ?>
-                                            <button onclick="selectTabDirectPortal(<?php echo $job['job_id']; ?>)" class="w-full sm:w-auto bg-slate-900 hover:bg-slate-950 text-indigo-300 font-bold text-xs px-4 py-2 rounded-xl border border-slate-700 shadow-2xs transition-all inline-flex items-center justify-center gap-1 active:scale-95">
-                                                <span class="material-symbols-outlined text-[14px]">tune</span> <span>Configure / Review</span>
-                                            </button>
-                                        <?php else: ?>
-                                            <a href="<?php echo URLROOT; ?>/job/apply/<?php echo $job['job_id']; ?>" class="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs px-5 py-2.5 rounded-xl text-center shadow-md shadow-indigo-600/20 transition-all inline-block active:scale-95">
-                                                Apply Target
-                                            </a>
-                                        <?php endif; ?>
-                                    </div>
-                                </div>
-                            <?php endforeach; ?>
-                        </div>
-                    <?php else: ?>
-                        <div class="bg-slate-800/40 rounded-2xl p-12 text-center border border-slate-700/40">
-                            <span class="material-symbols-outlined text-slate-600 text-4xl block mb-2">work_off</span>
-                            <p class="text-xs text-slate-400 font-medium">No open hiring listings currently exposed on this pipeline gateway.</p>
-                        </div>
-                    <?php endif; ?>
-                </div>
-
-                <!-- ════ TAB 4: EXCLUSIVE APPLICANT CONTROL CENTER VIEWPORT ════ -->
-                <?php if ($isOwner): ?>
-                    <div id="tab-portal" class="tab-content hidden space-y-6 animate-in fade-in duration-300">
-                        
-                        <!-- Operator Management Console Banner -->
-                        <div class="bg-gradient-to-r from-indigo-600 via-indigo-700 to-blue-700 text-white rounded-3xl p-6 shadow-xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 relative overflow-hidden border border-indigo-400/20">
-                            <div class="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_70%_70%,white_1px,transparent_1px)] bg-[size:16px_16px]"></div>
-                            <div class="relative z-10 space-y-1 min-w-0 flex-1">
-                                <span class="bg-white/10 backdrop-blur-md text-white text-[9px] font-black tracking-widest uppercase px-2.5 py-0.5 rounded-full border border-white/10 block w-fit">Authorized Telemetry Control Node</span>
-                                <h3 class="text-lg font-black tracking-tight text-white">Central Listing Controller Suite</h3>
-                                <p class="text-xs text-indigo-100/90 font-normal leading-relaxed">Adjust individual post availability limits, switch intake channels asynchronously, inspect submitted resumes, and configure live platform locks.</p>
-                            </div>
-                            <div class="flex items-center gap-2 shrink-0 relative z-10">
-                                <button onclick="openAddJobModal()" class="bg-white text-indigo-700 hover:bg-indigo-50 font-bold text-xs px-4 py-3 rounded-xl transition-all shadow-md active:scale-95 inline-flex items-center gap-1.5">
-                                    <span class="material-symbols-outlined text-[16px]">add_circle</span> Post Opening
+                <!-- TAB: JOBS -->
+                <div id="tab-jobs" class="tab-content hidden space-y-4">
+                    <div class="bg-white rounded-xl border border-outline-variant/30 ambient-shadow overflow-hidden">
+                        <div class="p-4 border-b border-outline-variant/20 flex items-center justify-between bg-surface-container-low">
+                            <h2 class="font-title-lg text-on-surface">Openings (<?php echo count($jobs); ?>)</h2>
+                            <?php if ($isOwner): ?>
+                                <button onclick="openAddJobModal()" class="text-sm font-label-lg text-primary hover:bg-surface-variant px-3 py-1.5 rounded transition-colors flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-[18px]">add</span> Post job
                                 </button>
-                            </div>
+                            <?php endif; ?>
                         </div>
 
-                        <!-- Config Dials Table Matrix -->
-                        <div class="bg-slate-800/80 backdrop-blur-md rounded-2xl shadow-xl border border-slate-700/60 overflow-hidden">
-                            <div class="p-4 bg-slate-800/90 border-b border-slate-700/60 flex items-center justify-between">
-                                <span class="text-xs font-black uppercase tracking-wider text-indigo-400">Inline Target Allocations & Diagnostic Controls</span>
-                                <span class="text-[10px] font-medium text-slate-400">Synchronized background writes</span>
+                        <?php if (!empty($jobs)): ?>
+                            <div class="divide-y divide-outline-variant/20">
+                                <?php foreach ($jobs as $job): ?>
+                                    <div class="p-6 hover:bg-surface-container-low transition-colors flex flex-col sm:flex-row justify-between gap-4">
+                                        <div class="space-y-1">
+                                            <a href="<?php echo URLROOT; ?>/job/apply/<?php echo $job['job_id']; ?>" class="font-title-lg text-primary hover:underline inline-block"><?php echo htmlspecialchars($job['title']); ?></a>
+                                            <p class="font-body-md text-on-surface-variant text-sm"><?php echo htmlspecialchars($job['location'] ?? 'Remote'); ?> &bull; <?php echo htmlspecialchars($job['job_type']); ?></p>
+                                            <p class="font-body-sm text-secondary text-xs pt-2">Posted on <?php echo date('M j, Y', strtotime($job['posted_at'])); ?></p>
+                                        </div>
+                                        <div class="shrink-0">
+                                            <?php if ($isOwner): ?>
+                                                <button onclick="document.querySelector('[data-tab=\'portal\']').click()" class="text-primary font-label-md px-4 py-1.5 rounded-full border border-primary hover:bg-primary-fixed hover:border-primary-container transition-colors">
+                                                    Manage
+                                                </button>
+                                            <?php else: ?>
+                                                <a href="<?php echo URLROOT; ?>/job/apply/<?php echo $job['job_id']; ?>" class="inline-block bg-primary text-white font-label-md px-5 py-2 rounded-full hover:bg-[#004182] transition-colors shadow-sm">
+                                                    Apply
+                                                </a>
+                                            <?php endif; ?>
+                                        </div>
+                                    </div>
+                                <?php endforeach; ?>
                             </div>
+                        <?php else: ?>
+                            <div class="p-12 text-center">
+                                <span class="material-symbols-outlined text-4xl text-outline-variant mb-2">work_off</span>
+                                <h3 class="font-title-md text-on-surface">No open jobs</h3>
+                                <p class="text-sm text-secondary mt-1">There are no job openings at the moment.</p>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                </div>
 
-                            <div class="overflow-x-auto">
-                                <table class="w-full text-left border-collapse">
-                                    <thead>
-                                        <tr class="border-b border-slate-700/40 text-[10px] font-black text-slate-400 uppercase tracking-wider bg-slate-900/40">
-                                            <th class="p-4">Target Title String & Area</th>
-                                            <th class="p-4">Intake Status</th>
-                                            <th class="p-4">Applicant Cap Value</th>
-                                            <th class="p-4 text-center">Telemetry Status</th>
-                                            <th class="p-4 text-right">Roster Diagnostic Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody class="divide-y divide-slate-700/40 text-xs font-medium text-slate-200">
-                                        <?php if (!empty($jobs)): ?>
-                                            <?php foreach ($jobs as $job): ?>
-                                                <?php 
-                                                    $jid = $job['job_id'];
-                                                    $isClosed = ($job['status'] === 'Closed');
-                                                ?>
-                                                <tr class="hover:bg-slate-700/30 transition-colors" id="row-job-<?php echo $jid; ?>">
-                                                    <td class="p-4 max-w-[200px]">
-                                                        <strong class="text-white block truncate"><?php echo htmlspecialchars($job['title']); ?></strong>
-                                                        <span class="text-[11px] text-slate-400 block truncate"><?php echo htmlspecialchars($job['location'] ?? 'Remote Gateway'); ?></span>
-                                                    </td>
-                                                    
-                                                    <td class="p-4">
-                                                        <select id="status-<?php echo $jid; ?>" class="text-xs bg-slate-900 border border-slate-700 rounded-xl px-3 py-1.5 font-bold text-slate-200 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-colors">
-                                                            <option value="Live" <?php echo !$isClosed ? 'selected' : ''; ?>>Live Active</option>
-                                                            <option value="Closed" <?php echo $isClosed ? 'selected' : ''; ?>>Closed Full</option>
-                                                        </select>
-                                                    </td>
+                <!-- TAB: HIRING DESK (Owner Only) -->
+                <?php if ($isOwner): ?>
+                <div id="tab-portal" class="tab-content hidden space-y-6">
+                    <div class="bg-white rounded-xl border border-outline-variant/30 ambient-shadow overflow-hidden">
+                        <div class="p-6 border-b border-outline-variant/20 bg-surface-container-low flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                            <div>
+                                <h2 class="font-title-lg text-on-surface">Hiring Dashboard</h2>
+                                <p class="text-sm font-body-md text-secondary mt-1">Manage listings and review applicants.</p>
+                            </div>
+                            <button onclick="openAddJobModal()" class="bg-primary text-white font-label-md px-4 py-2 rounded-full hover:bg-[#004182] transition-colors flex items-center gap-1.5 shadow-sm">
+                                <span class="material-symbols-outlined text-[18px]">add</span> Post New Job
+                            </button>
+                        </div>
 
-                                                    <td class="p-4">
-                                                        <div class="flex items-center gap-1.5 max-w-[120px]">
-                                                            <input type="number" id="limit-<?php echo $jid; ?>" value="<?php echo htmlspecialchars($job['applicant_limit'] ?? ''); ?>" placeholder="No Cap" class="w-20 text-xs bg-slate-900 border border-slate-700 rounded-xl px-2.5 py-1.5 font-bold text-slate-200 placeholder:text-slate-600 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-colors">
-                                                            <button onclick="saveJobConfig(<?php echo $jid; ?>)" class="p-1.5 text-indigo-400 hover:bg-slate-700 rounded-lg transition-colors" title="Commit parameter">
-                                                                <span class="material-symbols-outlined text-[15px] block">save</span>
-                                                            </button>
-                                                        </div>
-                                                    </td>
-
-                                                    <td class="p-4 text-center font-bold">
-                                                        <span class="px-2.5 py-1 rounded-md text-[11px] <?php echo ((int)$job['applicant_count'] > 0) ? 'bg-indigo-500/10 text-indigo-300 border border-indigo-500/20' : 'bg-slate-900 text-slate-500'; ?>">
-                                                            <?php echo (int)($job['applicant_count'] ?? 0); ?> Applied
-                                                        </span>
-                                                    </td>
-
-                                                    <td class="p-4 text-right">
-                                                        <button onclick="viewCandidates(<?php echo $jid; ?>, '<?php echo addslashes(htmlspecialchars($job['title'])); ?>')" class="bg-slate-900 hover:bg-slate-950 border border-slate-700 text-indigo-300 font-bold px-3.5 py-1.5 rounded-xl text-[11px] transition-all inline-flex items-center gap-1 shadow-2xs active:scale-95">
-                                                            <span class="material-symbols-outlined text-[14px]">groups</span> <span>Review Submissions</span>
-                                                        </button>
-                                                    </td>
-                                                </tr>
-                                            <?php endforeach; ?>
-                                        <?php else: ?>
-                                            <tr>
-                                                <td colspan="5" class="p-8 text-center text-slate-500 italic">No job listing variables configured inline yet.</td>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left">
+                                <thead>
+                                    <tr class="bg-surface-container border-b border-outline-variant/30 text-xs font-label-lg text-on-surface-variant uppercase tracking-wider">
+                                        <th class="p-4 font-semibold">Job Title</th>
+                                        <th class="p-4 font-semibold">Status</th>
+                                        <th class="p-4 font-semibold">Applicants</th>
+                                        <th class="p-4 font-semibold text-right">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-outline-variant/20">
+                                    <?php if (!empty($jobs)): ?>
+                                        <?php foreach ($jobs as $job): ?>
+                                            <tr class="hover:bg-surface-container-low transition-colors" id="row-job-<?php echo $job['job_id']; ?>">
+                                                <td class="p-4">
+                                                    <p class="font-title-md text-on-surface"><?php echo htmlspecialchars($job['title']); ?></p>
+                                                    <p class="font-body-sm text-xs text-secondary mt-0.5"><?php echo htmlspecialchars($job['location'] ?? 'Remote'); ?></p>
+                                                </td>
+                                                <td class="p-4">
+                                                    <select id="status-<?php echo $job['job_id']; ?>" onchange="saveJobConfig(<?php echo $job['job_id']; ?>)" class="text-sm border border-outline-variant rounded-md py-1 px-2 focus:ring-primary focus:border-primary">
+                                                        <option value="Live" <?php echo $job['status'] !== 'Closed' ? 'selected' : ''; ?>>Active</option>
+                                                        <option value="Closed" <?php echo $job['status'] === 'Closed' ? 'selected' : ''; ?>>Closed</option>
+                                                    </select>
+                                                </td>
+                                                <td class="p-4">
+                                                    <span class="inline-flex items-center justify-center px-2.5 py-1 rounded-full text-xs font-medium <?php echo ((int)$job['applicant_count'] > 0) ? 'bg-primary-fixed text-primary-container' : 'bg-surface-variant text-secondary'; ?>">
+                                                        <?php echo (int)($job['applicant_count'] ?? 0); ?> applied
+                                                    </span>
+                                                </td>
+                                                <td class="p-4 text-right">
+                                                    <button onclick="viewCandidates(<?php echo $job['job_id']; ?>, '<?php echo addslashes(htmlspecialchars($job['title'])); ?>')" class="text-primary font-label-md hover:bg-primary-fixed px-3 py-1.5 rounded-full transition-colors border border-transparent hover:border-primary-container inline-flex items-center gap-1">
+                                                        <span class="material-symbols-outlined text-[16px]">groups</span> Review
+                                                    </button>
+                                                </td>
                                             </tr>
-                                        <?php endif; ?>
-                                    </tbody>
-                                </table>
-                            </div>
+                                        <?php endforeach; ?>
+                                    <?php else: ?>
+                                        <tr>
+                                            <td colspan="4" class="p-8 text-center text-secondary font-body-md italic">No active job listings.</td>
+                                        </tr>
+                                    <?php endif; ?>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
+                </div>
                 <?php endif; ?>
-
             </div>
 
-            <!-- Global Environment Metadata Sidebar Stack -->
+            <!-- Right Sidebar -->
             <aside class="space-y-6">
-                
-                <!-- Spec Block Card -->
-                <div class="bg-slate-800/80 backdrop-blur-md p-5 rounded-2xl shadow-xl border border-slate-700/60 space-y-4">
-                    <h3 class="text-xs font-black text-indigo-400 uppercase tracking-widest flex items-center gap-1.5">
-                        <span class="material-symbols-outlined text-[15px]">data_object</span> Sourcing Telemetry
-                    </h3>
-                    
-                    <div class="space-y-3.5 text-xs">
-                        <div class="border-b border-slate-700/40 pb-2.5">
-                            <span class="text-[9px] font-black uppercase text-slate-500 block tracking-wider">Target Domain Reference</span>
-                            <a class="text-indigo-400 font-bold hover:underline truncate block mt-0.5" href="<?php echo htmlspecialchars($website); ?>" target="_blank"><?php echo htmlspecialchars($website === '#' ? 'Domain Unassigned' : $website); ?></a>
-                        </div>
-                        <div class="border-b border-slate-700/40 pb-2.5">
-                            <span class="text-[9px] font-black uppercase text-slate-500 block tracking-wider">Assigned Industry Spec</span>
-                            <p class="font-bold text-slate-200 mt-0.5 truncate"><?php echo htmlspecialchars($industry); ?></p>
-                        </div>
-                        <div class="border-b border-slate-700/40 pb-2.5">
-                            <span class="text-[9px] font-black uppercase text-slate-500 block tracking-wider">Workforce Scale</span>
-                            <p class="font-bold text-slate-200 mt-0.5"><?php echo htmlspecialchars($size); ?></p>
-                            <p class="text-[10px] text-indigo-300 font-black mt-1 bg-indigo-500/10 p-1.5 rounded-lg border border-indigo-500/20 block"><?php echo count($jobs); ?> target job channels</p>
+                <div class="bg-white rounded-xl border border-outline-variant/30 ambient-shadow p-5">
+                    <h3 class="font-title-md text-on-surface mb-4">About this page</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <p class="text-xs font-label-md text-secondary uppercase tracking-wider mb-1">Website</p>
+                            <a href="<?php echo htmlspecialchars($website); ?>" target="_blank" class="text-sm font-body-md text-primary hover:underline truncate block"><?php echo htmlspecialchars($website); ?></a>
                         </div>
                         <div>
-                            <span class="text-[9px] font-black uppercase text-slate-500 block tracking-wider">Headquarters Node Flag</span>
-                            <p class="font-bold text-slate-200 mt-0.5 flex items-center gap-1">
-                                <span class="material-symbols-outlined text-[13px] text-slate-400">public</span> Standard Production Cloud
-                            </p>
+                            <p class="text-xs font-label-md text-secondary uppercase tracking-wider mb-1">Industry</p>
+                            <p class="text-sm font-body-md text-on-surface"><?php echo htmlspecialchars($industry); ?></p>
+                        </div>
+                        <div>
+                            <p class="text-xs font-label-md text-secondary uppercase tracking-wider mb-1">Company size</p>
+                            <p class="text-sm font-body-md text-on-surface"><?php echo htmlspecialchars($size); ?></p>
+                        </div>
+                        <div class="pt-2 border-t border-outline-variant/20">
+                            <a href="#" data-tab-link="about" class="text-sm font-label-md text-primary hover:underline">Show more details</a>
                         </div>
                     </div>
                 </div>
-
-                <!-- Live Quick Diagnostics Links Strip -->
-                <?php if ($isOwner): ?>
-                    <div class="bg-slate-800/80 backdrop-blur-md p-5 rounded-2xl shadow-xl border border-slate-700/60 space-y-3">
-                        <h3 class="text-xs font-black text-indigo-400 uppercase tracking-widest flex items-center gap-1.5">
-                            <span class="material-symbols-outlined text-[15px]">bolt</span> Quick Dashboard Actions
-                        </h3>
-                        <button onclick="openAddJobModal()" class="w-full bg-slate-900 hover:bg-slate-950 text-indigo-300 font-bold p-3 rounded-xl border border-slate-700 text-xs text-left transition-all flex items-center justify-between group active:scale-95">
-                            <span class="flex items-center gap-2">
-                                <span class="material-symbols-outlined text-[16px] text-indigo-400">add_task</span> Post New Listing
-                            </span>
-                            <span class="material-symbols-outlined text-[14px] group-hover:translate-x-0.5 transition-transform">arrow_forward</span>
-                        </button>
-                        <button onclick="openEditCompanyModal()" class="w-full bg-slate-900 hover:bg-slate-950 text-slate-300 font-bold p-3 rounded-xl border border-slate-700 text-xs text-left transition-all flex items-center justify-between group active:scale-95">
-                            <span class="flex items-center gap-2">
-                                <span class="material-symbols-outlined text-[16px] text-slate-400">edit_attributes</span> Sync Bio String
-                            </span>
-                            <span class="material-symbols-outlined text-[14px] group-hover:translate-x-0.5 transition-transform">arrow_forward</span>
-                        </button>
-                    </div>
-                <?php endif; ?>
-
             </aside>
         </div>
     </div>
-
 </main>
 
-<!-- ════ PREMIUM VIEWPORT-SAFE EDIT PROFILE DATA MODAL ════ -->
+<!-- Modals -->
 <?php if ($isOwner): ?>
-<div id="editCompanyModal" class="fixed inset-0 z-[250] hidden overflow-y-auto font-sans" role="dialog" aria-modal="true">
-    <div class="fixed inset-0 bg-slate-950/80 backdrop-blur-md transition-opacity" onclick="closeEditCompanyModal()"></div>
-
-    <div class="min-h-screen px-4 py-8 flex items-center justify-center relative z-10">
-        <div class="relative w-full max-w-xl bg-slate-900 text-white rounded-3xl shadow-2xl overflow-hidden flex flex-col border border-slate-700 max-h-[calc(100vh-4rem)] animate-in fade-in zoom-in-95 duration-200">
-            
-            <div class="p-6 border-b border-slate-800 flex items-center justify-between shrink-0 bg-slate-950/50">
+<!-- Edit Modal -->
+<div id="editCompanyModal" class="fixed inset-0 z-50 hidden">
+    <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeEditCompanyModal()"></div>
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-lg bg-white rounded-xl shadow-2xl flex flex-col max-h-[90vh]">
+        <div class="p-5 border-b border-outline-variant/20 flex justify-between items-center">
+            <h2 class="font-title-lg text-on-surface">Edit Company Details</h2>
+            <button onclick="closeEditCompanyModal()" class="w-8 h-8 rounded-full hover:bg-surface-container flex items-center justify-center text-secondary">
+                <span class="material-symbols-outlined text-xl">close</span>
+            </button>
+        </div>
+        <div class="p-6 overflow-y-auto">
+            <form action="<?php echo URLROOT; ?>/company/update_profile" method="POST" enctype="multipart/form-data" class="space-y-5">
                 <div>
-                    <h3 class="text-base font-black text-white tracking-tight flex items-center gap-2">
-                        <span class="material-symbols-outlined text-indigo-400 text-[18px]">settings</span> Edit Enterprise Scope
-                    </h3>
-                    <p class="text-xs text-slate-400 mt-0.5">Configure public targeting string variables.</p>
-                </div>
-                <button onclick="closeEditCompanyModal()" class="w-8 h-8 flex items-center justify-center rounded-full bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white transition-colors">
-                    <span class="material-symbols-outlined text-[16px]">close</span>
-                </button>
-            </div>
-
-            <form action="<?php echo URLROOT; ?>/company/update_profile" method="POST" class="flex-1 overflow-y-auto p-6 space-y-4 custom-scrollbar">
-                <div>
-                    <label class="block text-xs font-bold text-slate-300 mb-1">Executive Summary Description</label>
-                    <textarea name="description" rows="4" class="w-full text-xs bg-slate-950 border border-slate-700 rounded-xl p-3 text-slate-100 font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"><?php echo htmlspecialchars($company['description'] ?? ''); ?></textarea>
-                </div>
-
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs font-bold text-slate-300 mb-1">Target Web Domain URL</label>
-                        <input type="text" name="website" value="<?php echo htmlspecialchars($company['website'] ?? ''); ?>" placeholder="https://domain.com" class="w-full text-xs bg-slate-950 border border-slate-700 rounded-xl p-3 text-slate-100 font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-slate-300 mb-1">Industry Spec Node</label>
-                        <input type="text" name="industry" value="<?php echo htmlspecialchars($company['industry'] ?? ''); ?>" placeholder="e.g. Analytics, Automation" class="w-full text-xs bg-slate-950 border border-slate-700 rounded-xl p-3 text-slate-100 font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all">
+                    <label class="block font-label-lg text-on-surface mb-1">Company Logo</label>
+                    <div class="flex items-center gap-4">
+                        <img src="<?php echo htmlspecialchars($logo); ?>" alt="" class="w-16 h-16 rounded-lg object-contain bg-white border border-outline-variant">
+                        <input type="file" name="logo" accept="image/*" class="block w-full text-sm">
                     </div>
                 </div>
-
                 <div>
-                    <label class="block text-xs font-bold text-slate-300 mb-1">Workforce Scale Cluster</label>
-                    <input type="text" name="size" value="<?php echo htmlspecialchars($company['size'] ?? ''); ?>" placeholder="e.g. 51-200 nodes" class="w-full text-xs bg-slate-950 border border-slate-700 rounded-xl p-3 text-slate-100 font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all">
+                    <label class="block font-label-lg text-on-surface mb-1">Description</label>
+                    <textarea name="description" rows="4" class="w-full p-3 rounded-md border border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary text-sm bg-white"><?php echo htmlspecialchars($company['description'] ?? ''); ?></textarea>
                 </div>
-
-                <div class="pt-4 border-t border-slate-800 flex justify-end gap-2">
-                    <button type="button" onclick="closeEditCompanyModal()" class="px-5 py-2.5 text-xs font-bold bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-xl transition-all">Abort</button>
-                    <button type="submit" class="px-5 py-2.5 text-xs font-bold bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl shadow-md shadow-indigo-600/20 transition-all">Commit Save</button>
+                <div>
+                    <label class="block font-label-lg text-on-surface mb-1">Website URL</label>
+                    <input type="text" name="website" value="<?php echo htmlspecialchars($company['website'] ?? ''); ?>" class="w-full h-10 px-3 rounded-md border border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary text-sm bg-white">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block font-label-lg text-on-surface mb-1">Industry</label>
+                        <input type="text" name="industry" value="<?php echo htmlspecialchars($company['industry'] ?? ''); ?>" class="w-full h-10 px-3 rounded-md border border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary text-sm bg-white">
+                    </div>
+                    <div>
+                        <label class="block font-label-lg text-on-surface mb-1">Company Size</label>
+                        <input type="text" name="size" value="<?php echo htmlspecialchars($company['size'] ?? ''); ?>" class="w-full h-10 px-3 rounded-md border border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary text-sm bg-white">
+                    </div>
+                </div>
+                <div class="pt-4 flex justify-end gap-3 border-t border-outline-variant/20 mt-6">
+                    <button type="button" onclick="closeEditCompanyModal()" class="px-5 py-2 rounded-full font-label-md text-secondary hover:bg-surface-variant transition-colors border border-outline-variant">Cancel</button>
+                    <button type="submit" class="px-5 py-2 rounded-full font-label-md bg-primary text-white hover:bg-[#004182] transition-colors shadow-sm">Save changes</button>
                 </div>
             </form>
-
         </div>
     </div>
 </div>
 
-<!-- ════ NEW PREMIUM VIEWPORT-SAFE POST JOB OPENING MODAL ════ -->
-<div id="addJobModal" class="fixed inset-0 z-[250] hidden overflow-y-auto font-sans" role="dialog" aria-modal="true">
-    <div class="fixed inset-0 bg-slate-950/80 backdrop-blur-md transition-opacity" onclick="closeAddJobModal()"></div>
-
-    <div class="min-h-screen px-4 py-8 flex items-center justify-center relative z-10">
-        <div class="relative w-full max-w-xl bg-slate-900 text-white rounded-3xl shadow-2xl overflow-hidden flex flex-col border border-slate-700 max-h-[calc(100vh-4rem)] animate-in fade-in zoom-in-95 duration-200">
-            
-            <div class="p-6 border-b border-slate-800 flex items-center justify-between shrink-0 bg-slate-950/50">
+<!-- Add Job Modal -->
+<div id="addJobModal" class="fixed inset-0 z-50 hidden">
+    <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeAddJobModal()"></div>
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-lg bg-white rounded-xl shadow-2xl flex flex-col max-h-[90vh]">
+        <div class="p-5 border-b border-outline-variant/20 flex justify-between items-center">
+            <h2 class="font-title-lg text-on-surface">Post a Job</h2>
+            <button onclick="closeAddJobModal()" class="w-8 h-8 rounded-full hover:bg-surface-container flex items-center justify-center text-secondary">
+                <span class="material-symbols-outlined text-xl">close</span>
+            </button>
+        </div>
+        <div class="p-6 overflow-y-auto">
+            <form action="<?php echo URLROOT; ?>/company/add_job" method="POST" class="space-y-5">
                 <div>
-                    <h3 class="text-base font-black text-white tracking-tight flex items-center gap-2">
-                        <span class="material-symbols-outlined text-indigo-400 text-[18px]">add_task</span> Post Job Opening Channel
-                    </h3>
-                    <p class="text-xs text-slate-400 mt-0.5">Author structured pipeline configuration inline.</p>
+                    <label class="block font-label-lg text-on-surface mb-1">Job Title *</label>
+                    <input type="text" name="title" required class="w-full h-10 px-3 rounded-md border border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary text-sm bg-white">
                 </div>
-                <button onclick="closeAddJobModal()" class="w-8 h-8 flex items-center justify-center rounded-full bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white transition-colors">
-                    <span class="material-symbols-outlined text-[16px]">close</span>
-                </button>
-            </div>
-
-            <form action="<?php echo URLROOT; ?>/company/add_job" method="POST" class="flex-1 overflow-y-auto p-6 space-y-4 custom-scrollbar">
-                <div>
-                    <label class="block text-xs font-bold text-slate-300 mb-1">Target Opening Title String <span class="text-rose-400">*</span></label>
-                    <input type="text" name="title" required placeholder="e.g. Senior PHP Infrastructure Architect" class="w-full text-xs bg-slate-950 border border-slate-700 rounded-xl p-3 text-slate-100 font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all">
-                </div>
-
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-xs font-bold text-slate-300 mb-1">Employment Matrix Type</label>
-                        <select name="job_type" class="w-full text-xs bg-slate-950 border border-slate-700 rounded-xl p-3 text-slate-100 font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all">
-                            <option value="Full-time">Full-time Node</option>
-                            <option value="Part-time">Part-time Band</option>
-                            <option value="Contract">Contract Scope</option>
-                            <option value="Internship">Internship Intake</option>
+                        <label class="block font-label-lg text-on-surface mb-1">Employment Type</label>
+                        <select name="job_type" class="w-full h-10 px-3 rounded-md border border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary text-sm bg-white">
+                            <option value="Full-time">Full-time</option>
+                            <option value="Part-time">Part-time</option>
+                            <option value="Contract">Contract</option>
+                            <option value="Internship">Internship</option>
                         </select>
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-slate-300 mb-1">Target Experience Clearance</label>
-                        <select name="experience_level" class="w-full text-xs bg-slate-950 border border-slate-700 rounded-xl p-3 text-slate-100 font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all">
-                            <option value="Entry">Entry Cluster</option>
-                            <option value="Mid">Mid Level Engineer</option>
-                            <option value="Senior">Senior Architecture</option>
-                            <option value="Director">Executive Spec</option>
+                        <label class="block font-label-lg text-on-surface mb-1">Experience Level</label>
+                        <select name="experience_level" class="w-full h-10 px-3 rounded-md border border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary text-sm bg-white">
+                            <option value="Entry">Entry Level</option>
+                            <option value="Associate">Associate</option>
+                            <option value="Mid-Senior">Mid-Senior level</option>
+                            <option value="Director">Director</option>
                         </select>
                     </div>
                 </div>
-
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-xs font-bold text-slate-300 mb-1">Target Cluster Geography</label>
-                        <input type="text" name="location" placeholder="e.g. Remote / On-site City" class="w-full text-xs bg-slate-950 border border-slate-700 rounded-xl p-3 text-slate-100 font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all">
+                        <label class="block font-label-lg text-on-surface mb-1">Location</label>
+                        <input type="text" name="location" placeholder="e.g. Remote" class="w-full h-10 px-3 rounded-md border border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary text-sm bg-white">
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-slate-300 mb-1">Salary Disclosed Parameter</label>
-                        <input type="text" name="salary_range" placeholder="e.g. ₹8 LPA - ₹14 LPA" class="w-full text-xs bg-slate-950 border border-slate-700 rounded-xl p-3 text-slate-100 font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all">
+                        <label class="block font-label-lg text-on-surface mb-1">Salary Range</label>
+                        <input type="text" name="salary_range" placeholder="e.g. $80k - $100k" class="w-full h-10 px-3 rounded-md border border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary text-sm bg-white">
                     </div>
                 </div>
-
                 <div>
-                    <label class="block text-xs font-bold text-slate-300 mb-1">Applicant Cap Volume Limit (Optional)</label>
-                    <input type="number" name="applicant_limit" placeholder="Leave empty for unconstrained auto intake" class="w-full text-xs bg-slate-950 border border-slate-700 rounded-xl p-3 text-slate-100 font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all">
+                    <label class="block font-label-lg text-on-surface mb-1">Job Description *</label>
+                    <textarea name="description" rows="5" required class="w-full p-3 rounded-md border border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary text-sm bg-white"></textarea>
                 </div>
-
-                <div>
-                    <label class="block text-xs font-bold text-slate-300 mb-1">Complete Job Responsibilities & Stack Requirements <span class="text-rose-400">*</span></label>
-                    <textarea name="description" rows="5" required placeholder="Enumerate target telemetry scopes, cloud framework libraries, and integration duties..." class="w-full text-xs bg-slate-950 border border-slate-700 rounded-xl p-3 text-slate-100 font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"></textarea>
-                </div>
-
-                <div class="pt-4 border-t border-slate-800 flex justify-end gap-2">
-                    <button type="button" onclick="closeAddJobModal()" class="px-5 py-2.5 text-xs font-bold bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-xl transition-all">Abort Action</button>
-                    <button type="submit" class="px-5 py-2.5 text-xs font-bold bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl shadow-md shadow-indigo-600/20 transition-all">Publish Job Opening</button>
+                <div class="pt-4 flex justify-end gap-3 border-t border-outline-variant/20 mt-6">
+                    <button type="button" onclick="closeAddJobModal()" class="px-5 py-2 rounded-full font-label-md text-secondary hover:bg-surface-variant transition-colors border border-outline-variant">Cancel</button>
+                    <button type="submit" class="px-5 py-2 rounded-full font-label-md bg-primary text-white hover:bg-[#004182] transition-colors shadow-sm">Post Job</button>
                 </div>
             </form>
-
         </div>
     </div>
 </div>
 
-<!-- ════ PREMIUM DIAGNOSTIC CANDIDATES INSPECTOR MODAL ════ -->
-<div id="candidatesModal" class="fixed inset-0 z-[250] hidden overflow-y-auto font-sans" role="dialog" aria-modal="true">
-    <div class="fixed inset-0 bg-slate-950/80 backdrop-blur-md transition-opacity" onclick="closeCandidatesModal()"></div>
-
-    <div class="min-h-screen px-4 py-8 flex items-center justify-center relative z-10">
-        <div class="relative w-full max-w-3xl bg-slate-900 text-white rounded-3xl shadow-2xl overflow-hidden flex flex-col border border-slate-700 max-h-[calc(100vh-4rem)] animate-in fade-in zoom-in-95 duration-200">
-            
-            <div class="p-6 border-b border-slate-800 flex items-center justify-between shrink-0 bg-slate-950/50">
-                <div class="min-w-0 pr-4">
-                    <h3 class="text-base font-black tracking-tight text-white truncate flex items-center gap-2" id="cand-job-title">
-                        <span class="material-symbols-outlined text-indigo-400 text-[18px]">groups</span> Sourced Intake Submissions
-                    </h3>
-                    <p class="text-xs text-slate-400 mt-0.5">Candidate profiles with attached credentials safely decoded.</p>
-                </div>
-                <button onclick="closeCandidatesModal()" class="w-8 h-8 flex items-center justify-center rounded-full bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white transition-colors shrink-0">
-                    <span class="material-symbols-outlined text-[16px]">close</span>
-                </button>
-            </div>
-
-            <div id="candidates-wrap" class="flex-1 overflow-y-auto p-6 space-y-4 custom-scrollbar">
-                <!-- Rendered asynchronously -->
-            </div>
-
-            <div class="p-4 border-t border-slate-800 flex justify-end shrink-0 bg-slate-950/30">
-                <button onclick="closeCandidatesModal()" class="px-5 py-2 text-xs font-bold bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl transition-all">Conclude View</button>
-            </div>
-
+<!-- Candidates Modal -->
+<div id="candidatesModal" class="fixed inset-0 z-50 hidden">
+    <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeCandidatesModal()"></div>
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl bg-white rounded-xl shadow-2xl flex flex-col max-h-[90vh]">
+        <div class="p-5 border-b border-outline-variant/20 flex justify-between items-center bg-surface-container-low">
+            <h2 class="font-title-lg text-on-surface" id="cand-job-title">Applicants</h2>
+            <button onclick="closeCandidatesModal()" class="w-8 h-8 rounded-full hover:bg-surface-variant flex items-center justify-center text-secondary">
+                <span class="material-symbols-outlined text-xl">close</span>
+            </button>
+        </div>
+        <div class="p-6 overflow-y-auto" id="candidates-wrap">
+            <!-- Loaded via JS -->
         </div>
     </div>
 </div>
 <?php endif; ?>
 
-<!-- System Telemetry UI Interfacing Scripts -->
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-    // ── Dedicated Workspace Tab Switcher Logic ──
+    // Tab Logic
     const tabs = document.querySelectorAll('[data-tab]');
     const contents = document.querySelectorAll('.tab-content');
 
     function selectTab(target) {
         tabs.forEach(t => {
-            const isP = (t.getAttribute('data-tab') === 'portal');
-            t.className = "px-5 py-2.5 text-xs font-bold shrink-0 transition-all flex items-center gap-1.5 rounded-full";
-            if (isP) {
-                t.classList.add('bg-indigo-500/10', 'text-indigo-400', 'hover:bg-indigo-500/20', 'border', 'border-indigo-500/30', 'ml-auto');
-            } else {
-                t.classList.add('text-slate-400', 'hover:text-slate-200', 'hover:bg-slate-700/50');
-            }
+            t.classList.remove('text-primary', 'border-primary');
+            t.classList.add('text-secondary', 'border-transparent');
         });
-
+        
         const activeTabButton = document.querySelector(`[data-tab="${target}"]`);
         if (activeTabButton) {
-            if (target === 'portal') {
-                activeTabButton.className = "px-5 py-2.5 text-xs font-black shrink-0 transition-all flex items-center gap-1.5 rounded-full bg-indigo-600 text-white shadow-md shadow-indigo-600/20 ml-auto";
-            } else {
-                activeTabButton.className = "px-5 py-2.5 text-xs font-bold shrink-0 transition-all flex items-center gap-1.5 rounded-full bg-indigo-600 text-white shadow-md shadow-indigo-600/20";
-            }
+            activeTabButton.classList.remove('text-secondary', 'border-transparent');
+            activeTabButton.classList.add('text-primary', 'border-primary');
         }
 
         contents.forEach(c => c.classList.add('hidden'));
-        
-        let matched = document.getElementById(`tab-${target}`);
-        if (target === 'about') {
-            const allContents = document.querySelectorAll('.tab-content');
-            allContents.forEach(el => {
-                if(el.id === 'tab-about' || (el.querySelector('h3') && el.querySelector('h3').textContent.includes('Identification'))) {
-                    matched = el;
-                }
-            });
-        }
-        if (matched) {
-            matched.classList.remove('hidden');
-        }
+        const activeContent = document.getElementById(`tab-${target}`);
+        if (activeContent) activeContent.classList.remove('hidden');
     }
 
     tabs.forEach(tab => {
@@ -657,98 +463,64 @@ document.addEventListener('DOMContentLoaded', () => {
         trigger.addEventListener('click', (e) => {
             e.preventDefault();
             selectTab(trigger.getAttribute('data-tab-link'));
+            window.scrollTo({ top: 300, behavior: 'smooth' });
         });
     });
+
+    // Follow Logic
+    const followBtn = document.getElementById('follow-btn');
+    if (followBtn) {
+        followBtn.addEventListener('click', async function() {
+            const companyId = this.getAttribute('data-id');
+            const isFollowing = this.classList.contains('border-2');
+            const url = isFollowing ? `${URLROOT}/company/unfollow/${companyId}` : `${URLROOT}/company/follow/${companyId}`;
+            
+            try {
+                const res = await fetch(url, { method: 'POST' });
+                const data = await res.json();
+                if (data.success) {
+                    window.location.reload();
+                } else {
+                    if(data.message === 'Unauthorized') window.location.href = `${URLROOT}/auth/login`;
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        });
+    }
 });
 
-// ── Secure Overlay Triggers ──
-function openEditCompanyModal() {
-    const m = document.getElementById('editCompanyModal');
-    if(m) { m.classList.remove('hidden'); document.body.style.overflow = 'hidden'; }
-}
+// Modal Logic
+function openEditCompanyModal() { document.getElementById('editCompanyModal').classList.remove('hidden'); }
+function closeEditCompanyModal() { document.getElementById('editCompanyModal').classList.add('hidden'); }
+function openAddJobModal() { document.getElementById('addJobModal').classList.remove('hidden'); }
+function closeAddJobModal() { document.getElementById('addJobModal').classList.add('hidden'); }
+function closeCandidatesModal() { document.getElementById('candidatesModal').classList.add('hidden'); }
 
-function closeEditCompanyModal() {
-    const m = document.getElementById('editCompanyModal');
-    if(m) { m.classList.add('hidden'); document.body.style.overflow = ''; }
-}
-
-function openAddJobModal() {
-    const m = document.getElementById('addJobModal');
-    if(m) { m.classList.remove('hidden'); document.body.style.overflow = 'hidden'; }
-}
-
-function closeAddJobModal() {
-    const m = document.getElementById('addJobModal');
-    if(m) { m.classList.add('hidden'); document.body.style.overflow = ''; }
-}
-
-function closeCandidatesModal() {
-    const m = document.getElementById('candidatesModal');
-    if(m) { m.classList.add('hidden'); document.body.style.overflow = ''; }
-}
-
-// ── Direct Roster Trigger Hook ──
-function selectTabDirectPortal(jobId) {
-    // Jump straight to portal panel to manage job controls inline
-    const trigger = document.querySelector('[data-tab="portal"]');
-    if (trigger) {
-        trigger.click();
-        setTimeout(() => {
-            const row = document.getElementById(`row-job-${jobId}`);
-            if (row) {
-                row.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                row.classList.add('bg-indigo-500/20');
-                setTimeout(() => row.classList.remove('bg-indigo-500/20'), 2000);
-            }
-        }, 150);
-    }
-}
-
-// ── Inline Remote Param Update Writes ──
 async function saveJobConfig(jobId) {
     const statusVal = document.getElementById(`status-${jobId}`).value;
-    const limitInput = document.getElementById(`limit-${jobId}`).value;
-
     try {
         const formData = new FormData();
         formData.append('status', statusVal);
-        formData.append('applicant_limit', limitInput);
-
-        const res = await fetch(`${URLROOT}/company/update_job/${jobId}`, {
+        await fetch(`${URLROOT}/company/update_job/${jobId}`, {
             method: 'POST',
             body: formData
         });
-        const data = await res.json();
-        
-        if (data.success) {
-            const btn = document.querySelector(`#limit-${jobId} + button`);
-            if (btn) {
-                const origHtml = btn.innerHTML;
-                btn.innerHTML = `<span class="material-symbols-outlined text-[15px] text-emerald-400 block">check</span>`;
-                setTimeout(() => btn.innerHTML = origHtml, 1200);
-            }
-        } else {
-            alert('Failed saving config settings.');
-        }
     } catch (e) {
         console.error(e);
-        alert('Transmission array issue.');
     }
 }
 
-// ── Dynamic Remote Candidates Parsing & Render Array ──
 async function viewCandidates(jobId, jobTitle) {
     const titleEl = document.getElementById('cand-job-title');
     const wrapEl = document.getElementById('candidates-wrap');
     const modalEl = document.getElementById('candidatesModal');
     
     if (!modalEl || !wrapEl) return;
-
-    if (titleEl) titleEl.innerHTML = `<span class="material-symbols-outlined text-indigo-400 text-[18px]">groups</span> Sourced Intakes: ${escapeHtml(jobTitle)}`;
-    wrapEl.innerHTML = `<div class="p-8 text-center"><div class="inline-block w-6 h-6 border-2 border-indigo-400 border-t-transparent rounded-full animate-spin"></div></div>`;
     
+    if (titleEl) titleEl.textContent = `Applicants for: ${jobTitle}`;
+    wrapEl.innerHTML = `<div class="p-8 text-center"><div class="inline-block w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin"></div></div>`;
     modalEl.classList.remove('hidden');
-    document.body.style.overflow = 'hidden';
 
     try {
         const res = await fetch(`${URLROOT}/company/get_applicants/${jobId}`);
@@ -756,41 +528,30 @@ async function viewCandidates(jobId, jobTitle) {
 
         if (data.success && data.applicants && data.applicants.length > 0) {
             wrapEl.innerHTML = data.applicants.map(app => `
-                <div class="p-4 rounded-2xl bg-slate-950/60 border border-slate-800 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                    <div class="flex items-start gap-3 min-w-0 flex-1">
-                        <img class="w-10 h-10 rounded-full object-cover shrink-0 mt-0.5 border border-slate-700 shadow-2xs" 
-                             src="${app.profile_pic ? `${URLROOT}/uploads/avatars/${app.profile_pic}` : `https://ui-avatars.com/api/?name=${encodeURIComponent(app.first_name+' '+app.last_name)}&background=4f46e5&color=fff`}">
-                        <div class="min-w-0 flex-1">
-                            <strong class="text-xs text-white block truncate">${escapeHtml(app.first_name)} ${escapeHtml(app.last_name)}</strong>
-                            <span class="text-[11px] text-slate-400 block truncate font-medium">${escapeHtml(app.email || 'No target tag attached')}</span>
-                            ${app.phone ? `<span class="text-[10px] text-indigo-400 font-bold block mt-0.5 flex items-center gap-1"><span class="material-symbols-outlined text-[12px]">call</span> ${escapeHtml(app.phone)}</span>` : ''}
-                            ${app.cover_letter ? `<p class="text-[11px] text-slate-300 bg-slate-900/90 p-3 rounded-xl border border-slate-800 mt-2 font-normal leading-relaxed overflow-wrap-anywhere">${escapeHtml(app.cover_letter)}</p>` : ''}
-                        </div>
+                <div class="p-4 border border-outline-variant/30 rounded-lg mb-4 flex items-start gap-4 hover:bg-surface-container-low transition-colors">
+                    <img src="${app.profile_pic ? `${URLROOT}/uploads/profiles/${app.profile_pic}` : pnProfilePicUrl({ full_name: `${app.first_name} ${app.last_name}` })}" class="w-12 h-12 rounded-full object-cover shrink-0 border border-outline-variant/30">
+                    <div class="flex-1 min-w-0">
+                        <p class="font-title-md text-on-surface truncate">${app.first_name} ${app.last_name}</p>
+                        <p class="font-body-md text-sm text-on-surface-variant truncate">${app.email}</p>
+                        ${app.phone ? `<p class="font-body-sm text-xs text-secondary mt-1">📞 ${app.phone}</p>` : ''}
+                        ${app.cover_letter ? `<p class="font-body-md text-sm text-on-surface-variant mt-2 bg-surface-container-low p-3 rounded border border-outline-variant/20 italic">"${app.cover_letter}"</p>` : ''}
                     </div>
-                    
-                    <div class="flex flex-col items-stretch sm:items-end gap-2 shrink-0 w-full sm:w-auto">
-                        <span class="text-[10px] text-slate-500 font-medium block text-right">${new Date(app.applied_at).toLocaleDateString(undefined, {month:'short', day:'numeric'})}</span>
+                    <div class="shrink-0">
                         ${app.resume_path ? `
-                            <a href="${URLROOT}/uploads/resumes/${app.resume_path}" target="_blank" download
-                               class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-3.5 py-2 rounded-xl text-[11px] shadow-md shadow-indigo-600/20 inline-flex items-center justify-center gap-1.5 transition-all active:scale-95">
-                                <span class="material-symbols-outlined text-[14px]">download</span> <span>Candidate CV Payload</span>
+                            <a href="${URLROOT}/uploads/resumes/${app.resume_path}" target="_blank" download class="text-primary font-label-md px-4 py-2 rounded border border-primary hover:bg-primary-fixed transition-colors flex items-center gap-1">
+                                <span class="material-symbols-outlined text-[18px]">download</span> Resume
                             </a>
-                        ` : `<span class="text-[10px] text-slate-500 italic">No CV Attached</span>`}
+                        ` : `<span class="text-xs text-secondary italic">No Resume</span>`}
                     </div>
                 </div>
             `).join('');
         } else {
-            wrapEl.innerHTML = `<div class="p-8 text-center text-slate-500 italic">No applicant form attachments registered on this target slot.</div>`;
+            wrapEl.innerHTML = `<div class="p-12 text-center text-secondary italic">No applicants yet.</div>`;
         }
     } catch (e) {
         console.error(e);
-        wrapEl.innerHTML = `<div class="p-8 text-center text-rose-400 font-bold">Network synchronization issue processing payload array.</div>`;
+        wrapEl.innerHTML = `<div class="p-8 text-center text-error font-body-md">Failed to load applicants.</div>`;
     }
-}
-
-function escapeHtml(str) {
-    if (!str) return '';
-    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 </script>
 

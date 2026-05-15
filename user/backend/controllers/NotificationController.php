@@ -7,7 +7,7 @@ class NotificationController extends Controller {
     }
 
     public function index() {
-        if(!isLoggedIn()) {
+        if (!isLoggedIn()) {
             header('Location: ' . URLROOT . '/auth/login');
             exit;
         }
@@ -15,23 +15,77 @@ class NotificationController extends Controller {
     }
 
     public function fetch() {
-        if(!isLoggedIn()) {
+        if (!isLoggedIn()) {
             echo json_encode(['success' => false]);
             exit;
         }
-        $notifications = $this->notificationModel->getNotifications($_SESSION['user_id']);
-        echo json_encode(['success' => true, 'notifications' => $notifications]);
+        $userId = $_SESSION['user_id'];
+        $notifications = $this->notificationModel->getNotifications($userId);
+        echo json_encode([
+            'success' => true,
+            'notifications' => $notifications,
+            'unread_count' => $this->notificationModel->getUnreadCount($userId)
+        ]);
+    }
+
+    public function unread_count() {
+        if (!isLoggedIn()) {
+            echo json_encode(['success' => false, 'count' => 0]);
+            exit;
+        }
+        echo json_encode([
+            'success' => true,
+            'count' => $this->notificationModel->getUnreadCount($_SESSION['user_id'])
+        ]);
     }
 
     public function mark_read() {
-        if(!isLoggedIn()) {
+        if (!isLoggedIn()) {
             echo json_encode(['success' => false]);
             exit;
         }
-        if($this->notificationModel->markAsRead($_SESSION['user_id'])) {
-            echo json_encode(['success' => true]);
-        } else {
+        $ok = $this->notificationModel->markAsRead($_SESSION['user_id']);
+        echo json_encode(['success' => $ok, 'unread_count' => 0]);
+    }
+
+    public function mark_one($id = null) {
+        if (!isLoggedIn()) {
             echo json_encode(['success' => false]);
+            exit;
         }
+        if (!$id) {
+            echo json_encode(['success' => false, 'message' => 'Invalid id']);
+            return;
+        }
+        $ok = $this->notificationModel->markOneAsRead((int)$id, $_SESSION['user_id']);
+        echo json_encode([
+            'success' => $ok,
+            'unread_count' => $this->notificationModel->getUnreadCount($_SESSION['user_id'])
+        ]);
+    }
+
+    public function dismiss($id = null) {
+        if (!isLoggedIn()) {
+            echo json_encode(['success' => false]);
+            exit;
+        }
+        if (!$id) {
+            echo json_encode(['success' => false, 'message' => 'Invalid id']);
+            return;
+        }
+        $ok = $this->notificationModel->dismiss((int)$id, $_SESSION['user_id']);
+        echo json_encode([
+            'success' => $ok,
+            'unread_count' => $this->notificationModel->getUnreadCount($_SESSION['user_id'])
+        ]);
+    }
+
+    public function clear_all() {
+        if (!isLoggedIn()) {
+            echo json_encode(['success' => false]);
+            exit;
+        }
+        $ok = $this->notificationModel->clearAll($_SESSION['user_id']);
+        echo json_encode(['success' => $ok, 'unread_count' => 0]);
     }
 }
