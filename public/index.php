@@ -23,6 +23,7 @@ require_once '../app/helpers/session_helper.php';
 require_once '../app/helpers/MailHelper.php';
 require_once '../app/helpers/image_helper.php';
 require_once '../app/helpers/nav_helper.php';
+require_once '../app/helpers/content_helper.php';
 
 // Init Core App
 $app = new App();

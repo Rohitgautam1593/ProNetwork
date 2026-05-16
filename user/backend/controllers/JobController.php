@@ -76,6 +76,10 @@ class JobController extends Controller {
 
     public function apply($job_id) {
         if(!isLoggedIn()) {
+            if($_SERVER['REQUEST_METHOD'] === 'GET') {
+                header('Location: ' . URLROOT . '/auth/login');
+                exit;
+            }
             echo json_encode(['success' => false, 'message' => 'Unauthorized']);
             return;
         }
@@ -159,9 +163,10 @@ class JobController extends Controller {
             } else {
                 echo json_encode(['success' => false, 'message' => 'Could not submit application.']);
             }
-        } else {
-            echo json_encode(['success' => false, 'message' => 'Invalid request method.']);
         }
+
+        header('Location: ' . URLROOT . '/user/jobs?id=' . (int)$job_id);
+        exit;
     }
 
     public function report($job_id) {

@@ -19,7 +19,32 @@ class Post extends Model {
             });
         }
 
-        return $posts;
+        return array_map([$this, 'normalizePostRow'], $posts);
+    }
+
+    public function getPostsByUser($authorId, $viewerId = null) {
+        $viewer = (int) ($viewerId ?? 0);
+        $this->db->query("SELECT p.*, u.full_name, u.role as user_role, u.profile_pic, 
+                          (SELECT COUNT(*) FROM post_reactions WHERE post_id = p.post_id) as reaction_count,
+                          (SELECT COUNT(*) FROM comments c WHERE c.post_id = p.post_id) as comment_count,
+                          (SELECT COUNT(*) FROM post_reactions pr WHERE pr.post_id = p.post_id AND pr.user_id = :viewer_id) as user_has_liked
+                          FROM posts p 
+                          JOIN users u ON p.user_id = u.user_id 
+                          WHERE p.user_id = :author_id
+                          ORDER BY p.created_at DESC");
+        $this->db->bind(':author_id', $authorId);
+        $this->db->bind(':viewer_id', $viewer);
+        $posts = $this->db->resultSet();
+
+        return array_map([$this, 'normalizePostRow'], $posts);
+    }
+
+    private function normalizePostRow(array $row): array
+    {
+        if (array_key_exists('content', $row) && is_string($row['content'])) {
+            $row['content'] = pn_normalize_post_content($row['content']);
+        }
+        return $row;
     }
 
     private function getFollowedCompanyActivity($userId) {
@@ -87,7 +112,7 @@ class Post extends Model {
     public function addPost($data) {
         $this->db->query("INSERT INTO posts (user_id, content, post_image) VALUES (:user_id, :content, :post_image)");
         $this->db->bind(':user_id', $data['user_id']);
-        $this->db->bind(':content', $data['content']);
+        $this->db->bind(':content', pn_normalize_post_content($data['content'] ?? ''));
         $this->db->bind(':post_image', $data['post_image'] ?? null);
 
         if($this->db->execute()) {
@@ -106,7 +131,8 @@ class Post extends Model {
                           FROM posts p JOIN users u ON p.user_id = u.user_id WHERE p.post_id = :post_id");
         $this->db->bind(':post_id', $id);
         $this->db->bind(':viewer_id', $viewer);
-        return $this->db->single();
+        $row = $this->db->single();
+        return $row ? $this->normalizePostRow($row) : false;
     }
 
     public function addReaction($post_id, $user_id, $type = 'like') {
@@ -153,7 +179,13 @@ class Post extends Model {
              ORDER BY c.created_at ASC"
         );
         $this->db->bind(':post_id', $post_id);
-        return $this->db->resultSet();
+        $rows = $this->db->resultSet();
+        return array_map(static function (array $row): array {
+            if (isset($row['content']) && is_string($row['content'])) {
+                $row['content'] = pn_normalize_post_content($row['content']);
+            }
+            return $row;
+        }, $rows);
     }
 
     public function getReactionsForPost($post_id) {
@@ -176,6 +208,7 @@ class Post extends Model {
     }
 
     public function addComment($post_id, $user_id, $content) {
+        $content = pn_normalize_post_content($content);
         $this->db->query("INSERT INTO comments (post_id, user_id, content) VALUES (:post_id, :user_id, :content)");
         $this->db->bind(':post_id', $post_id);
         $this->db->bind(':user_id', $user_id);

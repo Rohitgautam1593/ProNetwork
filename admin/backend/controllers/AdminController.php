@@ -554,7 +554,8 @@ class AdminController extends Controller {
                 $subtitle = $user['email'];
                 $content = !empty($user['bio']) ? $user['bio'] : 'No bio provided.';
                 if (!empty($user['profile_pic'])) {
-                    $image = strpos($user['profile_pic'], 'http') === 0 ? $user['profile_pic'] : URLROOT . '/uploads/profiles/' . $user['profile_pic'];
+                    $baseDir = ($user['role'] === 'Company') ? '/uploads/companies/' : '/uploads/profiles/';
+                    $image = strpos($user['profile_pic'], 'http') === 0 ? $user['profile_pic'] : URLROOT . $baseDir . $user['profile_pic'];
                 }
                 $meta = [
                     'User ID' => $user['user_id'],

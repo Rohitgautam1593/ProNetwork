@@ -469,13 +469,13 @@ async function showJobDetail(job) {
     const html = buildJobDetailHtml(freshJob);
     const detailContainer = document.getElementById('job-detail-container');
     if (detailContainer) {
-        detailContainer.className = 'jobs-detail-panel bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden flex flex-col sticky top-20 max-h-[calc(100vh-100px)]';
+        detailContainer.className = 'jobs-detail-panel bg-white rounded-xl border border-slate-200 shadow-sm overflow-y-auto sticky top-20 max-h-[calc(100vh-100px)]';
         detailContainer.innerHTML = html;
         wireJobDetailActions(detailContainer, freshJob);
     }
 
     const mobileBody = document.getElementById('jobs-mobile-detail-body');
-    if (mobileBody && window.matchMedia('(max-width: 767px)').matches) {
+    if (mobileBody && window.matchMedia('(max-width: 1179px)').matches) {
         mobileBody.innerHTML = html;
         wireJobDetailActions(mobileBody, freshJob);
         openMobileJobDetail();
@@ -516,14 +516,14 @@ function buildJobDetailHtml(freshJob) {
 
     return `
         <div class="relative shrink-0 border-b border-slate-100">
-            <div class="h-28 bg-slate-800 relative">
+            <div class="h-24 bg-slate-800 relative">
                 <img src="${banner}" alt="" class="absolute inset-0 w-full h-full object-cover opacity-60">
                 <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
             </div>
-            <div class="absolute top-16 left-5 w-16 h-16 bg-white rounded-xl shadow-md border-4 border-white flex items-center justify-center overflow-hidden">
+            <div class="absolute top-14 left-5 w-16 h-16 bg-white rounded-xl shadow-md border-4 border-white flex items-center justify-center overflow-hidden">
                 <img src="${logo}" alt="" class="w-full h-full object-contain">
             </div>
-            <div class="pt-10 px-5 pb-5 bg-white">
+            <div class="pt-9 px-5 pb-4 bg-white">
                 <h2 class="text-xl font-black text-slate-900 mb-1 leading-tight">${escapeHtml(freshJob.title)}</h2>
                 <div class="text-sm text-slate-600 mb-3 flex flex-wrap items-center gap-2">
                     <a href="${companyUrl}" class="text-[#0A66C2] font-bold hover:underline">${escapeHtml(freshJob.company_name)}</a>
@@ -544,7 +544,7 @@ function buildJobDetailHtml(freshJob) {
                 <div class="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden mb-4 max-w-xs">
                     <div class="bg-[#0A66C2] h-full rounded-full transition-all" style="width:${Math.min(100, (count / limit) * 100)}%"></div>
                 </div>` : ''}
-                <div class="flex flex-wrap gap-2">
+                <div class="flex flex-wrap gap-2 jobs-detail-actions">
                     <button type="button" id="job-apply-btn" ${disabled ? 'disabled' : ''} class="jobs-detail-cta flex items-center justify-center gap-2 font-bold py-2.5 px-6 rounded-full transition-all ${applyBtnClass}">${applyBtnText}</button>
                     <button type="button" id="job-save-btn" class="jobs-detail-secondary flex items-center justify-center gap-1.5 font-bold py-2.5 px-5 rounded-full border-2 border-slate-200 hover:border-amber-300 hover:bg-amber-50 transition-all ${saved ? 'is-saved text-amber-700 border-amber-200 bg-amber-50' : 'text-slate-600'}">
                         <span class="material-symbols-outlined text-[18px]" style="font-variation-settings:'FILL' ${saved ? 1 : 0}">bookmark</span>
@@ -559,7 +559,7 @@ function buildJobDetailHtml(freshJob) {
                 </div>
             </div>
         </div>
-        <div class="flex-1 overflow-y-auto p-5 bg-slate-50/40 space-y-4">
+        <div class="p-5 bg-slate-50/40 space-y-4">
             <section class="bg-white rounded-xl border border-slate-100 p-5 shadow-sm">
                 <h3 class="font-bold text-slate-900 mb-3 flex items-center gap-2">
                     <span class="material-symbols-outlined text-[#0A66C2]">description</span> About the role
@@ -624,7 +624,7 @@ function closeMobileJobDetail() {
 
 function openApplyModal(job) {
     const backdrop = document.createElement('div');
-    backdrop.className = 'fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm opacity-0 transition-opacity duration-300';
+    backdrop.className = 'fixed inset-0 z-50 flex items-center justify-center p-3 md:p-4 bg-slate-900/60 backdrop-blur-sm opacity-0 transition-opacity duration-300';
 
     const u = getUserState() || {};
     const parts = (u.full_name || '').split(' ');
@@ -633,53 +633,54 @@ function openApplyModal(job) {
     const phoneVal = u.phone || '';
 
     backdrop.innerHTML = `
-        <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden transform scale-95 transition-transform duration-300" id="apply-modal-content">
-            <div class="px-6 py-5 border-b border-slate-100 bg-slate-50/50 flex justify-between items-start">
+        <div class="apply-modal-card bg-white rounded-2xl shadow-2xl max-w-[520px] w-full overflow-hidden transform scale-95 transition-transform duration-300 flex flex-col" id="apply-modal-content">
+            <div class="px-5 py-4 border-b border-slate-100 bg-slate-50/50 flex justify-between items-start shrink-0">
                 <div>
-                    <h3 class="text-xl font-bold text-slate-900">Apply to ${escapeHtml(job.company_name)}</h3>
+                    <h3 class="text-lg font-bold text-slate-900">Apply to ${escapeHtml(job.company_name)}</h3>
                     <p class="text-sm font-medium text-slate-500 mt-1">${escapeHtml(job.title)}</p>
                 </div>
                 <button type="button" class="text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full p-1" id="apply-modal-close">
                     <span class="material-symbols-outlined text-[24px]">close</span>
                 </button>
             </div>
-            <form id="apply-submission-form" class="p-6 space-y-5">
-                <div class="grid grid-cols-2 gap-4">
+            <form id="apply-submission-form" class="apply-modal-body px-5 py-4 space-y-4 overflow-y-auto">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
                         <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">First name *</label>
-                        <input type="text" name="first_name" required value="${escapeHtml(fName)}" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#0A66C2]/20 focus:border-[#0A66C2]">
+                        <input type="text" name="first_name" required value="${escapeHtml(fName)}" class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#0A66C2]/20 focus:border-[#0A66C2]">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">Last name *</label>
-                        <input type="text" name="last_name" required value="${escapeHtml(lName)}" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#0A66C2]/20 focus:border-[#0A66C2]">
+                        <input type="text" name="last_name" required value="${escapeHtml(lName)}" class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#0A66C2]/20 focus:border-[#0A66C2]">
                     </div>
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">Phone</label>
-                    <input type="text" name="phone" value="${escapeHtml(phoneVal)}" placeholder="+1 (555) 000-0000" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#0A66C2]/20 focus:border-[#0A66C2]">
+                    <input type="text" name="phone" value="${escapeHtml(phoneVal)}" placeholder="+1 (555) 000-0000" class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#0A66C2]/20 focus:border-[#0A66C2]">
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">Resume (PDF/Word) *</label>
                     <div class="relative group">
                         <input type="file" name="resume" required accept=".pdf,.doc,.docx" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" id="resume-input">
-                        <div class="w-full px-4 py-6 border-2 border-dashed border-slate-300 rounded-xl bg-slate-50 group-hover:bg-blue-50 group-hover:border-blue-300 transition-all flex flex-col items-center text-center">
-                            <span class="material-symbols-outlined text-3xl text-slate-400 group-hover:text-[#0A66C2] mb-2">upload_file</span>
+                        <div class="w-full px-4 py-4 border-2 border-dashed border-slate-300 rounded-xl bg-slate-50 group-hover:bg-blue-50 group-hover:border-blue-300 transition-all flex flex-col items-center text-center">
+                            <span class="material-symbols-outlined text-2xl text-slate-400 group-hover:text-[#0A66C2] mb-1">upload_file</span>
                             <span class="text-sm font-bold text-slate-700" id="resume-label">Click or drag to upload</span>
                         </div>
                     </div>
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">Cover note (optional)</label>
-                    <textarea name="cover_letter" rows="3" placeholder="Why you are a great fit…" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#0A66C2]/20 resize-none"></textarea>
+                    <textarea name="cover_letter" rows="2" placeholder="Why you are a great fit..." class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#0A66C2]/20 resize-none"></textarea>
                 </div>
             </form>
-            <div class="px-6 py-4 bg-slate-50 border-t border-slate-100 flex justify-end gap-3">
-                <button type="button" class="px-6 py-2.5 text-sm font-bold text-slate-600 hover:bg-slate-200 rounded-full" id="apply-modal-cancel">Cancel</button>
-                <button type="submit" form="apply-submission-form" class="px-8 py-2.5 text-sm font-bold bg-[#0A66C2] text-white hover:bg-[#004182] rounded-full" id="apply-modal-confirm">Submit application</button>
+            <div class="px-5 py-3 bg-slate-50 border-t border-slate-100 flex flex-col-reverse sm:flex-row sm:justify-end gap-2 shrink-0">
+                <button type="button" class="px-5 py-2.5 text-sm font-bold text-slate-600 hover:bg-slate-200 rounded-full" id="apply-modal-cancel">Cancel</button>
+                <button type="submit" form="apply-submission-form" class="px-6 py-2.5 text-sm font-bold bg-[#0A66C2] text-white hover:bg-[#004182] rounded-full" id="apply-modal-confirm">Submit application</button>
             </div>
         </div>`;
 
     document.body.appendChild(backdrop);
+    document.body.style.overflow = 'hidden';
     const fileInput = backdrop.querySelector('#resume-input');
     const fileLabel = backdrop.querySelector('#resume-label');
     fileInput?.addEventListener('change', function () {
@@ -693,6 +694,7 @@ function openApplyModal(job) {
 
     const close = () => {
         backdrop.classList.add('opacity-0');
+        document.body.style.overflow = '';
         setTimeout(() => backdrop.remove(), 300);
     };
     backdrop.querySelector('#apply-modal-cancel')?.addEventListener('click', close);

@@ -2,7 +2,7 @@
 <?php require USERROOT . '/frontend/views/layouts/navbar.php'; ?>
 
 <!-- View Content -->
-<div class="bg-[#f3f2ef] min-h-screen pt-6 pb-12 font-['Manrope']">
+<div id="profile-page" class="bg-[#f3f2ef] min-h-screen pt-6 pb-12 font-['Manrope']">
     <div class="max-w-[1128px] mx-auto grid grid-cols-1 md:grid-cols-12 gap-6 px-4">
         <!-- Left Column: Primary Content -->
         <div class="md:col-span-8 flex flex-col gap-4">

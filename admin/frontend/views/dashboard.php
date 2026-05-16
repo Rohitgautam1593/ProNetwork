@@ -231,8 +231,10 @@ $activityStyles = [
                         class="flex items-center gap-3 px-5 py-3 hover:bg-blue-50/60 cursor-pointer group transition-all duration-150">
                         <div
                             class="w-9 h-9 rounded-full bg-blue-100 text-blue-700 font-black text-sm flex-shrink-0 flex items-center justify-center overflow-hidden ring-2 ring-blue-50">
-                            <?php if (!empty($usr['profile_pic'])): ?>
-                                <img src="<?php echo strpos($usr['profile_pic'], 'http') === 0 ? $usr['profile_pic'] : URLROOT . '/uploads/profiles/' . $usr['profile_pic']; ?>"
+                            <?php if (!empty($usr['profile_pic'])): 
+                                $baseDir = ($usr['role'] === 'Company') ? '/uploads/companies/' : '/uploads/profiles/';
+                            ?>
+                                <img src="<?php echo strpos($usr['profile_pic'], 'http') === 0 ? $usr['profile_pic'] : URLROOT . $baseDir . $usr['profile_pic']; ?>"
                                     class="w-full h-full object-cover">
                             <?php else:
                                 echo strtoupper(substr($usr['full_name'], 0, 1)); endif; ?>

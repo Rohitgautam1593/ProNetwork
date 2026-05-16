@@ -89,19 +89,21 @@ async function initProfile() {
 }
 
 function renderProfileLoadError(message) {
-    const name = document.querySelector('[data-user-name="full"]');
+    const scope = document.getElementById('profile-page') || document;
+    const name = scope.querySelector('[data-user-name="full"]');
     if (name) name.textContent = message;
 }
 
 function renderProfileData() {
     const u = currentUserData;
-    document.querySelectorAll('[data-user-name="full"]').forEach(el => el.textContent = u.full_name || 'Profile');
-    document.querySelectorAll('[data-user-headline]').forEach(el => el.textContent = u.headline || 'Professional');
-    document.querySelectorAll('[data-user-location]').forEach(el => el.textContent = u.location || 'Location not set');
-    document.querySelectorAll('[data-user-bio]').forEach(el => el.textContent = u.bio || (viewingOwnProfile ? 'Add a summary about yourself.' : 'No summary added yet.'));
+    const scope = document.getElementById('profile-page') || document;
+    scope.querySelectorAll('[data-user-name="full"]').forEach(el => el.textContent = u.full_name || 'Profile');
+    scope.querySelectorAll('[data-user-headline]').forEach(el => el.textContent = u.headline || 'Professional');
+    scope.querySelectorAll('[data-user-location]').forEach(el => el.textContent = u.location || 'Location not set');
+    scope.querySelectorAll('[data-user-bio]').forEach(el => el.textContent = u.bio || (viewingOwnProfile ? 'Add a summary about yourself.' : 'No summary added yet.'));
 
     const picUrl = pnProfilePicUrl(u);
-    document.querySelectorAll('img[data-user-pic="true"]').forEach(img => img.src = picUrl);
+    scope.querySelectorAll('img[data-user-pic="true"]').forEach(img => img.src = picUrl);
     const fullImg = document.getElementById('fullscreen-img');
     if (fullImg) fullImg.src = picUrl;
 
@@ -479,6 +481,7 @@ async function saveProfileEdit(e) {
         const data = await res.json();
         if (data.success) {
             currentUserData = data.user;
+            syncCurrentUserShell();
             renderProfileData();
             updateProfileStrength();
             closeModal('profile-edit-modal');
@@ -646,6 +649,7 @@ function bindImageUploads() {
             const data = await res.json();
             if (data.success) {
                 currentUserData.profile_pic = data.fileName;
+                syncCurrentUserShell();
                 renderProfileData();
                 toast('Profile picture updated', 'success');
             } else {
@@ -666,6 +670,7 @@ function bindImageUploads() {
             const data = await res.json();
             if (data.success) {
                 currentUserData.cover_image = data.fileName;
+                syncCurrentUserShell();
                 renderProfileData();
                 toast('Cover photo updated', 'success');
             } else {
@@ -675,6 +680,12 @@ function bindImageUploads() {
             coverInput.value = '';
         }
     });
+}
+
+function syncCurrentUserShell() {
+    if (!viewingOwnProfile) return;
+    if (typeof setUserState === 'function') setUserState(currentUserData);
+    if (typeof populateUserData === 'function') populateUserData(currentUserData);
 }
 
 async function loadExperience(targetId = null) {

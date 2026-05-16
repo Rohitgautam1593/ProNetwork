@@ -1,10 +1,10 @@
 <?php require USERROOT . '/frontend/views/layouts/header.php'; ?>
 <?php require USERROOT . '/frontend/views/layouts/navbar.php'; ?>
 
-<div class="user-page-shell pt-2 pb-12">
+<div class="settings-page user-page-shell pb-12">
     <div class="max-w-[1128px] mx-auto grid grid-cols-1 md:grid-cols-[240px_1fr] gap-6 items-start px-4 md:px-0">
-        <aside class="md:sticky md:top-20 flex flex-col gap-2 bg-white rounded-lg border border-gray-200 shadow-[0px_4px_12px_rgba(0,0,0,0.05)] overflow-hidden divide-y divide-gray-100">
-            <div class="p-4">
+        <aside class="settings-sidebar md:sticky md:top-24 flex flex-col gap-2 bg-white rounded-lg border border-gray-200 shadow-[0px_4px_12px_rgba(0,0,0,0.05)] overflow-hidden divide-y divide-gray-100">
+            <div class="p-4 bg-slate-50/70">
                 <div class="flex items-center gap-3 mb-1">
                     <img alt="Profile picture" data-user-pic="true" class="w-9 h-9 rounded-full object-cover bg-white" src="<?php echo pn_profile_pic_url(); ?>"/>
                     <div>
@@ -35,7 +35,7 @@
                     <span class="font-label-lg">General preferences</span>
                 </button>
             </nav>
-            <div class="p-4">
+            <div class="p-4 bg-slate-50/60">
                 <button id="settings-export-shortcut" class="w-full py-2 px-4 rounded-full border border-[#0A66C2] text-[#0A66C2] font-semibold text-sm hover:bg-blue-50 transition-colors">
                     Download my data
                 </button>
@@ -43,9 +43,38 @@
         </aside>
 
         <section class="flex flex-col gap-6">
-            <div class="bg-white rounded-lg p-6 shadow-[0px_4px_12px_rgba(0,0,0,0.05)] border border-gray-100">
-                <h2 id="settings-page-title" class="font-display-md text-2xl mb-1">Account preferences</h2>
-                <p id="settings-page-copy" class="text-gray-500 font-body-md">Manage profile basics, contact details, and account information.</p>
+            <div class="settings-hero bg-white rounded-lg p-6 shadow-[0px_4px_12px_rgba(0,0,0,0.05)] border border-gray-100">
+                <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5">
+                    <div>
+                        <p class="text-xs uppercase tracking-wide font-black text-[#0A66C2] mb-2">Control center</p>
+                        <h2 id="settings-page-title" class="font-display-md text-2xl mb-1">Account preferences</h2>
+                        <p id="settings-page-copy" class="text-gray-500 font-body-md max-w-2xl">Manage profile basics, contact details, and account information.</p>
+                    </div>
+                    <div class="flex flex-wrap gap-2">
+                        <button type="button" data-settings-action="open-profile" class="settings-hero-action">
+                            <span class="material-symbols-outlined text-[18px]">account_circle</span>
+                            View profile
+                        </button>
+                        <button type="button" data-settings-action="export-data" class="settings-hero-action">
+                            <span class="material-symbols-outlined text-[18px]">download</span>
+                            Export
+                        </button>
+                    </div>
+                </div>
+                <div class="settings-status-grid">
+                    <button type="button" data-settings-tab-jump="account" class="settings-status-card">
+                        <span class="material-symbols-outlined">badge</span>
+                        <span><strong id="settings-card-profile">Profile</strong><small id="settings-card-profile-copy">Loading...</small></span>
+                    </button>
+                    <button type="button" data-settings-tab-jump="security" class="settings-status-card">
+                        <span class="material-symbols-outlined">verified_user</span>
+                        <span><strong>Security</strong><small id="settings-card-security-copy">Active session</small></span>
+                    </button>
+                    <button type="button" data-settings-tab-jump="visibility" class="settings-status-card">
+                        <span class="material-symbols-outlined">visibility</span>
+                        <span><strong>Visibility</strong><small id="settings-card-visibility-copy">Loading...</small></span>
+                    </button>
+                </div>
             </div>
 
             <div data-settings-panel="account" class="settings-panel flex flex-col gap-6">

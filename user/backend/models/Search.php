@@ -21,12 +21,20 @@ class Search extends Model {
         $this->db->bind(':query', $query);
         $jobs = $this->db->resultSet();
 
+
+        $companySearchCondition = "WHERE name LIKE :query OR industry LIKE :query OR description LIKE :query";
+        if (strtolower($term) === 'pages' || strtolower($term) === 'page') {
+            $companySearchCondition = ""; // Show all companies for "pages" keyword
+        }
+
         $this->db->query("SELECT company_id, name as company_name, industry, logo_path as logo
                           FROM companies
-                          WHERE name LIKE :query OR industry LIKE :query OR description LIKE :query
+                          {$companySearchCondition}
                           ORDER BY name ASC
                           LIMIT 5");
-        $this->db->bind(':query', $query);
+        if ($companySearchCondition !== "") {
+            $this->db->bind(':query', $query);
+        }
         $companies = $this->db->resultSet();
 
         $this->db->query("SELECT p.post_id, p.content, p.created_at, u.full_name

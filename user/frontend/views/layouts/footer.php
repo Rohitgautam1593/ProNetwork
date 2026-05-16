@@ -1,7 +1,7 @@
   </main>
   <!-- Footer Component -->
-  <footer class="w-full py-16 border-t border-gray-200 bg-white font-['Manrope'] antialiased mt-auto">
-    <div class="max-w-[1128px] mx-auto px-4 grid grid-cols-2 md:grid-cols-4 gap-12 mb-12">
+  <footer class="pn-site-footer w-full py-10 md:py-12 border-t border-gray-200 bg-white font-['Manrope'] antialiased mt-auto">
+    <div class="max-w-[1128px] mx-auto px-4 grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-10 mb-8">
       <div class="col-span-2 md:col-span-1">
         <span class="text-xl font-black text-[#0A66C2] mb-6 block">ProNetwork</span>
         <p class="text-gray-500 text-sm leading-relaxed">Connecting the world's professionals to make them more
@@ -52,6 +52,7 @@
   </footer>
 
   <script src="<?php echo URLROOT; ?>/assets/js/forms.js?v=<?php echo time(); ?>"></script>
+  <script src="<?php echo URLROOT; ?>/assets/js/navigation.js?v=<?php echo time(); ?>"></script>
   <script src="<?php echo URLROOT; ?>/assets/js/main.js?v=<?php echo time(); ?>"></script>
   <script src="<?php echo URLROOT; ?>/assets/js/search.js?v=<?php echo time(); ?>"></script>
   

@@ -1,14 +1,452 @@
 :root {
   --pronetwork-blue: #0A66C2;
+  --pn-ink: #0f172a;
+  --pn-muted: #64748b;
+  --pn-line: #dbe3ee;
+  --pn-soft: #f4f7fb;
+  --pn-card: #ffffff;
+  --pn-sticky-top: 5.75rem;
+  --pn-sticky-max-height: calc(100dvh - 7rem);
   --radius-md: 10px;
-  --card-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --card-shadow: 0 10px 28px rgba(15, 23, 42, 0.07);
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 12px;
   --space-4: 16px;
   --space-6: 24px;
 }
-body { font-family: Inter, Manrope, "Segoe UI", sans-serif; }
+body {
+  font-family: Inter, Manrope, "Segoe UI", sans-serif;
+  background:
+    radial-gradient(circle at top left, rgba(10, 102, 194, 0.08), transparent 32rem),
+    linear-gradient(180deg, #f6f9fc 0%, #eef3f8 44%, #f8fafc 100%);
+  color: var(--pn-ink);
+}
+
+::selection {
+  background: rgba(10, 102, 194, 0.18);
+}
+
+/* User shell and shared polish */
+.user-page-shell {
+  min-height: calc(100vh - 3.5rem);
+  padding-bottom: 5.5rem;
+}
+
+.user-page-shell .max-w-\[1128px\] {
+  width: 100%;
+}
+
+.user-page-shell .bg-white {
+  background: rgba(255, 255, 255, 0.96) !important;
+}
+
+.user-page-shell .rounded-lg,
+.user-page-shell .rounded-xl {
+  border-radius: 14px !important;
+}
+
+.user-page-shell .shadow-sm,
+.user-page-shell [class*="shadow-[0px_4px_12px"],
+.user-page-shell [class*="shadow-[0px_2px_8px"] {
+  box-shadow: var(--card-shadow) !important;
+}
+
+.user-page-shell .border-slate-200,
+.user-page-shell .border-gray-100,
+.user-page-shell .border-gray-200 {
+  border-color: var(--pn-line) !important;
+}
+
+.user-page-shell button,
+.user-page-shell a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.user-page-shell button:focus-visible,
+.user-page-shell a:focus-visible,
+#global-search-input:focus-visible,
+#global-search-input-mobile:focus-visible {
+  outline: 3px solid rgba(10, 102, 194, 0.22);
+  outline-offset: 2px;
+}
+
+.user-page-shell section,
+.user-page-shell aside > .bg-white,
+.user-page-shell .pn-feed-card,
+.user-page-shell .settings-hero,
+.user-page-shell .settings-panel > .bg-white {
+  transition:
+    border-color 0.22s ease,
+    box-shadow 0.22s ease,
+    transform 0.22s ease;
+}
+
+.user-page-shell section:hover,
+.user-page-shell aside > .bg-white:hover,
+.user-page-shell .settings-hero:hover,
+.user-page-shell .settings-panel > .bg-white:hover {
+  border-color: rgba(10, 102, 194, 0.16) !important;
+  box-shadow: 0 16px 38px rgba(15, 23, 42, 0.09) !important;
+}
+
+.user-page-shell input,
+.user-page-shell textarea,
+.pn-search-input {
+  min-height: 2.5rem;
+}
+
+.user-page-shell input:focus,
+.user-page-shell textarea:focus,
+.pn-search-input:focus {
+  border-color: var(--pronetwork-blue) !important;
+  box-shadow: 0 0 0 4px rgba(10, 102, 194, 0.14) !important;
+}
+
+.user-page-shell [class*="sticky"][class*="top-20"],
+.user-page-shell [class*="sticky"][class*="top-24"] {
+  top: var(--pn-sticky-top) !important;
+  z-index: 4;
+  align-self: start;
+}
+
+.user-page-shell aside[class*="sticky"],
+.user-page-shell aside [class*="sticky"][class*="top-20"],
+.user-page-shell .settings-sidebar,
+.user-page-shell .jobs-list-panel,
+.user-page-shell .jobs-detail-panel {
+  max-height: var(--pn-sticky-max-height);
+}
+
+.user-page-shell aside[class*="sticky"],
+.user-page-shell aside [class*="sticky"][class*="top-20"],
+.user-page-shell .settings-sidebar {
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+
+.user-page-shell .jobs-list-panel,
+.user-page-shell .jobs-detail-panel,
+.user-page-shell #job-detail-container,
+.user-page-shell#notifications-page .sticky,
+.user-page-shell#messaging-page .sticky {
+  z-index: 3;
+}
+
+.user-page-shell#messaging-page > .grid > .sticky,
+.user-page-shell#messaging-page > .grid > div[class*="sticky"] {
+  height: var(--pn-sticky-max-height) !important;
+}
+
+.user-page-shell#jobs-page #jobs-container {
+  max-height: calc(100dvh - 18rem) !important;
+}
+
+.user-page-shell#jobs-page #job-detail-container {
+  max-height: var(--pn-sticky-max-height) !important;
+  overflow: auto;
+}
+
+.user-page-shell#jobs-page #jobs-alerts-card {
+  position: static;
+}
+
+.user-page-shell#jobs-page .jobs-page-grid {
+  align-items: start;
+}
+
+.user-page-shell#jobs-page .jobs-sidebar-col,
+.user-page-shell#jobs-page .jobs-list-col,
+.user-page-shell#jobs-page .jobs-detail-col {
+  min-width: 0;
+}
+
+.user-page-shell#jobs-page .jobs-list-panel,
+.user-page-shell#jobs-page .jobs-detail-panel {
+  width: 100%;
+}
+
+@media (min-width: 1180px) {
+  .user-page-shell#jobs-page .jobs-page-grid {
+    display: grid;
+    grid-template-columns: minmax(220px, 0.85fr) minmax(360px, 1.2fr) minmax(390px, 1.45fr);
+  }
+
+  .user-page-shell#jobs-page .jobs-sidebar-col,
+  .user-page-shell#jobs-page .jobs-list-col,
+  .user-page-shell#jobs-page .jobs-detail-col {
+    grid-column: auto / span 1;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1179px) {
+  .user-page-shell#jobs-page .jobs-page-grid {
+    display: grid;
+    grid-template-columns: minmax(220px, 0.8fr) minmax(0, 1.35fr);
+  }
+
+  .user-page-shell#jobs-page .jobs-sidebar-col,
+  .user-page-shell#jobs-page .jobs-list-col {
+    grid-column: auto / span 1;
+  }
+
+  .user-page-shell#jobs-page .jobs-detail-col {
+    display: none !important;
+  }
+}
+
+.user-page-shell .sticky .z-10 {
+  z-index: 2;
+}
+
+.pn-topbar {
+  box-shadow: 0 12px 34px rgba(15, 23, 42, 0.08);
+}
+
+.pn-brand {
+  min-height: 2.75rem;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.pn-brand:hover {
+  transform: translateY(-1px);
+}
+
+.pn-brand-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 12px;
+  color: #fff;
+  font-family: Manrope, Inter, sans-serif;
+  font-weight: 900;
+  letter-spacing: 0;
+  background: linear-gradient(135deg, #0a66c2, #084a8f);
+  box-shadow: 0 10px 22px rgba(10, 102, 194, 0.24);
+}
+
+.pn-main-nav {
+  padding: 0.35rem;
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  border-radius: 16px;
+  background: rgba(248, 250, 252, 0.72);
+}
+
+.pn-main-nav .pn-nav-item {
+  min-height: 2.75rem;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+}
+
+.pn-main-nav .pn-nav-item.is-active {
+  color: #075aa8;
+  background: #fff;
+  box-shadow: 0 8px 18px rgba(10, 102, 194, 0.12);
+}
+
+.pn-main-nav .pn-nav-item:not(.is-active):hover {
+  background: rgba(255, 255, 255, 0.82);
+  color: #0f172a;
+}
+
+.pn-profile-menu-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  min-height: 2.75rem;
+  padding: 0.35rem 0.5rem;
+  color: #475569;
+  border: 1px solid transparent;
+  border-radius: 14px;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.pn-profile-menu-toggle:hover,
+.pn-profile-menu-toggle.is-active,
+.pn-profile-menu-toggle[aria-expanded="true"] {
+  color: #0f172a;
+  background: #fff;
+  border-color: rgba(10, 102, 194, 0.14);
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08);
+}
+
+.pn-profile-menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 0.75rem);
+  width: min(19rem, calc(100vw - 2rem));
+  overflow: hidden;
+  border: 1px solid var(--pn-line);
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 22px 48px rgba(15, 23, 42, 0.18);
+}
+
+.pn-profile-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.8rem 1rem;
+  color: #334155;
+  font-size: 0.875rem;
+  font-weight: 750;
+  transition: background-color 0.16s ease, color 0.16s ease;
+}
+
+.pn-profile-menu-item:hover {
+  color: var(--pronetwork-blue);
+  background: #eff6ff;
+}
+
+.pn-mobile-avatar-link {
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.pn-mobile-avatar-link:active {
+  transform: scale(0.95);
+}
+
+.pn-mobile-bottom-nav {
+  position: fixed;
+  left: max(0.75rem, env(safe-area-inset-left));
+  right: max(0.75rem, env(safe-area-inset-right));
+  bottom: max(0.75rem, env(safe-area-inset-bottom));
+  z-index: 60;
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 0.15rem;
+  padding: 0.45rem;
+  border: 1px solid rgba(203, 213, 225, 0.9);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 18px 44px rgba(15, 23, 42, 0.18);
+  backdrop-filter: blur(16px);
+}
+
+.pn-mobile-nav-link {
+  display: flex;
+  min-width: 0;
+  min-height: 3.2rem;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.1rem;
+  border-radius: 15px;
+  color: #64748b;
+  font-size: 0.62rem;
+  font-weight: 800;
+  line-height: 1;
+  transition:
+    background-color 0.18s ease,
+    color 0.18s ease,
+    transform 0.18s ease;
+}
+
+.pn-mobile-nav-link .material-symbols-outlined {
+  font-size: 1.45rem;
+  line-height: 1;
+}
+
+.pn-mobile-nav-link.is-active {
+  color: #075aa8;
+  background: #eaf4ff;
+}
+
+.pn-mobile-nav-link:active {
+  transform: scale(0.96);
+}
+
+.pn-site-footer {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(248, 250, 252, 0.96));
+}
+
+.pn-site-footer a,
+.pn-site-footer [data-icon] {
+  transition: color 0.18s ease, transform 0.18s ease;
+}
+
+.pn-site-footer a:hover,
+.pn-site-footer [data-icon]:hover {
+  transform: translateY(-1px);
+}
+
+.pn-feed-sidebar-footer {
+  margin-top: 0.25rem;
+  padding: 1rem 0.5rem 0.25rem;
+  color: #64748b;
+}
+
+.pn-feed-sidebar-footer a {
+  border-radius: 999px;
+  padding: 0.2rem 0.35rem;
+  line-height: 1.2;
+  transition: background-color 0.18s ease, color 0.18s ease;
+}
+
+.pn-feed-sidebar-footer a:hover {
+  background: rgba(10, 102, 194, 0.08);
+  text-decoration: none;
+}
+
+.pn-feed-sidebar-footer > div {
+  margin-top: 0.45rem;
+  padding-top: 0.65rem;
+  border-top: 1px solid rgba(203, 213, 225, 0.75);
+}
+
+@media (max-width: 767px) {
+  .pn-site-footer {
+    padding-bottom: 7.5rem;
+  }
+
+  .user-page-shell {
+    padding-bottom: 6rem;
+  }
+
+  .user-page-shell .grid {
+    gap: 1rem;
+  }
+
+  .user-page-shell [class*="sticky"][class*="top-20"],
+  .user-page-shell [class*="sticky"][class*="top-24"] {
+    position: static;
+    max-height: none;
+    overflow: visible;
+  }
+
+  .user-page-shell .settings-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .user-page-shell .settings-link {
+    width: fit-content;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1023px), (max-height: 720px) {
+  .user-page-shell [class*="sticky"][class*="top-20"],
+  .user-page-shell [class*="sticky"][class*="top-24"],
+  .user-page-shell aside[class*="sticky"],
+  .user-page-shell aside [class*="sticky"][class*="top-20"],
+  .user-page-shell#jobs-page .jobs-list-panel,
+  .user-page-shell#jobs-page .jobs-detail-panel {
+    position: static;
+    max-height: none;
+    overflow: visible;
+  }
+
+  .user-page-shell#jobs-page #jobs-container {
+    max-height: none !important;
+  }
+}
 
 /* Admin experience */
 .admin-body {
@@ -479,6 +917,41 @@ body { font-family: Inter, Manrope, "Segoe UI", sans-serif; }
     0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
+.post-body-content,
+.pn-feed-card .clickable-post-body,
+.pn-feed-card .clickable-post-body > p {
+  display: block;
+  width: 100%;
+  text-align: left;
+}
+
+.post-body-content {
+  white-space: pre-line;
+  word-wrap: break-word;
+  overflow-wrap: anywhere;
+}
+
+/* Feed post copy — breathing room below header and above media */
+.pn-feed-card .clickable-post-body {
+  padding-top: 0.5rem;
+}
+
+.pn-feed-card .post-body-content {
+  padding: 0.25rem 0.25rem 0.75rem;
+}
+
+.pn-feed-card .post-body-content:has(+ .pn-feed-post-media-wrap) {
+  padding-bottom: 1rem;
+}
+
+.pn-feed-card .pn-feed-post-media-wrap {
+  margin-top: 0.125rem;
+}
+
+#big-post-view-modal .post-body-content {
+  padding: 1.125rem 1.25rem 1.25rem;
+}
+
 .pn-feed-actions {
   position: relative;
 }
@@ -818,6 +1291,23 @@ body { font-family: Inter, Manrope, "Segoe UI", sans-serif; }
   transform: none !important;
 }
 
+.jobs-detail-panel {
+  scrollbar-gutter: stable;
+}
+
+.jobs-detail-actions {
+  align-items: center;
+}
+
+.apply-modal-card {
+  max-height: min(720px, calc(100dvh - 2rem));
+}
+
+.apply-modal-body {
+  min-height: 0;
+  overscroll-behavior: contain;
+}
+
 .jobs-detail-icon-btn {
   display: flex;
   align-items: center;
@@ -845,6 +1335,13 @@ body { font-family: Inter, Manrope, "Segoe UI", sans-serif; }
 
 .jobs-mobile-drawer.is-open {
   transform: translateY(0);
+}
+
+@media (min-width: 1180px) {
+  .jobs-mobile-backdrop,
+  .jobs-mobile-drawer {
+    display: none !important;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1187,6 +1684,90 @@ a.notif-actor-link.font-bold {
   font-weight: 700;
   padding: 0.25rem 0.75rem;
   transition: background-color 0.2s, color 0.2s;
+}
+
+.settings-hero {
+  overflow: hidden;
+}
+
+.settings-hero-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  min-height: 2.25rem;
+  border-radius: 999px;
+  padding: 0.45rem 0.8rem;
+  color: #0f172a;
+  font-size: 0.875rem;
+  font-weight: 800;
+  white-space: nowrap;
+  transition: background-color 0.18s ease, color 0.18s ease;
+}
+
+.settings-hero-action:hover {
+  background: #eff6ff;
+  color: #0a66c2;
+}
+
+.settings-status-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.85rem;
+  margin-top: 1.25rem;
+}
+
+.settings-status-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  min-width: 0;
+  padding: 0.85rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.85rem;
+  background: #f8fafc;
+  text-align: left;
+  transition: background-color 0.18s ease, border-color 0.18s ease, transform 0.18s ease;
+}
+
+.settings-status-card:hover {
+  transform: translateY(-1px);
+  border-color: rgba(10, 102, 194, 0.24);
+  background: #eff6ff;
+}
+
+.settings-status-card > .material-symbols-outlined {
+  flex: 0 0 auto;
+  color: #0a66c2;
+  font-size: 1.35rem;
+}
+
+.settings-status-card > span:last-child {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.settings-status-card strong {
+  display: block;
+  color: #0f172a;
+  font-size: 0.95rem;
+  line-height: 1.2;
+}
+
+.settings-status-card small {
+  display: block;
+  color: #64748b;
+  font-size: 0.76rem;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 1023px) {
+  .settings-status-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .settings-link:hover {

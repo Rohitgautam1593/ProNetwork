@@ -62,9 +62,9 @@
 
                 <form action="<?php echo URLROOT; ?>/company/register" method="POST" class="space-y-4" <?php echo !empty($data['successMessage']) ? 'style="opacity:0.45;pointer-events:none;"' : ''; ?>>
                     <div>
-                        <label class="block font-label-md text-on-surface mb-1" for="company_name">Company name <span class="text-error">*</span></label>
-                        <input id="company_name" type="text" name="company_name" required placeholder="Acme Inc."
-                               value="<?php echo htmlspecialchars($_POST['company_name'] ?? ''); ?>"
+                        <label class="block font-label-md text-on-surface mb-1" for="full_name">Full name <span class="text-error">*</span></label>
+                        <input id="full_name" type="text" name="full_name" required placeholder="John Doe"
+                               value="<?php echo htmlspecialchars($_POST['full_name'] ?? ''); ?>"
                                class="w-full h-10 px-3 rounded-md border border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary text-sm font-body-md bg-white">
                     </div>
                     <div>
@@ -76,32 +76,6 @@
                     <div>
                         <label class="block font-label-md text-on-surface mb-1" for="password">Password <span class="text-error">*</span></label>
                         <input id="password" type="password" name="password" required placeholder="Min. 6 characters" minlength="6"
-                               class="w-full h-10 px-3 rounded-md border border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary text-sm font-body-md bg-white">
-                    </div>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="block font-label-md text-on-surface mb-1" for="industry">Industry</label>
-                            <select id="industry" name="industry" class="w-full h-10 px-3 rounded-md border border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary text-sm font-body-md bg-white">
-                                <option value="Information Technology">Technology</option>
-                                <option value="Financial Services">Finance</option>
-                                <option value="Healthcare">Healthcare</option>
-                                <option value="Consulting">Consulting</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block font-label-md text-on-surface mb-1" for="size">Company size</label>
-                            <select id="size" name="size" class="w-full h-10 px-3 rounded-md border border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary text-sm font-body-md bg-white">
-                                <option value="1-10 employees">1–10</option>
-                                <option value="11-50 employees" selected>11–50</option>
-                                <option value="51-200 employees">51–200</option>
-                                <option value="200+ employees">200+</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div>
-                        <label class="block font-label-md text-on-surface mb-1" for="website">Website <span class="text-secondary font-normal">(optional)</span></label>
-                        <input id="website" type="url" name="website" placeholder="https://"
-                               value="<?php echo htmlspecialchars($_POST['website'] ?? ''); ?>"
                                class="w-full h-10 px-3 rounded-md border border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary text-sm font-body-md bg-white">
                     </div>
 

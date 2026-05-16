@@ -291,13 +291,13 @@ function pnPostMediaMarkup(post) {
     const url = `${URLROOT}/uploads/posts/${encodeURIComponent(fn)}`;
     if (['mp4', 'webm', 'ogv'].includes(ext)) {
         return `
-                    <div class="mt-3 -mx-4 overflow-hidden rounded-lg">
+                    <div class="pn-feed-post-media-wrap mt-1 -mx-4 overflow-hidden rounded-lg">
                         <video src="${url}" class="pn-feed-post-media w-full max-h-[500px] object-contain bg-black border-y border-slate-50 dark:border-slate-800 group-hover/pb:opacity-95 transition-opacity" controls playsinline preload="metadata"></video>
                     </div>`;
     }
     return `
-                    <div class="mt-3 -mx-4 overflow-hidden rounded-lg">
-                        <img src="${url}" alt="" class="pn-feed-post-media w-full max-h-[500px] object-cover border-y border-slate-50 dark:border-slate-800 group-hover/pb:opacity-95 transition-opacity" decoding="async">
+                    <div class="pn-feed-post-media-wrap mt-1 -mx-4 overflow-hidden rounded-lg">
+                        <img src="${url}" alt="" class="pn-feed-post-media w-full max-h-[600px] object-contain bg-slate-50 border-y border-slate-100 dark:border-slate-800 group-hover/pb:opacity-95 transition-opacity" decoding="async">
                     </div>`;
 }
 
@@ -402,7 +402,7 @@ function renderPostCard(post, prepend = false, staggerIndex = 0) {
 
     card.innerHTML = `
         <div class="p-4">
-            <div class="flex justify-between items-start mb-3">
+            <div class="flex justify-between items-start mb-2">
                 <div class="flex items-center space-x-3">
                     <div class="w-12 h-12 rounded-full border border-slate-100 overflow-hidden bg-slate-50 cursor-pointer shrink-0" onclick="window.location.href='${post.is_company_activity || post.user_role === 'Company' || post.user_role === 'Company Page' ? `${URLROOT}/company/show/${post.company_id || post.user_id}` : `${URLROOT}/user/profile?id=${post.user_id}`}'">
                         <img src="${pnProfilePicUrl(post)}" alt="${escapeHtml(post.full_name)}" class="w-full h-full object-cover">
@@ -435,9 +435,9 @@ function renderPostCard(post, prepend = false, staggerIndex = 0) {
                 </div>
             </div>
             
-            <div class="clickable-post-body cursor-pointer group/pb transition-all">
-                <div class="post-body-content text-[14px] text-slate-800 dark:text-slate-200 leading-normal whitespace-pre-wrap group-hover/pb:text-slate-900 dark:group-hover/pb:text-white">
-                    ${escapeHtml(post.content)}
+            <div class="clickable-post-body cursor-pointer group/pb transition-all text-left w-full">
+                <div class="post-body-content text-[14px] text-slate-800 dark:text-slate-200 leading-normal whitespace-pre-line group-hover/pb:text-slate-900 dark:group-hover/pb:text-white w-full">
+                    ${escapeHtml(normalizePostContent(post.content))}
                 </div>
 
                 ${pnPostMediaMarkup(post)}
@@ -543,7 +543,7 @@ function renderCompanyActivityCard(post, prepend = false, staggerIndex = 0) {
 
     card.innerHTML = `
         <div class="p-4">
-            <div class="flex items-center justify-between mb-3">
+            <div class="flex items-center justify-between mb-2">
                 <a href="${URLROOT}/company/show/${post.company_id}" class="flex items-center space-x-3 min-w-0">
                     <div class="w-12 h-12 rounded-lg border border-slate-100 overflow-hidden bg-white shrink-0">
                         <img src="${logo}" alt="${escapeHtml(post.company_name)}" class="w-full h-full object-contain">
@@ -556,10 +556,10 @@ function renderCompanyActivityCard(post, prepend = false, staggerIndex = 0) {
                 </a>
                 <span class="text-[11px] px-2 py-1 rounded-full bg-blue-50 text-[#0A66C2] font-bold">${isJob ? 'Hiring' : 'Update'}</span>
             </div>
-            <div class="clickable-post-body cursor-pointer group/pb transition-all">
-                <p class="text-[14px] text-slate-800 leading-normal group-hover/pb:text-slate-900">${escapeHtml(post.content)}</p>
-                <div class="mt-3 -mx-4">
-                    <img src="${banner}" alt="" class="w-full max-h-[260px] object-cover border-y border-slate-50 group-hover/pb:opacity-95 transition-opacity">
+            <div class="clickable-post-body cursor-pointer group/pb transition-all text-left w-full">
+                <p class="post-body-content text-[14px] text-slate-800 leading-normal whitespace-pre-line group-hover/pb:text-slate-900 w-full">${escapeHtml(normalizePostContent(post.content))}</p>
+                <div class="pn-feed-post-media-wrap mt-1 -mx-4 overflow-hidden rounded-lg">
+                    <img src="${banner}" alt="" class="w-full max-h-[320px] object-contain bg-slate-50 border-y border-slate-100 group-hover/pb:opacity-95 transition-opacity">
                 </div>
             </div>
             <div class="mt-4 flex gap-2">
@@ -649,7 +649,7 @@ function renderBigPostOverlay(postObj) {
                 <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center shadow-lg mb-4">
                     <span class="material-symbols-outlined text-white text-3xl">format_quote</span>
                 </div>
-                <p class="text-white text-lg font-bold leading-relaxed line-clamp-6 italic">"${escapeHtml(postObj.content || title)}"</p>
+                <p class="text-white text-lg font-bold leading-relaxed line-clamp-6 italic">"${escapeHtml(normalizePostContent(postObj.content) || title)}"</p>
                 <span class="text-xs text-slate-500 font-semibold mt-4 tracking-widest uppercase">• ProNetwork Feed Update •</span>
             </div>
         `;
@@ -688,8 +688,8 @@ function renderBigPostOverlay(postObj) {
         <!-- Scrollable Thread Content & Comments -->
         <div class="flex-1 overflow-y-auto flex flex-col min-h-0">
             <!-- Post Paragraph Content -->
-            <div class="p-4 text-sm text-slate-800 dark:text-slate-200 leading-normal whitespace-pre-wrap shrink-0 border-b border-slate-50 dark:border-slate-800/50">
-                ${escapeHtml(postObj.content || '')}
+            <div class="text-sm text-slate-800 dark:text-slate-200 leading-normal whitespace-pre-line shrink-0 border-b border-slate-50 dark:border-slate-800/50 post-body-content w-full">
+                ${escapeHtml(normalizePostContent(postObj.content))}
             </div>
 
             <!-- Stats Counts -->
@@ -873,7 +873,7 @@ function renderCommentHtml(c) {
                     </div>
                     ${delBtn}
                 </div>
-                <p class="text-[13px] text-slate-700 dark:text-slate-200 mt-0.5 whitespace-pre-wrap break-words">${escapeHtml(c.content)}</p>
+                <p class="text-[13px] text-slate-700 dark:text-slate-200 mt-0.5 whitespace-pre-line break-words">${escapeHtml(normalizePostContent(c.content))}</p>
             </div>
         </div>`;
 }

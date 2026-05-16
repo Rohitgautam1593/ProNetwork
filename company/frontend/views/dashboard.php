@@ -19,6 +19,17 @@
 ?>
 
 <main class="bg-surface-container-low min-h-screen pt-4 pb-12">
+    <?php if ($isOwner): ?>
+    <div class="max-w-[1128px] mx-auto px-4 mb-4">
+        <div class="bg-indigo-50 border border-indigo-200 text-indigo-800 px-4 py-3 rounded-lg flex items-center gap-3">
+            <span class="material-symbols-outlined text-indigo-600">domain</span>
+            <div>
+                <p class="font-bold text-sm">Company Dashboard</p>
+                <p class="text-xs text-indigo-700">You are managing your company operations. <a href="<?php echo URLROOT; ?>/user/feed" class="underline font-semibold ml-1 hover:text-indigo-900">Switch to Personal Feed</a></p>
+            </div>
+        </div>
+    </div>
+    <?php endif; ?>
     <div class="max-w-[1128px] mx-auto px-4">
         
         <!-- Premium Hero Banner -->

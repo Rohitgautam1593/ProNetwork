@@ -35,7 +35,7 @@ class PostController extends Controller {
         }
 
         // Support multipart/form-data for file uploads
-        $content = trim($_POST['content'] ?? '');
+        $content = pn_normalize_post_content($_POST['content'] ?? '');
         $fileName = null;
 
         if(isset($_FILES['media']) && $_FILES['media']['error'] !== UPLOAD_ERR_NO_FILE) {
@@ -205,7 +205,7 @@ class PostController extends Controller {
             if (!is_array($input)) {
                 $input = $_POST;
             }
-            $content = isset($input['content']) ? trim((string) $input['content']) : '';
+            $content = isset($input['content']) ? pn_normalize_post_content((string) $input['content']) : '';
             $len = function_exists('mb_strlen') ? mb_strlen($content) : strlen($content);
             if ($content === '') {
                 echo json_encode(['success' => false, 'message' => 'Comment cannot be empty.']);

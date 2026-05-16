@@ -2,6 +2,17 @@
 <?php require USERROOT . '/frontend/views/layouts/navbar.php'; ?>
 <!-- Page content (single <main> lives in navbar layout) -->
 <div class="user-page-shell pb-12 pt-2">
+    <?php if (hasRole('Company')): ?>
+    <div class="max-w-[1128px] mx-auto px-4 mb-4">
+        <div class="bg-indigo-50 border border-indigo-200 text-indigo-800 px-4 py-3 rounded-lg flex items-center gap-3">
+            <span class="material-symbols-outlined text-indigo-600">person</span>
+            <div>
+                <p class="font-bold text-sm">Personal Feed</p>
+                <p class="text-xs text-indigo-700">You are interacting as your personal profile. <a href="<?php echo URLROOT; ?>/company/dashboard" class="underline font-semibold ml-1 hover:text-indigo-900">Switch to Company</a></p>
+            </div>
+        </div>
+    </div>
+    <?php endif; ?>
     <div class="max-w-[1128px] mx-auto grid grid-cols-1 md:grid-cols-12 gap-6 px-4">
         <!-- Left Sidebar: Profile Summary -->
         <aside class="md:col-span-3 flex flex-col space-y-2 self-start sticky top-20 z-10">
@@ -138,7 +149,7 @@
                 <button class="mt-4 text-slate-500 font-semibold text-sm hover:bg-slate-50 w-full text-left py-1 rounded flex items-center transition-colors" onclick="window.location.href='<?php echo URLROOT; ?>/user/network'">View all recommendations <span class="material-symbols-outlined text-[14px] ml-1">arrow_forward</span></button>
             </div>
             <!-- Footer Links -->
-            <footer class="p-4 flex flex-wrap justify-center gap-x-4 gap-y-2">
+            <footer class="pn-feed-sidebar-footer flex flex-wrap justify-center gap-x-4 gap-y-2">
                 <a class="text-[11px] text-slate-500 hover:text-[#0A66C2] hover:underline" href="<?php echo URLROOT; ?>/user/network">About</a>
                 <a class="text-[11px] text-slate-500 hover:text-[#0A66C2] hover:underline" href="<?php echo URLROOT; ?>/user/settings">Accessibility</a>
                 <a class="text-[11px] text-slate-500 hover:text-[#0A66C2] hover:underline" href="<?php echo URLROOT; ?>/user/messaging">Help Center</a>

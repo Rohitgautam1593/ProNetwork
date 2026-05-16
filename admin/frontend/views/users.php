@@ -43,8 +43,10 @@
                                     if(!empty($pic) && (strpos($pic, 'http') === 0)): 
                                 ?>
                                     <img src="<?php echo $pic; ?>" alt="" class="w-full h-full object-cover">
-                                <?php elseif(!empty($pic)): ?>
-                                    <img src="<?php echo URLROOT . '/uploads/profiles/' . $pic; ?>" alt="" class="w-full h-full object-cover">
+                                <?php elseif(!empty($pic)): 
+                                    $baseDir = ($user['role'] === 'Company') ? '/uploads/companies/' : '/uploads/profiles/';
+                                ?>
+                                    <img src="<?php echo URLROOT . $baseDir . $pic; ?>" alt="" class="w-full h-full object-cover">
                                 <?php else: ?>
                                     <?php echo strtoupper(substr($user['full_name'], 0, 1)); ?>
                                 <?php endif; ?>

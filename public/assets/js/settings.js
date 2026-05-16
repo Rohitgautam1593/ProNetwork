@@ -47,6 +47,9 @@ function bindSettingsTabs() {
   document.querySelectorAll('.settings-tab').forEach((tab) => {
     tab.addEventListener('click', () => activateSettingsTab(tab.dataset.settingsTab));
   });
+  document.querySelectorAll('[data-settings-tab-jump]').forEach((tab) => {
+    tab.addEventListener('click', () => activateSettingsTab(tab.dataset.settingsTabJump));
+  });
 }
 
 function activateSettingsTab(tabName) {
@@ -106,6 +109,9 @@ function renderSettings() {
   setText('settings-language-summary', settingsPrefs.language || 'English (US)');
   setText('settings-content-language-summary', settingsPrefs.content_language || 'English');
   setText('settings-autoplay-summary', onOff(settingsPrefs.autoplay_videos));
+  setText('settings-card-profile-copy', settingsUser.headline ? 'Basics complete' : 'Add a headline');
+  setText('settings-card-security-copy', `${settingsUser.email || 'Email'} · Active`);
+  setText('settings-card-visibility-copy', `${labelFor('profile_visibility', settingsPrefs.profile_visibility)} profile`);
   applyThemePreference(settingsPrefs.theme);
 }
 

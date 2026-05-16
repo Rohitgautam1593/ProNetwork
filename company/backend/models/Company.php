@@ -17,14 +17,11 @@ class Company extends Model {
     }
 
     public function getCompanyForUser($userId) {
-        $this->db->query("SELECT company_id, user_id, name as company_name, industry, logo_path as logo, banner_path as banner, description, website, size, founded_year, followers, created_at FROM companies WHERE user_id = :userId OR name = (SELECT full_name FROM users WHERE user_id = :userId) LIMIT 1");
+        $this->db->query("SELECT company_id, user_id, name as company_name, industry, logo_path as logo, banner_path as banner, description, website, size, founded_year, followers, created_at FROM companies WHERE user_id = :userId LIMIT 1");
         $this->db->bind(':userId', $userId);
-        $row = $this->db->single();
-        if ($row) {
-            return $row;
-        }
-        return $this->getPrimaryCompany();
+        return $this->db->single();
     }
+
 
     public function getFollowSuggestions($userId, $limit = 4) {
         $this->db->query("SELECT company_id, name as company_name, industry, logo_path as logo, banner_path as banner, followers

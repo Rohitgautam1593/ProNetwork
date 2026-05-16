@@ -436,7 +436,7 @@ function initFeedComposer() {
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const text = content.value.trim();
+    const text = typeof normalizePostContent === 'function' ? normalizePostContent(content.value) : content.value.trim();
     const file = mediaInput?.files?.[0];
 
     if (!text && !file) {

@@ -2,9 +2,9 @@
 <?php require USERROOT . '/frontend/views/layouts/navbar.php'; ?>
 
 <div class="user-page-shell pt-2 pb-12 font-['Manrope']" id="jobs-page">
-    <div class="max-w-[1128px] mx-auto grid grid-cols-1 md:grid-cols-12 gap-6 px-4">
+    <div class="jobs-page-grid max-w-[1128px] mx-auto grid grid-cols-1 md:grid-cols-12 gap-6 px-4">
 
-        <aside class="md:col-span-3 space-y-4">
+        <aside class="jobs-sidebar-col md:col-span-4 lg:col-span-3 space-y-4">
             <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden sticky top-20">
                 <div class="p-4 border-b border-slate-100 bg-gradient-to-br from-slate-50 to-white">
                     <h2 class="font-title-md text-slate-900">Job search</h2>
@@ -59,7 +59,7 @@
             </div>
         </aside>
 
-        <section class="md:col-span-4 flex flex-col gap-4">
+        <section class="jobs-list-col md:col-span-8 lg:col-span-4 flex flex-col gap-4">
             <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden flex flex-col jobs-list-panel sticky top-20">
                 <div class="p-4 border-b border-slate-100 space-y-3 bg-white z-10">
                     <div class="flex items-start justify-between gap-2">
@@ -94,7 +94,7 @@
             </div>
         </section>
 
-        <aside class="hidden md:block md:col-span-5">
+        <aside class="jobs-detail-col hidden lg:block lg:col-span-5 min-w-0">
             <div id="job-detail-container" class="jobs-detail-panel bg-white rounded-xl border border-slate-200 shadow-sm flex flex-col items-center justify-center sticky top-20 text-center p-8 min-h-[320px] max-h-[calc(100vh-100px)]">
                 <div class="w-20 h-20 bg-gradient-to-br from-blue-50 to-indigo-100 rounded-2xl flex items-center justify-center mb-5 shadow-inner">
                     <span class="material-symbols-outlined text-4xl text-[#0A66C2]/60">work</span>
@@ -106,8 +106,8 @@
     </div>
 </div>
 
-<div id="jobs-mobile-backdrop" class="jobs-mobile-backdrop hidden fixed inset-0 z-40 bg-slate-900/50 backdrop-blur-sm md:hidden" aria-hidden="true"></div>
-<div id="jobs-mobile-detail" class="jobs-mobile-drawer hidden fixed inset-x-0 bottom-0 z-50 md:hidden max-h-[92vh] flex flex-col rounded-t-2xl bg-white shadow-2xl transform translate-y-full transition-transform duration-300" role="dialog" aria-modal="true" aria-labelledby="jobs-mobile-detail-title">
+<div id="jobs-mobile-backdrop" class="jobs-mobile-backdrop hidden fixed inset-0 z-40 bg-slate-900/50 backdrop-blur-sm" aria-hidden="true"></div>
+<div id="jobs-mobile-detail" class="jobs-mobile-drawer hidden fixed inset-x-0 bottom-0 z-50 max-h-[92vh] flex flex-col rounded-t-2xl bg-white shadow-2xl transform translate-y-full transition-transform duration-300" role="dialog" aria-modal="true" aria-labelledby="jobs-mobile-detail-title">
     <div class="flex items-center justify-between px-4 py-3 border-b border-slate-100 shrink-0">
         <h2 id="jobs-mobile-detail-title" class="font-bold text-slate-800 text-sm">Job details</h2>
         <button type="button" id="jobs-mobile-close" class="w-10 h-10 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-600" aria-label="Close">

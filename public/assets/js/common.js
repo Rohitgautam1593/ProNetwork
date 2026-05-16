@@ -176,6 +176,22 @@ function escapeHtml(s) {
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
 
+/** Strip leading/trailing whitespace per line (incl. NBSP) from post/comment copy. */
+function normalizePostContent(text) {
+  if (text == null) return '';
+  return String(text)
+    .replace(/\r\n?/g, '\n')
+    .replace(/^\uFEFF/, '')
+    .split('\n')
+    .map((line) =>
+      line
+        .replace(/^[\s\u00A0\u1680\u2000-\u200A\u202F\u205F\u3000\uFEFF]+/, '')
+        .replace(/[\s\u00A0\u1680\u2000-\u200A\u202F\u205F\u3000\uFEFF]+$/, '')
+    )
+    .join('\n')
+    .trim();
+}
+
 function initGlobalSearch() {
     const input = document.getElementById('global-search-input');
     const results = document.getElementById('global-search-results');

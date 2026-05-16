@@ -38,12 +38,8 @@ class CompanyController extends Controller {
         }
 
         $isOwner = false;
-        if (isLoggedIn()) {
-            if (hasRole('Company') && $_SESSION['user_name'] === $company['company_name']) {
-                $isOwner = true;
-            } elseif ($company['user_id'] == $_SESSION['user_id']) {
-                $isOwner = true;
-            }
+        if (isLoggedIn() && $company['user_id'] == $_SESSION['user_id']) {
+            $isOwner = true;
         }
 
         $isFollowing = false;
@@ -54,7 +50,7 @@ class CompanyController extends Controller {
         $this->view('company/dashboard', [
             'company' => $company,
             'jobs' => $this->jobModel->getJobsByCompany($id),
-            'posts' => $this->postModel->getPosts(),
+            'posts' => $this->postModel->getPostsByUser($company['user_id'], isLoggedIn() ? $_SESSION['user_id'] : null),
             'isOwner' => $isOwner,
             'isFollowing' => $isFollowing
         ]);
@@ -153,20 +149,12 @@ class CompanyController extends Controller {
                 $input = $_POST;
             }
 
-            $companyName = trim($input['company_name'] ?? '');
+            $fullName = trim($input['full_name'] ?? '');
             $email = strtolower(trim($input['email'] ?? ''));
             $password = trim($input['password'] ?? '');
-            $industry = trim($input['industry'] ?? 'Technology & Systems');
-            $size = trim($input['size'] ?? '11-50 employees');
-            $website = trim($input['website'] ?? '');
-            $description = trim($input['description'] ?? '');
 
-            if (empty($website)) {
-                $website = 'https://' . preg_replace('/[^a-zA-Z0-9]/', '', strtolower($companyName)) . '.pronetwork.demo';
-            }
-
-            if (empty($companyName) || empty($email) || empty($password)) {
-                $error = 'Please complete all required fields: Company Name, Corporate Email, and Password.';
+            if (empty($fullName) || empty($email) || empty($password)) {
+                $error = 'Please complete all required fields: Full Name, Corporate Email, and Password.';
             } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
                 $error = 'Please submit a standard, properly structured electronic mail address.';
             } elseif (strlen($password) < 6) {
@@ -179,59 +167,39 @@ class CompanyController extends Controller {
                 if ($db->single()) {
                     $error = 'Specified email identifier is already attached to an active ProNetwork account profile.';
                 } else {
-                    $db->query('SELECT company_id FROM companies WHERE name = :name');
-                    $db->bind(':name', $companyName);
-                    if ($db->single()) {
-                        $error = 'Corporate identity tag already registered within our system network.';
-                    } else {
-                        $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+                    $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
-                        $db->query(
-                            "INSERT INTO users (full_name, email, password, role, headline, location, industry, bio, status) 
-                             VALUES (:full_name, :email, :password, 'Company', :headline, 'Global Headquarters', :industry, :bio, 'Approved')"
-                        );
-                        $db->bind(':full_name', $companyName);
-                        $db->bind(':email', $email);
-                        $db->bind(':password', $hashedPassword);
-                        $db->bind(':headline', 'Official Registered Hub &bull; ' . $industry);
-                        $db->bind(':industry', $industry);
-                        $db->bind(':bio', 'Verified employer workspace terminal actively managed on ProNetwork.');
+                    $db->query(
+                        "INSERT INTO users (full_name, email, password, role, headline, location, industry, bio, status) 
+                         VALUES (:full_name, :email, :password, 'Company', :headline, 'Global Headquarters', 'Enterprise', :bio, 'Approved')"
+                    );
+                    $db->bind(':full_name', $fullName);
+                    $db->bind(':email', $email);
+                    $db->bind(':password', $hashedPassword);
+                    $db->bind(':headline', 'Enterprise Operator');
+                    $db->bind(':bio', 'Verified employer workspace terminal actively managed on ProNetwork.');
 
-                        if ($db->execute()) {
-                            $newUserId = $db->lastInsertId();
+                    if ($db->execute()) {
+                        $newUserId = $db->lastInsertId();
 
-                            $db->query(
-                                'INSERT INTO companies (name, industry, description, website, size, founded_year, followers, user_id) 
-                                 VALUES (:name, :industry, :description, :website, :size, :founded_year, 1, :user_id)'
-                            );
-                            $db->bind(':name', $companyName);
-                            $db->bind(':industry', $industry);
-                            $db->bind(':description', empty($description) ? 'Pioneering sophisticated platform capabilities and unlocking premium enterprise distributed network connections.' : $description);
-                            $db->bind(':website', $website);
-                            $db->bind(':size', $size);
-                            $db->bind(':founded_year', date('Y'));
-                            $db->bind(':user_id', $newUserId);
-                            $db->execute();
+                        session_regenerate_id(true);
+                        $_SESSION['user_id'] = $newUserId;
+                        $_SESSION['user_name'] = $fullName;
+                        $_SESSION['role'] = 'Company';
+                        $_SESSION['is_admin'] = false;
 
-                            session_regenerate_id(true);
-                            $_SESSION['user_id'] = $newUserId;
-                            $_SESSION['user_name'] = $companyName;
-                            $_SESSION['role'] = 'Company';
-                            $_SESSION['is_admin'] = false;
+                        $successMessage = 'Workspace terminal provisioned successfully! Authorizing routing link...';
 
-                            $successMessage = 'Workspace terminal provisioned successfully! Authorizing routing link...';
-
-                            if (isset($_SERVER['CONTENT_TYPE']) && strpos($_SERVER['CONTENT_TYPE'], 'application/json') !== false) {
-                                echo json_encode([
-                                    'success' => true,
-                                    'message' => $successMessage,
-                                    'redirect' => URLROOT . '/company/dashboard',
-                                ]);
-                                exit;
-                            }
-                        } else {
-                            $error = 'Critical database transaction failure during identity assignment.';
+                        if (isset($_SERVER['CONTENT_TYPE']) && strpos($_SERVER['CONTENT_TYPE'], 'application/json') !== false) {
+                            echo json_encode([
+                                'success' => true,
+                                'message' => $successMessage,
+                                'redirect' => URLROOT . '/company/dashboard',
+                            ]);
+                            exit;
                         }
+                    } else {
+                        $error = 'Critical database transaction failure during identity assignment.';
                     }
                 }
             }
@@ -327,7 +295,7 @@ class CompanyController extends Controller {
 
         $company = $this->companyModel->getCompanyForUser($_SESSION['user_id']);
         if (!$company) {
-            header('Location: ' . URLROOT . '/company');
+            header('Location: ' . URLROOT . '/company/create');
             exit;
         }
         
@@ -350,6 +318,12 @@ class CompanyController extends Controller {
                     $upload = $this->storeCompanyLogo($_FILES['logo']);
                     if ($upload['success']) {
                         $data['logo_path'] = $upload['fileName'];
+                        // Sync with users table
+                        $db = Database::getInstance();
+                        $db->query('UPDATE users SET profile_pic = :pic WHERE user_id = :uid');
+                        $db->bind(':pic', $upload['fileName']);
+                        $db->bind(':uid', $_SESSION['user_id']);
+                        $db->execute();
                     }
                 }
                 $this->companyModel->updateCompanyDetails($company['company_id'], $data);

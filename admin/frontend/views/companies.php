@@ -26,8 +26,13 @@
                 <tr class="hover:bg-slate-50/80 transition-colors group cursor-pointer" data-admin-preview data-preview-type="Company" data-preview-id="<?php echo (int)$company['company_id']; ?>">
                     <td class="px-6 py-4">
                         <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center font-bold text-slate-400 text-[10px] overflow-hidden border border-slate-200">
-                                <?php echo strtoupper(substr($company['name'], 0, 1)); ?>
+                            <div class="w-10 h-10 rounded-lg bg-slate-50 flex items-center justify-center font-bold text-slate-400 text-[10px] overflow-hidden border border-slate-100 ring-4 ring-slate-50/50 flex-shrink-0">
+                                <?php if(!empty($company['logo_path'])): ?>
+                                    <img src="<?php echo (strpos($company['logo_path'], 'http') === 0) ? $company['logo_path'] : URLROOT . '/uploads/companies/' . $company['logo_path']; ?>" 
+                                         alt="" class="w-full h-full object-contain p-1">
+                                <?php else: ?>
+                                    <?php echo strtoupper(substr($company['name'], 0, 1)); ?>
+                                <?php endif; ?>
                             </div>
                             <span class="text-sm font-bold text-slate-900"><?php echo $company['name']; ?></span>
                         </div>
