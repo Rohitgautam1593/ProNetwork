@@ -95,25 +95,6 @@
     </div>
 </div>
 
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-    const searchInput = document.getElementById('admin-post-search');
-    const postsTable = document.getElementById('admin-posts-table');
-
-    if (searchInput && postsTable) {
-        searchInput.addEventListener('keyup', () => {
-            const term = searchInput.value.toLowerCase();
-            const rows = Array.from(postsTable.getElementsByTagName('tr'));
-
-            rows.forEach((row) => {
-                if (row.id === 'no-posts-placeholder') return;
-                const textContent = row.innerText.toLowerCase();
-                row.style.display = textContent.includes(term) ? '' : 'none';
-            });
-        });
-    }
-});
-</script>
 
 <script src="<?php echo URLROOT; ?>/assets/js/admin/admin.js?v=<?php echo time(); ?>"></script>
 

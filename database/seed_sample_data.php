@@ -509,6 +509,12 @@ try {
         'status' => 'Reviewed',
     ]);
 
+    // Synchronize company followers to match actual company_followers count
+    $pdo->exec("UPDATE companies c SET c.followers = (SELECT COUNT(*) FROM company_followers cf WHERE cf.company_id = c.company_id)");
+
+    // Synchronize job applicant counts to match actual applications count
+    $pdo->exec("UPDATE jobs j SET j.applicant_count = (SELECT COUNT(*) FROM applications a WHERE a.job_id = j.job_id)");
+
     $pdo->commit();
     echo "Seed data inserted successfully.\n";
 } catch (Throwable $e) {

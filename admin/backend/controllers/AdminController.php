@@ -11,7 +11,11 @@ class AdminController extends Controller {
         }
 
         if (!hasRole('Admin')) {
-            header('Location: ' . URLROOT . '/user/feed');
+            if (hasRole('Company') || ($_SESSION['role'] ?? '') === 'Company') {
+                header('Location: ' . URLROOT . '/company/dashboard');
+            } else {
+                header('Location: ' . URLROOT . '/user/feed');
+            }
             exit;
         }
 

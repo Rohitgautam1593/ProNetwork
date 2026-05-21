@@ -4,10 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ProNetwork — Administrative Control Suite Gateway</title>
+    <link rel="icon" type="image/svg+xml" href="<?php echo URLROOT; ?>/favicon.svg">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     <script>
         tailwind.config = {
             theme: {
@@ -71,7 +73,7 @@
             <div class="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-cyan-500/50 to-transparent"></div>
 
             <div class="text-center mb-8">
-                <div class="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-gradient-to-tr from-cyan-500 to-blue-600 shadow-lg shadow-cyan-500/30 mb-4 text-white font-extrabold text-xl tracking-wider">
+                <div class="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-gradient-to-br from-[#0a66c2] to-[#084a8f] shadow-lg shadow-[#0a66c2]/35 mb-4 text-white font-black text-xl tracking-wide">
                     PN
                 </div>
                 <h1 class="text-2xl md:text-3xl font-extrabold text-white tracking-tight">Admin Gateway</h1>
@@ -105,8 +107,15 @@
                     <div class="relative group">
                         <input type="password" id="password" name="password"
                             placeholder="••••••••••••"
-                            class="w-full px-4 py-3 bg-portal-input border border-slate-800 rounded-xl text-sm text-white placeholder-slate-600 focus:outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 transition-all duration-200 block"
+                            class="w-full pl-4 pr-12 py-3 bg-portal-input border border-slate-800 rounded-xl text-sm text-white placeholder-slate-600 focus:outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 transition-all duration-200 block"
                             autocomplete="current-password" required />
+                        <button type="button" data-toggle-password="password" class="absolute right-4 top-1/2 -translate-y-1/2 z-20 text-slate-400 hover:text-cyan-400 transition-colors flex items-center justify-center">
+                            <span class="material-symbols-outlined text-[20px]">visibility</span>
+                        </button>
+                    </div>
+                    <div class="flex items-center justify-between mt-1">
+                        <div></div>
+                        <button type="button" onclick="openResetModal()" class="text-[11px] text-cyan-500 hover:text-cyan-400 hover:underline transition-colors font-medium">Forgot Clearance Key?</button>
                     </div>
                     <p id="password-error" class="text-[11px] text-rose-400 font-medium hidden animate-in fade-in duration-150"></p>
                 </div>
@@ -196,6 +205,275 @@
             document.getElementById('password-error').classList.add('hidden');
             this.classList.remove('border-rose-500/60');
         });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('[data-toggle-password]').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const targetId = btn.getAttribute('data-toggle-password');
+                    togglePasswordVisibility(targetId, btn);
+                });
+            });
+        });
+
+        function togglePasswordVisibility(inputId, btnEl) {
+            console.log("Admin Gateway togglePasswordVisibility execution initiated for:", inputId);
+            const input = document.getElementById(inputId);
+            if (!input) {
+                console.warn("Admin Gateway target password input element not found in DOM:", inputId);
+                return;
+            }
+            const icon = btnEl.querySelector('.material-symbols-outlined') || btnEl;
+            if (input.type === 'password') {
+                input.type = 'text';
+                if (icon) icon.textContent = 'visibility_off';
+                console.log("Admin Gateway input type toggled to: text");
+            } else {
+                input.type = 'password';
+                if (icon) icon.textContent = 'visibility';
+                console.log("Admin Gateway input type toggled to: password");
+            }
+        }
+
+        const URLROOT = '<?php echo URLROOT; ?>';
+
+        function openResetModal() {
+            const modal = document.getElementById('reset-modal');
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+            }, 10);
+            document.getElementById('step-email').classList.remove('hidden');
+            document.getElementById('step-otp').classList.add('hidden');
+            document.getElementById('step-password').classList.add('hidden');
+            document.getElementById('reset-email-input').value = '';
+            document.getElementById('reset-otp-input').value = '';
+            document.getElementById('new-password-input').value = '';
+            document.getElementById('confirm-password-input').value = '';
+            document.getElementById('reset-email-error').classList.add('hidden');
+            document.getElementById('reset-otp-error').classList.add('hidden');
+            document.getElementById('reset-password-error').classList.add('hidden');
+        }
+
+        function closeResetModal() {
+            const modal = document.getElementById('reset-modal');
+            modal.classList.add('opacity-0');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+        }
+
+        async function handleSendOTP() {
+            const emailInput = document.getElementById('reset-email-input');
+            const errorEl = document.getElementById('reset-email-error');
+            const btn = document.getElementById('send-otp-btn');
+            const spinner = document.getElementById('send-otp-spinner');
+
+            errorEl.classList.add('hidden');
+            const emailVal = emailInput.value.trim();
+
+            if (!emailVal || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal)) {
+                errorEl.textContent = 'Please enter a valid email address.';
+                errorEl.classList.remove('hidden');
+                return;
+            }
+
+            btn.disabled = true;
+            spinner.classList.remove('hidden');
+
+            try {
+                const response = await fetch(`${URLROOT}/auth/forgot_password`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: emailVal, portal: 'admin' })
+                });
+                const result = await response.json();
+
+                if (result.success) {
+                    document.getElementById('step-email').classList.add('hidden');
+                    document.getElementById('step-otp').classList.remove('hidden');
+                    document.getElementById('reset-otp-input').focus();
+                } else {
+                    errorEl.textContent = result.message || 'Verification key dispatch failed.';
+                    errorEl.classList.remove('hidden');
+                }
+            } catch (err) {
+                errorEl.textContent = 'Server communications error occurred.';
+                errorEl.classList.remove('hidden');
+            } finally {
+                btn.disabled = false;
+                spinner.classList.add('hidden');
+            }
+        }
+
+        async function handleVerifyOTP() {
+            const emailVal = document.getElementById('reset-email-input').value.trim();
+            const otpInput = document.getElementById('reset-otp-input');
+            const errorEl = document.getElementById('reset-otp-error');
+            const btn = document.getElementById('verify-otp-btn');
+            const spinner = document.getElementById('verify-otp-spinner');
+
+            errorEl.classList.add('hidden');
+            const otpVal = otpInput.value.trim();
+
+            if (!otpVal || otpVal.length !== 6) {
+                errorEl.textContent = 'Verification key must be exactly 6 digits.';
+                errorEl.classList.remove('hidden');
+                return;
+            }
+
+            btn.disabled = true;
+            spinner.classList.remove('hidden');
+
+            try {
+                const response = await fetch(`${URLROOT}/auth/verify_otp`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: emailVal, otp: otpVal })
+                });
+                const result = await response.json();
+
+                if (result.success) {
+                    document.getElementById('step-otp').classList.add('hidden');
+                    document.getElementById('step-password').classList.remove('hidden');
+                    document.getElementById('new-password-input').focus();
+                } else {
+                    errorEl.textContent = result.message || 'Invalid verification key.';
+                    errorEl.classList.remove('hidden');
+                }
+            } catch (err) {
+                errorEl.textContent = 'Server communications error occurred.';
+                errorEl.classList.remove('hidden');
+            } finally {
+                btn.disabled = false;
+                spinner.classList.add('hidden');
+            }
+        }
+
+        async function handleResetPassword() {
+            const emailVal = document.getElementById('reset-email-input').value.trim();
+            const otpVal = document.getElementById('reset-otp-input').value.trim();
+            const pwInput = document.getElementById('new-password-input');
+            const confirmInput = document.getElementById('confirm-password-input');
+            const errorEl = document.getElementById('reset-password-error');
+            const btn = document.getElementById('reset-pw-btn');
+            const spinner = document.getElementById('reset-pw-spinner');
+
+            errorEl.classList.add('hidden');
+            const pwVal = pwInput.value.trim();
+            const confirmVal = confirmInput.value.trim();
+
+            if (!pwVal || pwVal.length < 6) {
+                errorEl.textContent = 'Secret must be at least 6 characters.';
+                errorEl.classList.remove('hidden');
+                return;
+            }
+
+            if (pwVal !== confirmVal) {
+                errorEl.textContent = 'Credentials verification mismatch.';
+                errorEl.classList.remove('hidden');
+                return;
+            }
+
+            btn.disabled = true;
+            spinner.classList.remove('hidden');
+
+            try {
+                const response = await fetch(`${URLROOT}/auth/reset_password`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: emailVal, otp: otpVal, password: pwVal })
+                });
+                const result = await response.json();
+
+                if (result.success) {
+                    alert('Clearance secret re-established successfully! Re-routing...');
+                    closeResetModal();
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 500);
+                } else {
+                    errorEl.textContent = result.message || 'Credential modification failed.';
+                    errorEl.classList.remove('hidden');
+                }
+            } catch (err) {
+                errorEl.textContent = 'Server communications error occurred.';
+                errorEl.classList.remove('hidden');
+            } finally {
+                btn.disabled = false;
+                spinner.classList.add('hidden');
+            }
+        }
     </script>
+
+    <!-- Admin Reset Password Modal -->
+    <div id="reset-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md hidden transition-all duration-300 opacity-0">
+      <div class="w-full max-w-md bg-[#0d1222] border border-slate-800 rounded-3xl p-8 relative shadow-2xl mx-4">
+        <div class="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-cyan-500 to-transparent"></div>
+        
+        <!-- Close button -->
+        <button type="button" onclick="closeResetModal()" class="absolute top-4 right-4 text-slate-500 hover:text-white transition-colors">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+        
+        <!-- Step 1: Send OTP -->
+        <div id="step-email" class="space-y-6">
+          <div class="text-center">
+            <h3 class="text-xl font-bold text-white tracking-wide">Reset Clearance Key</h3>
+            <p class="text-xs text-slate-400 mt-2">Enter your verified root email to authorize a security key broadcast.</p>
+          </div>
+          <div class="space-y-2">
+            <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider">Root Email</label>
+            <input type="email" id="reset-email-input" class="w-full px-4 py-3 bg-[#080b15] border border-slate-800 rounded-xl text-sm text-white placeholder-slate-600 focus:outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 transition-all duration-200" placeholder="admin@pronetwork.com">
+            <p id="reset-email-error" class="text-[11px] text-rose-400 font-medium hidden"></p>
+          </div>
+          <button onclick="handleSendOTP()" id="send-otp-btn" class="w-full py-3 px-4 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white text-sm font-bold rounded-xl shadow-lg transition-all duration-200 flex items-center justify-center gap-2">
+            <span>Authorize Key Broadcast</span>
+            <div id="send-otp-spinner" class="hidden w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+          </button>
+        </div>
+        
+        <!-- Step 2: Verify OTP -->
+        <div id="step-otp" class="space-y-6 hidden">
+          <div class="text-center">
+            <h3 class="text-xl font-bold text-white tracking-wide">Security Key Verification</h3>
+            <p class="text-xs text-slate-400 mt-2">Submit the 6-digit key dispatched to your terminal.</p>
+          </div>
+          <div class="space-y-2">
+            <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider">6-Digit OTP</label>
+            <input type="text" maxlength="6" id="reset-otp-input" class="w-full px-4 py-3 bg-[#080b15] border border-slate-800 rounded-xl text-sm text-center text-white tracking-[0.4em] font-bold focus:outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20" placeholder="000000">
+            <p id="reset-otp-error" class="text-[11px] text-rose-400 font-medium hidden"></p>
+          </div>
+          <button onclick="handleVerifyOTP()" id="verify-otp-btn" class="w-full py-3 px-4 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white text-sm font-bold rounded-xl shadow-lg transition-all duration-200 flex items-center justify-center gap-2">
+            <span>Verify Security Key</span>
+            <div id="verify-otp-spinner" class="hidden w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+          </button>
+        </div>
+        
+        <!-- Step 3: Change Password -->
+        <div id="step-password" class="space-y-6 hidden">
+          <div class="text-center">
+            <h3 class="text-xl font-bold text-white tracking-wide">Re-establish Credentials</h3>
+            <p class="text-xs text-slate-400 mt-2">Define your new core clearance access secret.</p>
+          </div>
+          <div class="space-y-4">
+            <div class="space-y-2">
+              <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider">New Password</label>
+              <input type="password" id="new-password-input" class="w-full px-4 py-3 bg-[#080b15] border border-slate-800 rounded-xl text-sm text-white focus:outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20" placeholder="••••••••••••">
+            </div>
+            <div class="space-y-2">
+              <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider">Confirm New Password</label>
+              <input type="password" id="confirm-password-input" class="w-full px-4 py-3 bg-[#080b15] border border-slate-800 rounded-xl text-sm text-white focus:outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20" placeholder="••••••••••••">
+              <p id="reset-password-error" class="text-[11px] text-rose-400 font-medium hidden"></p>
+            </div>
+          </div>
+          <button onclick="handleResetPassword()" id="reset-pw-btn" class="w-full py-3 px-4 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white text-sm font-bold rounded-xl shadow-lg transition-all duration-200 flex items-center justify-center gap-2">
+            <span>Commit Access Secret</span>
+            <div id="reset-pw-spinner" class="hidden w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+          </button>
+        </div>
+      </div>
+    </div>
 </body>
 </html>

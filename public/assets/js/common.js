@@ -54,7 +54,10 @@ function pnUiAvatarUrl(name, options = {}) {
 function pnProfilePicUrl(user = {}) {
     const pic = user.profile_pic || '';
     if (pic) {
-        return pic.startsWith('http') ? pic : `${URLROOT}/uploads/profiles/${pic.replace(/^\/+/, '')}`;
+        if (pic.startsWith('http')) return pic;
+        const isCompany = user.role === 'Company' || pic.startsWith('logos/');
+        const folder = isCompany ? 'companies' : 'profiles';
+        return `${URLROOT}/uploads/${folder}/${pic.replace(/^\/+/, '')}`;
     }
     return pnUiAvatarUrl(user.full_name);
 }

@@ -131,4 +131,11 @@ class Network extends Model {
         $this->db->bind(':receiver_id', $receiver_id);
         return $this->db->execute();
     }
+
+    public function getPendingRequestsCount($user_id) {
+        $this->db->query("SELECT COUNT(*) AS cnt FROM connections WHERE receiver_id = :user_id AND status = 'Pending'");
+        $this->db->bind(':user_id', $user_id);
+        $row = $this->db->single();
+        return (int)($row['cnt'] ?? 0);
+    }
 }

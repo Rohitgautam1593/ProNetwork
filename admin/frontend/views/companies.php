@@ -6,6 +6,12 @@
         <h1 class="text-2xl font-bold text-slate-900 font-manrope">Company Management</h1>
         <p class="text-slate-500 text-sm">Monitor and verify platform companies.</p>
     </div>
+    <div class="flex items-center gap-3">
+        <div class="relative">
+            <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[18px]">search</span>
+            <input type="text" id="admin-company-search" placeholder="Search companies..." class="pl-10 pr-4 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all w-64 md:w-72">
+        </div>
+    </div>
 </div>
 
 <?php flash('admin_message'); ?>
@@ -21,7 +27,7 @@
                     <th class="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest text-right">Actions</th>
                 </tr>
             </thead>
-            <tbody class="divide-y divide-slate-50">
+            <tbody id="admin-companies-table" class="divide-y divide-slate-50">
                 <?php foreach($data['companies'] as $company): ?>
                 <tr class="hover:bg-slate-50/80 transition-colors group cursor-pointer" data-admin-preview data-preview-type="Company" data-preview-id="<?php echo (int)$company['company_id']; ?>">
                     <td class="px-6 py-4">

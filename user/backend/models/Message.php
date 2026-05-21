@@ -181,4 +181,19 @@ class Message extends Model {
         $this->db->bind(':u2', $user2);
         return $this->db->execute();
     }
+
+    public function getUnreadMessagesCount($user_id) {
+        $this->db->query("SELECT COUNT(*) AS cnt FROM messages m 
+                          WHERE m.receiver_id = :user_id 
+                          AND m.is_read = 0 
+                          AND m.is_deleted = 0
+                          AND NOT EXISTS (
+                              SELECT 1 FROM blocked_users b 
+                              WHERE (b.blocker_id = :user_id AND b.blocked_id = m.sender_id)
+                              OR (b.blocker_id = m.sender_id AND b.blocked_id = :user_id)
+                          )");
+        $this->db->bind(':user_id', $user_id);
+        $row = $this->db->single();
+        return (int)($row['cnt'] ?? 0);
+    }
 }

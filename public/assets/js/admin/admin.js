@@ -426,6 +426,9 @@ function blankToNA(value) {
 document.addEventListener('DOMContentLoaded', () => {
     bindEntityPreviewClicks();
     bindUserSearch();
+    bindCompanySearch();
+    bindJobSearch();
+    bindPostSearch();
     bindUserForms();
 });
 
@@ -461,6 +464,59 @@ function bindUserSearch() {
         });
     });
 }
+
+function bindCompanySearch() {
+    const searchInput = $('admin-company-search');
+    const companyTable = $('admin-companies-table');
+
+    if (!searchInput || !companyTable) return;
+
+    searchInput.addEventListener('keyup', () => {
+        const term = searchInput.value.toLowerCase();
+        const rows = Array.from(companyTable.getElementsByTagName('tr'));
+
+        rows.forEach((row) => {
+            const textContent = row.innerText.toLowerCase();
+            row.style.display = textContent.includes(term) ? '' : 'none';
+        });
+    });
+}
+
+function bindJobSearch() {
+    const searchInput = $('admin-job-search');
+    const jobTable = $('admin-jobs-table');
+
+    if (!searchInput || !jobTable) return;
+
+    searchInput.addEventListener('keyup', () => {
+        const term = searchInput.value.toLowerCase();
+        const rows = Array.from(jobTable.getElementsByTagName('tr'));
+
+        rows.forEach((row) => {
+            const textContent = row.innerText.toLowerCase();
+            row.style.display = textContent.includes(term) ? '' : 'none';
+        });
+    });
+}
+
+function bindPostSearch() {
+    const searchInput = $('admin-post-search');
+    const postsTable = $('admin-posts-table');
+
+    if (!searchInput || !postsTable) return;
+
+    searchInput.addEventListener('keyup', () => {
+        const term = searchInput.value.toLowerCase();
+        const rows = Array.from(postsTable.getElementsByTagName('tr'));
+
+        rows.forEach((row) => {
+            if (row.id === 'no-posts-placeholder') return;
+            const textContent = row.innerText.toLowerCase();
+            row.style.display = textContent.includes(term) ? '' : 'none';
+        });
+    });
+}
+
 
 function bindUserForms() {
     const editForm = $('editUserForm');

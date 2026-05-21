@@ -247,12 +247,15 @@ class CompanyController extends Controller {
 
                 if ($user) {
                     if (password_verify($password, $user['password'])) {
-                        if ($user['role'] === 'Company' || stripos((string) $user['role'], 'company') !== false) {
+                        // Prevent Admin login through the Company operator portal
+                        if (!empty($user['is_admin']) || ($user['role'] ?? '') === 'Admin') {
+                            $error = 'Access Denied: Administrative accounts must authenticate exclusively via the secure Admin Portal.';
+                        } elseif ($user['role'] === 'Company' || stripos((string) $user['role'], 'company') !== false) {
                             session_regenerate_id(true);
                             $_SESSION['user_id'] = $user['user_id'];
                             $_SESSION['user_name'] = $user['full_name'];
                             $_SESSION['role'] = $user['role'];
-                            $_SESSION['is_admin'] = (($user['role'] ?? '') === 'Admin');
+                            $_SESSION['is_admin'] = false; // strictly ensure false here for company workspace
 
                             $successMessage = 'Clearance granted successfully! Routing to management node...';
 

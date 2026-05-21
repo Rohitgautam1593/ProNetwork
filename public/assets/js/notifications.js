@@ -32,7 +32,6 @@ let listFingerprint = '';
 document.addEventListener('DOMContentLoaded', () => {
     if (!document.getElementById('notifications-list')) return;
     initNotificationsPage();
-    startGlobalNotifBadgePoll();
 });
 
 function initNotificationsPage() {
@@ -208,27 +207,24 @@ function updateUnreadUi() {
     updateNavNotifBadge(unreadCount);
 }
 
-function startGlobalNotifBadgePoll() {
-    refreshNavNotifBadge();
-    setInterval(refreshNavNotifBadge, NOTIF_POLL_MS);
-}
-
-async function refreshNavNotifBadge() {
-    try {
-        const res = await fetch(`${URLROOT}/notification/unread_count`);
-        const data = await res.json();
-        if (data.success) updateNavNotifBadge(data.count);
-    } catch { /* ignore */ }
-}
-
 function updateNavNotifBadge(count) {
     const el = document.getElementById('nav-notif-badge');
-    if (!el) return;
-    if (count > 0) {
-        el.textContent = count > 99 ? '99+' : String(count);
-        el.classList.remove('hidden');
-    } else {
-        el.classList.add('hidden');
+    const elMobile = document.getElementById('nav-notif-badge-mobile');
+    if (el) {
+        if (count > 0) {
+            el.textContent = count > 99 ? '99+' : String(count);
+            el.classList.remove('hidden');
+        } else {
+            el.classList.add('hidden');
+        }
+    }
+    if (elMobile) {
+        if (count > 0) {
+            elMobile.textContent = count > 99 ? '99+' : String(count);
+            elMobile.classList.remove('hidden');
+        } else {
+            elMobile.classList.add('hidden');
+        }
     }
 }
 

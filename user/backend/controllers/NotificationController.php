@@ -88,4 +88,27 @@ class NotificationController extends Controller {
         $ok = $this->notificationModel->clearAll($_SESSION['user_id']);
         echo json_encode(['success' => $ok, 'unread_count' => 0]);
     }
+
+    public function badge_counts() {
+        if (!isLoggedIn()) {
+            echo json_encode(['success' => false, 'notifications' => 0, 'messages' => 0, 'network' => 0]);
+            exit;
+        }
+        $userId = $_SESSION['user_id'];
+        
+        $messageModel = $this->model('Message');
+        $networkModel = $this->model('Network');
+        
+        $notifCount = $this->notificationModel->getUnreadCount($userId);
+        $msgCount = $messageModel->getUnreadMessagesCount($userId);
+        $netCount = $networkModel->getPendingRequestsCount($userId);
+        
+        echo json_encode([
+            'success' => true,
+            'notifications' => $notifCount,
+            'messages' => $msgCount,
+            'network' => $netCount
+        ]);
+        exit;
+    }
 }

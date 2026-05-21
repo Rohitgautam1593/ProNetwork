@@ -116,6 +116,76 @@ class User extends Model {
         return $this->db->execute();
     }
 
+    private function ensurePasswordResetStorage() {
+        $this->db->query("CREATE TABLE IF NOT EXISTS password_resets (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            email VARCHAR(255) NOT NULL,
+            otp VARCHAR(6) NOT NULL,
+            token VARCHAR(64) NOT NULL,
+            expires_at DATETIME NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            INDEX idx_email (email),
+            INDEX idx_otp (otp),
+            INDEX idx_token (token)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+        $this->db->execute();
+
+        $this->db->query("SHOW COLUMNS FROM password_resets LIKE 'token'");
+        $hasTokenColumn = $this->db->single();
+        if (!$hasTokenColumn) {
+            $this->db->query("ALTER TABLE password_resets ADD token VARCHAR(64) NOT NULL DEFAULT '' AFTER otp");
+            $this->db->execute();
+        }
+
+        $this->db->query("SHOW INDEX FROM password_resets WHERE Key_name = 'idx_token'");
+        $hasTokenIndex = $this->db->single();
+        if (!$hasTokenIndex) {
+            $this->db->query("ALTER TABLE password_resets ADD INDEX idx_token (token)");
+            $this->db->execute();
+        }
+    }
+
+    // Save password reset OTP and Token (deletes old one and inserts a new one)
+    public function createPasswordReset($email, $otp, $token, $expiresAt) {
+        $this->ensurePasswordResetStorage();
+
+        // First delete any existing OTP for this email
+        $this->db->query("DELETE FROM password_resets WHERE email = :email");
+        $this->db->bind(':email', $email);
+        $this->db->execute();
+
+        // Insert new OTP and Token
+        $this->db->query("INSERT INTO password_resets (email, otp, token, expires_at) VALUES (:email, :otp, :token, :expires_at)");
+        $this->db->bind(':email', $email);
+        $this->db->bind(':otp', $otp);
+        $this->db->bind(':token', $token);
+        $this->db->bind(':expires_at', $expiresAt);
+        return $this->db->execute();
+    }
+
+    // Verify OTP exists and is not expired. Expiry is stored in PHP's UTC time.
+    public function verifyOTP($email, $otp) {
+        $this->db->query("SELECT * FROM password_resets WHERE email = :email AND otp = :otp AND expires_at > UTC_TIMESTAMP() LIMIT 1");
+        $this->db->bind(':email', $email);
+        $this->db->bind(':otp', $otp);
+        $row = $this->db->single();
+        return $row ? true : false;
+    }
+
+    // Verify Token exists and is not expired. Expiry is stored in PHP's UTC time.
+    public function verifyToken($token) {
+        $this->db->query("SELECT * FROM password_resets WHERE token = :token AND expires_at > UTC_TIMESTAMP() LIMIT 1");
+        $this->db->bind(':token', $token);
+        return $this->db->single();
+    }
+
+    // Delete OTP after successful use
+    public function deleteOTP($email) {
+        $this->db->query("DELETE FROM password_resets WHERE email = :email");
+        $this->db->bind(':email', $email);
+        return $this->db->execute();
+    }
+
     public function reportUser($data) {
         $this->db->query("INSERT INTO reports (reporter_id, target_type, target_id, reason, status)
                           VALUES (:reporter_id, 'User', :target_id, :reason, 'Pending')");

@@ -1,9 +1,7 @@
 <aside id="admin-sidebar" class="admin-sidebar w-72 lg:w-64 text-slate-300 flex-shrink-0 fixed lg:sticky top-0 left-0 h-screen flex flex-col z-[90] -translate-x-full lg:translate-x-0 transition-transform duration-300">
     <div class="p-6">
         <a href="<?php echo URLROOT; ?>/admin/dashboard" class="flex items-center gap-3 text-xl font-black text-white font-manrope">
-            <span class="w-10 h-10 rounded-2xl bg-cyan-400 text-slate-950 flex items-center justify-center shadow-lg shadow-cyan-950/30">
-                <span class="material-symbols-outlined text-[22px]">admin_panel_settings</span>
-            </span>
+            <span class="pn-brand-mark">P</span>
             ProAdmin
         </a>
         <p class="mt-3 text-[11px] text-slate-500 font-bold uppercase tracking-widest">Control Center</p>
@@ -19,9 +17,7 @@
                 <span class="material-symbols-outlined text-[20px]">group</span>
                 <span class="text-sm font-medium">Users</span>
             </div>
-            <?php if(!empty($data['stats']['pending_users'])): ?>
-                <span class="bg-amber-500 text-white text-[10px] font-black px-1.5 py-0.5 rounded-full"><?php echo $data['stats']['pending_users']; ?></span>
-            <?php endif; ?>
+            <span id="admin-pending-users-badge" class="bg-amber-500 text-white text-[10px] font-black px-1.5 py-0.5 rounded-full <?php echo empty($data['stats']['pending_users']) ? 'hidden' : ''; ?>"><?php echo htmlspecialchars($data['stats']['pending_users'] ?? '0'); ?></span>
         </a>
         <a href="<?php echo URLROOT; ?>/admin/companies" class="admin-nav-link flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/10 hover:text-white transition-colors <?php echo pn_admin_nav_active('companies') ? 'is-active text-white' : ''; ?>">
             <span class="material-symbols-outlined text-[20px]">business</span>
@@ -40,9 +36,7 @@
                 <span class="material-symbols-outlined text-[20px]">report</span>
                 <span class="text-sm font-medium">Reports</span>
             </div>
-            <?php if(!empty($data['stats']['unread_reports'])): ?>
-                <span class="bg-red-500 text-white text-[10px] font-black px-1.5 py-0.5 rounded-full"><?php echo $data['stats']['unread_reports']; ?></span>
-            <?php endif; ?>
+            <span id="admin-unread-reports-badge" class="bg-red-500 text-white text-[10px] font-black px-1.5 py-0.5 rounded-full <?php echo empty($data['stats']['unread_reports']) ? 'hidden' : ''; ?>"><?php echo htmlspecialchars($data['stats']['unread_reports'] ?? '0'); ?></span>
         </a>
     </nav>
 
@@ -71,52 +65,44 @@
             <div class="relative">
                 <button id="admin-notif-btn" class="text-slate-400 hover:text-slate-600 transition-all flex items-center justify-center p-1.5 rounded-full hover:bg-slate-100">
                     <span class="material-symbols-outlined text-[22px]">notifications</span>
-                    <?php if(!empty($data['stats']['total_admin_notifications'])): ?>
-                        <span class="absolute top-0 right-0 w-4 h-4 bg-red-500 text-white text-[9px] font-black rounded-full flex items-center justify-center border-2 border-white shadow-sm">
-                            <?php echo $data['stats']['total_admin_notifications']; ?>
-                        </span>
-                    <?php endif; ?>
+                    <span id="admin-total-notif-badge" class="absolute top-0 right-0 w-4 h-4 bg-red-500 text-white text-[9px] font-black rounded-full flex items-center justify-center border-2 border-white shadow-sm <?php echo empty($data['stats']['total_admin_notifications']) ? 'hidden' : ''; ?>">
+                        <?php echo htmlspecialchars($data['stats']['total_admin_notifications'] ?? '0'); ?>
+                    </span>
                 </button>
 
                 <!-- Notification Dropdown -->
                 <div id="admin-notif-dropdown" class="hidden absolute right-0 mt-3 w-80 bg-white rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.1)] border border-slate-100 z-50 overflow-hidden animate-in fade-in zoom-in duration-200 origin-top-right">
                     <div class="px-5 py-4 border-b border-slate-50 bg-slate-50/50 flex items-center justify-between">
                         <h3 class="text-xs font-bold text-slate-900 uppercase tracking-widest">Admin Alerts</h3>
-                        <span class="text-[10px] font-bold text-slate-400"><?php echo $data['stats']['total_admin_notifications']; ?> Action Items</span>
+                        <span id="admin-dropdown-count-label" class="text-[10px] font-bold text-slate-400"><?php echo htmlspecialchars($data['stats']['total_admin_notifications'] ?? '0'); ?> Action Items</span>
                     </div>
                     <div class="max-h-[300px] overflow-y-auto">
-                        <?php if(!empty($data['stats']['pending_users'])): ?>
-                            <a href="<?php echo URLROOT; ?>/admin/users" class="flex items-center gap-4 px-5 py-4 hover:bg-slate-50 transition-colors border-b border-slate-50 last:border-0">
-                                <div class="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center text-amber-600 flex-shrink-0">
-                                    <span class="material-symbols-outlined text-[20px]">person_add</span>
-                                </div>
-                                <div class="flex-1 min-w-0">
-                                    <p class="text-sm font-bold text-slate-900 truncate">New User Registrations</p>
-                                    <p class="text-xs text-slate-500 truncate"><?php echo $data['stats']['pending_users']; ?> accounts awaiting approval</p>
-                                </div>
-                            </a>
-                        <?php endif; ?>
-
-                        <?php if(!empty($data['stats']['unread_reports'])): ?>
-                            <a href="<?php echo URLROOT; ?>/admin/reports" class="flex items-center gap-4 px-5 py-4 hover:bg-slate-50 transition-colors border-b border-slate-50 last:border-0">
-                                <div class="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center text-red-600 flex-shrink-0">
-                                    <span class="material-symbols-outlined text-[20px]">flag</span>
-                                </div>
-                                <div class="flex-1 min-w-0">
-                                    <p class="text-sm font-bold text-slate-900 truncate">Community Reports</p>
-                                    <p class="text-xs text-slate-500 truncate"><?php echo $data['stats']['unread_reports']; ?> content flags to review</p>
-                                </div>
-                            </a>
-                        <?php endif; ?>
-
-                        <?php if($data['stats']['total_admin_notifications'] == 0): ?>
-                            <div class="px-5 py-8 text-center">
-                                <div class="w-12 h-12 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-3 text-slate-300">
-                                    <span class="material-symbols-outlined text-[24px]">check_circle</span>
-                                </div>
-                                <p class="text-sm text-slate-500">Everything caught up!</p>
+                        <a id="admin-dropdown-users-item" href="<?php echo URLROOT; ?>/admin/users" class="flex items-center gap-4 px-5 py-4 hover:bg-slate-50 transition-colors border-b border-slate-50 last:border-0 <?php echo empty($data['stats']['pending_users']) ? 'hidden' : ''; ?>">
+                            <div class="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center text-amber-600 flex-shrink-0">
+                                <span class="material-symbols-outlined text-[20px]">person_add</span>
                             </div>
-                        <?php endif; ?>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-sm font-bold text-slate-900 truncate">New User Registrations</p>
+                                <p id="admin-dropdown-users-desc" class="text-xs text-slate-500 truncate"><?php echo htmlspecialchars($data['stats']['pending_users'] ?? '0'); ?> accounts awaiting approval</p>
+                            </div>
+                        </a>
+
+                        <a id="admin-dropdown-reports-item" href="<?php echo URLROOT; ?>/admin/reports" class="flex items-center gap-4 px-5 py-4 hover:bg-slate-50 transition-colors border-b border-slate-50 last:border-0 <?php echo empty($data['stats']['unread_reports']) ? 'hidden' : ''; ?>">
+                            <div class="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center text-red-600 flex-shrink-0">
+                                <span class="material-symbols-outlined text-[20px]">flag</span>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-sm font-bold text-slate-900 truncate">Community Reports</p>
+                                <p id="admin-dropdown-reports-desc" class="text-xs text-slate-500 truncate"><?php echo htmlspecialchars($data['stats']['unread_reports'] ?? '0'); ?> content flags to review</p>
+                            </div>
+                        </a>
+
+                        <div id="admin-dropdown-empty-state" class="px-5 py-8 text-center <?php echo !empty($data['stats']['total_admin_notifications']) ? 'hidden' : ''; ?>">
+                            <div class="w-12 h-12 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-3 text-slate-300">
+                                <span class="material-symbols-outlined text-[24px]">check_circle</span>
+                            </div>
+                            <p class="text-sm text-slate-500">Everything caught up!</p>
+                        </div>
                     </div>
                     <div class="p-3 bg-slate-50/30 text-center border-t border-slate-50">
                         <a href="<?php echo URLROOT; ?>/admin/dashboard" class="text-[11px] font-bold text-[#0A66C2] hover:underline">View System Dashboard</a>

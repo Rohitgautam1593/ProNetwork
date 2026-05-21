@@ -4,9 +4,17 @@
  */
 'use strict';
 
-document.addEventListener('DOMContentLoaded', () => {
+function initAll() {
+  console.log("main.js initializing all components...");
   initDeadLinks();
-});
+  initPasswordToggles();
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initAll);
+} else {
+  initAll();
+}
 
 // GLOBAL NOTIFY
 function notify(message) {
@@ -32,4 +40,38 @@ function initDeadLinks() {
       notify((link.textContent || 'This link').trim() + ' - coming soon.');
     });
   });
+}
+
+// INITIALIZE PASSWORD TOGGLES
+function initPasswordToggles() {
+  console.log("initPasswordToggles search started...");
+  document.querySelectorAll('[data-toggle-password]').forEach(btn => {
+    console.log("Found password toggle button for element:", btn.getAttribute('data-toggle-password'));
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const targetId = btn.getAttribute('data-toggle-password');
+      togglePasswordVisibility(targetId, btn);
+    });
+  });
+}
+
+// TOGGLE PASSWORD VISIBILITY
+function togglePasswordVisibility(inputId, btnEl) {
+  console.log("togglePasswordVisibility execution initiated for:", inputId);
+  const input = document.getElementById(inputId);
+  if (!input) {
+    console.warn("Target password input element not found in DOM:", inputId);
+    return;
+  }
+  const icon = btnEl.querySelector('.material-symbols-outlined') || btnEl;
+  if (input.type === 'password') {
+    input.type = 'text';
+    if (icon) icon.textContent = 'visibility_off';
+    console.log("Input type toggled to: text");
+  } else {
+    input.type = 'password';
+    if (icon) icon.textContent = 'visibility';
+    console.log("Input type toggled to: password");
+  }
 }

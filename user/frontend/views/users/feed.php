@@ -175,7 +175,10 @@
             </div>
             <form id="feed-post-form" data-custom-validation="true" novalidate class="p-4 space-y-3">
                 <textarea id="feed-post-content" name="content" rows="5" required class="w-full border border-slate-200 rounded-lg p-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#0A66C2]" placeholder="What do you want to talk about?"></textarea>
-                <div id="feed-post-error" class="hidden text-xs text-red-600"></div>
+                <div id="feed-post-error" class="hidden text-xs text-red-600 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800/50 rounded-lg p-3 items-center gap-2 font-medium">
+                    <span class="material-symbols-outlined text-[18px] text-red-500">error</span>
+                    <span id="feed-post-error-text">Post content or media is required.</span>
+                </div>
                 <div id="post-media-section" class="hidden space-y-2 rounded-lg border border-slate-200 p-3">
                     <label class="text-sm font-semibold text-slate-700" for="feed-post-media">Upload media</label>
                     <input id="feed-post-media" name="media" type="file" accept="image/*,video/*" class="block w-full text-sm"/>

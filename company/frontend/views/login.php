@@ -49,8 +49,17 @@
                     </div>
                     <div>
                         <label class="block font-label-md text-on-surface mb-1" for="password">Password</label>
-                        <input id="password" type="password" name="password" required placeholder="Password"
-                               class="w-full h-10 px-3 rounded-md border border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary text-sm font-body-md bg-white">
+                        <div class="relative w-full">
+                            <input id="password" type="password" name="password" required placeholder="Password"
+                                   class="w-full h-10 pl-3 pr-10 rounded-md border border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary text-sm font-body-md bg-white">
+                            <button type="button" data-toggle-password="password" class="absolute right-3 top-1/2 -translate-y-1/2 z-20 text-secondary hover:text-primary transition-colors flex items-center justify-center">
+                                <span class="material-symbols-outlined text-[18px]">visibility</span>
+                            </button>
+                        </div>
+                        <div class="flex items-center justify-between mt-1">
+                            <div></div>
+                            <a class="font-label-md text-primary hover:underline text-xs" data-action="forgot-password" href="#">Forgot password?</a>
+                        </div>
                     </div>
 
                     <div class="pt-2">

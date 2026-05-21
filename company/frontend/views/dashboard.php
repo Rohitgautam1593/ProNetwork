@@ -59,7 +59,7 @@
                         <div class="flex flex-wrap items-center gap-2 text-sm text-secondary pt-1 font-body-md">
                             <span><?php echo htmlspecialchars($industry); ?></span>
                             <span class="text-outline-variant">&bull;</span>
-                            <span class="font-semibold text-on-surface"><?php echo number_format($followers); ?> followers</span>
+                            <span id="followers-count" class="font-semibold text-on-surface" data-count="<?php echo $followers; ?>"><?php echo number_format($followers); ?> followers</span>
                             <span class="text-outline-variant">&bull;</span>
                             <span><?php echo htmlspecialchars($size); ?></span>
                         </div>
@@ -194,9 +194,17 @@
                         </div>
 
                         <?php if (!empty($jobs)): ?>
-                            <div class="divide-y divide-outline-variant/20">
+                            <!-- Search option for jobs -->
+                            <div class="p-4 border-b border-outline-variant/20 bg-surface-container-lowest">
+                                <div class="relative">
+                                    <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-secondary text-[18px]">search</span>
+                                    <input type="text" id="jobs-search-input" placeholder="Search company job openings by title, employment type, or location..." class="w-full h-10 pl-10 pr-4 rounded-xl border border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary text-sm bg-surface-container-low focus:bg-white transition-all duration-300">
+                                </div>
+                            </div>
+
+                            <div class="divide-y divide-outline-variant/20" id="jobs-listings-container">
                                 <?php foreach ($jobs as $job): ?>
-                                    <div class="p-6 hover:bg-surface-container-low transition-colors flex flex-col sm:flex-row justify-between gap-4">
+                                    <div class="job-listing-item p-6 hover:bg-surface-container-low transition-colors flex flex-col sm:flex-row justify-between gap-4" data-title="<?php echo htmlspecialchars(strtolower($job['title'])); ?>" data-location="<?php echo htmlspecialchars(strtolower($job['location'] ?? 'remote')); ?>" data-type="<?php echo htmlspecialchars(strtolower($job['job_type'])); ?>">
                                         <div class="space-y-1">
                                             <a href="<?php echo URLROOT; ?>/job/apply/<?php echo $job['job_id']; ?>" class="font-title-lg text-primary hover:underline inline-block"><?php echo htmlspecialchars($job['title']); ?></a>
                                             <p class="font-body-md text-on-surface-variant text-sm"><?php echo htmlspecialchars($job['location'] ?? 'Remote'); ?> &bull; <?php echo htmlspecialchars($job['job_type']); ?></p>
@@ -259,10 +267,16 @@
                                                     <p class="font-body-sm text-xs text-secondary mt-0.5"><?php echo htmlspecialchars($job['location'] ?? 'Remote'); ?></p>
                                                 </td>
                                                 <td class="p-4">
-                                                    <select id="status-<?php echo $job['job_id']; ?>" onchange="saveJobConfig(<?php echo $job['job_id']; ?>)" class="text-sm border border-outline-variant rounded-md py-1 px-2 focus:ring-primary focus:border-primary">
-                                                        <option value="Live" <?php echo $job['status'] !== 'Closed' ? 'selected' : ''; ?>>Active</option>
-                                                        <option value="Closed" <?php echo $job['status'] === 'Closed' ? 'selected' : ''; ?>>Closed</option>
-                                                    </select>
+                                                    <div class="flex items-center gap-2">
+                                                        <select id="status-<?php echo $job['job_id']; ?>" onchange="saveJobConfig(<?php echo $job['job_id']; ?>)" class="text-sm border border-outline-variant rounded-md py-1.5 pl-3 pr-8 focus:ring-primary focus:border-primary bg-white appearance-none bg-[url('data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%25234a5568%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-[length:14px_14px] bg-[right_8px_center] bg-no-repeat cursor-pointer">
+                                                            <option value="Live" <?php echo $job['status'] !== 'Closed' ? 'selected' : ''; ?>>Active</option>
+                                                            <option value="Closed" <?php echo $job['status'] === 'Closed' ? 'selected' : ''; ?>>Closed</option>
+                                                        </select>
+                                                        <div class="flex items-center text-xs text-secondary gap-1 border border-outline-variant rounded-md px-2 py-1 bg-white">
+                                                            <span>Limit:</span>
+                                                            <input type="number" id="limit-<?php echo $job['job_id']; ?>" value="<?php echo htmlspecialchars($job['applicant_limit'] ?? ''); ?>" onchange="saveJobConfig(<?php echo $job['job_id']; ?>)" min="1" placeholder="∞" class="w-12 bg-transparent text-center border-none p-0 focus:ring-0 text-sm font-semibold outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
+                                                        </div>
+                                                    </div>
                                                 </td>
                                                 <td class="p-4">
                                                     <span class="inline-flex items-center justify-center px-2.5 py-1 rounded-full text-xs font-medium <?php echo ((int)$job['applicant_count'] > 0) ? 'bg-primary-fixed text-primary-container' : 'bg-surface-variant text-secondary'; ?>">
@@ -410,6 +424,12 @@
                         <input type="text" name="salary_range" placeholder="e.g. $80k - $100k" class="w-full h-10 px-3 rounded-md border border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary text-sm bg-white">
                     </div>
                 </div>
+                <div class="grid grid-cols-1 gap-4">
+                    <div>
+                        <label class="block font-label-lg text-on-surface mb-1">Max Limit of Applicants</label>
+                        <input type="number" name="applicant_limit" min="1" placeholder="e.g. 50 (leave empty for unlimited)" class="w-full h-10 px-3 rounded-md border border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary text-sm bg-white">
+                    </div>
+                </div>
                 <div>
                     <label class="block font-label-lg text-on-surface mb-1">Job Description *</label>
                     <textarea name="description" rows="5" required class="w-full p-3 rounded-md border border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary text-sm bg-white"></textarea>
@@ -490,12 +510,63 @@ document.addEventListener('DOMContentLoaded', () => {
                 const res = await fetch(url, { method: 'POST' });
                 const data = await res.json();
                 if (data.success) {
-                    window.location.reload();
+                    const countSpan = document.getElementById('followers-count');
+                    let count = parseInt(countSpan.getAttribute('data-count'), 10);
+                    if (isFollowing) {
+                        count = Math.max(0, count - 1);
+                        this.className = 'flex items-center justify-center gap-1.5 px-6 py-2 rounded-full font-label-lg transition-all duration-300 shadow-sm bg-primary text-white hover:bg-[#004182]';
+                        this.innerHTML = '<span class="material-symbols-outlined text-lg">add</span><span id="follow-text">Follow</span>';
+                    } else {
+                        count++;
+                        this.className = 'flex items-center justify-center gap-1.5 px-6 py-2 rounded-full font-label-lg transition-all duration-300 shadow-sm border-2 border-outline text-secondary hover:border-outline-variant hover:bg-surface-variant';
+                        this.innerHTML = '<span class="material-symbols-outlined text-lg">check</span><span id="follow-text">Following</span>';
+                    }
+                    countSpan.setAttribute('data-count', count);
+                    countSpan.textContent = count.toLocaleString() + ' followers';
                 } else {
                     if(data.message === 'Unauthorized') window.location.href = `${URLROOT}/auth/login`;
                 }
             } catch (e) {
                 console.error(e);
+            }
+        });
+    }
+
+    // Jobs Search filtering logic
+    const jobsSearchInput = document.getElementById('jobs-search-input');
+    if (jobsSearchInput) {
+        jobsSearchInput.addEventListener('input', function() {
+            const query = this.value.toLowerCase().trim();
+            const items = document.querySelectorAll('.job-listing-item');
+            let visibleCount = 0;
+            
+            items.forEach(item => {
+                const title = item.getAttribute('data-title') || '';
+                const location = item.getAttribute('data-location') || '';
+                const type = item.getAttribute('data-type') || '';
+                
+                if (title.includes(query) || location.includes(query) || type.includes(query)) {
+                    item.style.setProperty('display', 'flex', 'important');
+                    visibleCount++;
+                } else {
+                    item.style.setProperty('display', 'none', 'important');
+                }
+            });
+            
+            // Show/hide empty state
+            let emptyState = document.getElementById('jobs-search-empty-state');
+            if (visibleCount === 0) {
+                if (!emptyState) {
+                    emptyState = document.createElement('div');
+                    emptyState.id = 'jobs-search-empty-state';
+                    emptyState.className = 'p-12 text-center text-secondary font-body-md flex flex-col items-center justify-center';
+                    emptyState.innerHTML = '<span class="material-symbols-outlined text-4xl mb-2 text-outline-variant">search_off</span><p class="font-semibold">No job openings match your search query.</p>';
+                    document.getElementById('jobs-listings-container').appendChild(emptyState);
+                } else {
+                    emptyState.style.display = 'flex';
+                }
+            } else if (emptyState) {
+                emptyState.style.display = 'none';
             }
         });
     }
@@ -510,9 +581,11 @@ function closeCandidatesModal() { document.getElementById('candidatesModal').cla
 
 async function saveJobConfig(jobId) {
     const statusVal = document.getElementById(`status-${jobId}`).value;
+    const limitVal = document.getElementById(`limit-${jobId}`).value;
     try {
         const formData = new FormData();
         formData.append('status', statusVal);
+        formData.append('applicant_limit', limitVal);
         await fetch(`${URLROOT}/company/update_job/${jobId}`, {
             method: 'POST',
             body: formData

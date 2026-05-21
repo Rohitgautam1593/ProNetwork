@@ -10,31 +10,35 @@
 </div>
 <div class="absolute inset-0 bg-gradient-to-br from-primary via-primary/90 to-on-primary-fixed-variant z-10"></div>
 <div class="relative z-20 max-w-md text-on-primary text-center">
-<div class="mb-lg">
-<span class="font-display-lg text-[48px] tracking-tight font-black">ProNetwork</span>
-</div>
-<h1 class="font-display-md text-display-md mb-md">Welcome to your professional community</h1>
-<p class="font-body-lg text-body-lg text-on-primary/80 mb-xl">
-                    Connect with industry leaders, discover your next career move, and grow your professional identity.
-                </p>
-<div class="grid grid-cols-2 gap-md">
-<div class="p-md rounded-lg bg-white/10 backdrop-blur-md border border-white/20">
-<span class="material-symbols-outlined text-4xl mb-sm" data-icon="work">work</span>
-<p class="font-label-lg text-label-lg">1.2M+ Jobs</p>
-</div>
-<div class="p-md rounded-lg bg-white/10 backdrop-blur-md border border-white/20">
-<span class="material-symbols-outlined text-4xl mb-sm" data-icon="groups">groups</span>
-<p class="font-label-lg text-label-lg">Expert Groups</p>
-</div>
-</div>
-</div>
-</section>
-<!-- Form Section (Right) -->
-<section class="flex-1 flex flex-col justify-center items-center p-md md:p-xl bg-surface-container-lowest overflow-y-auto custom-scrollbar">
-<!-- Mobile Brand Logo -->
-<div class="md:hidden mb-lg">
-<span class="font-display-md text-primary font-black">ProNetwork</span>
-</div>
+    <div class="mb-lg flex flex-col items-center justify-center gap-3">
+        <span class="pn-brand-mark" style="width: 3.25rem; height: 3.25rem; border-radius: 16px; font-size: 1.75rem; box-shadow: 0 12px 28px rgba(10, 102, 194, 0.35);">P</span>
+        <span class="font-display-lg text-[48px] tracking-tight font-black">ProNetwork</span>
+    </div>
+    <h1 class="font-display-md text-display-md mb-md">Welcome to your professional community</h1>
+    <p class="font-body-lg text-body-lg text-on-primary/80 mb-xl">
+                        Connect with industry leaders, discover your next career move, and grow your professional identity.
+                    </p>
+    <div class="grid grid-cols-2 gap-md">
+    <div class="p-md rounded-lg bg-white/10 backdrop-blur-md border border-white/20">
+    <span class="material-symbols-outlined text-4xl mb-sm" data-icon="work">work</span>
+    <p class="font-label-lg text-label-lg">1.2M+ Jobs</p>
+    </div>
+    <div class="p-md rounded-lg bg-white/10 backdrop-blur-md border border-white/20">
+    <span class="material-symbols-outlined text-4xl mb-sm" data-icon="groups">groups</span>
+    <p class="font-label-lg text-label-lg">Expert Groups</p>
+    </div>
+    </div>
+    </div>
+    </section>
+    <!-- Form Section (Right) -->
+    <section class="flex-1 flex flex-col justify-center items-center p-md md:p-xl bg-surface-container-lowest overflow-y-auto custom-scrollbar">
+    <!-- Mobile Brand Logo -->
+    <div class="md:hidden mb-lg flex justify-center">
+      <a href="<?php echo URLROOT; ?>" class="pn-brand flex items-center gap-2 flex-shrink-0 rounded-xl px-1" aria-label="ProNetwork home">
+        <span class="pn-brand-mark">P</span>
+        <span class="text-xl font-black text-slate-950 tracking-tight">ProNetwork</span>
+      </a>
+    </div>
 <div class="w-full max-w-[400px] space-y-lg">
 <!-- Toggle Header -->
 <div class="text-center">
@@ -57,7 +61,12 @@
 </div>
 <div>
 <label class="block font-label-lg text-label-lg text-on-surface mb-xs" for="password">Password</label>
-<input class="w-full h-[48px] px-md rounded border border-outline-variant bg-white font-body-md form-input-focus" id="password" name="password" placeholder="••••••••" type="password" autocomplete="current-password"/>
+<div class="relative w-full">
+<input class="w-full h-[48px] pl-md pr-12 rounded border border-outline-variant bg-white font-body-md form-input-focus" id="password" name="password" placeholder="••••••••" type="password" autocomplete="current-password"/>
+<button type="button" data-toggle-password="password" class="absolute right-3 top-1/2 -translate-y-1/2 z-20 text-secondary hover:text-primary transition-colors flex items-center justify-center">
+<span class="material-symbols-outlined text-[20px]">visibility</span>
+</button>
+</div>
 </div>
 <div class="flex items-center justify-between">
 <label class="flex items-center space-x-sm cursor-pointer">
@@ -103,7 +112,12 @@
 </div>
 <div>
 <label class="block font-label-lg text-label-lg text-on-surface mb-xs" for="signup-password">Password</label>
-<input class="w-full h-[48px] px-md rounded border border-outline-variant bg-white font-body-md form-input-focus" id="signup-password" name="password" placeholder="••••••••" type="password" autocomplete="new-password"/>
+<div class="relative w-full">
+<input class="w-full h-[48px] pl-md pr-12 rounded border border-outline-variant bg-white font-body-md form-input-focus" id="signup-password" name="password" placeholder="••••••••" type="password" autocomplete="new-password"/>
+<button type="button" data-toggle-password="signup-password" class="absolute right-3 top-1/2 -translate-y-1/2 z-20 text-secondary hover:text-primary transition-colors flex items-center justify-center">
+<span class="material-symbols-outlined text-[20px]">visibility</span>
+</button>
+</div>
 <div class="mt-2">
 <div class="w-full h-1.5 bg-gray-200 rounded-full overflow-hidden"><div id="pw-strength-bar" class="h-full rounded-full transition-all duration-300" style="width:0%"></div></div>
 <p id="pw-strength-label" class="text-xs mt-1"></p>

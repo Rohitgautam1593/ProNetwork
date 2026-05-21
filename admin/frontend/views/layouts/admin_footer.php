@@ -230,7 +230,87 @@
                 }
             });
         }
+
+        // Start Admin Stats polling loop
+        startAdminStatsPolling();
     });
+
+    function startAdminStatsPolling() {
+        const hasAdminBadges = document.getElementById('admin-pending-users-badge') ||
+                               document.getElementById('admin-unread-reports-badge') ||
+                               document.getElementById('admin-total-notif-badge');
+                               
+        if (!hasAdminBadges) return;
+
+        const updateAdminBadge = (id, count) => {
+            const el = document.getElementById(id);
+            if (!el) return;
+            if (count > 0) {
+                el.textContent = String(count);
+                el.classList.remove('hidden');
+            } else {
+                el.classList.add('hidden');
+            }
+        };
+
+        const poll = async () => {
+            try {
+                const res = await fetch(`${URLROOT}/admin/stats_api`);
+                const data = await res.json();
+                
+                const pendingUsers = parseInt(data.pending_users ?? 0);
+                const unreadReports = parseInt(data.unread_reports ?? 0);
+                const totalNotif = parseInt(data.total_admin_notifications ?? 0);
+
+                // Update sidebar badges
+                updateAdminBadge('admin-pending-users-badge', pendingUsers);
+                updateAdminBadge('admin-unread-reports-badge', unreadReports);
+                updateAdminBadge('admin-total-notif-badge', totalNotif);
+
+                // Update header notification dropdown elements
+                const countLabel = document.getElementById('admin-dropdown-count-label');
+                if (countLabel) {
+                    countLabel.textContent = `${totalNotif} Action Item${totalNotif !== 1 ? 's' : ''}`;
+                }
+
+                const usersItem = document.getElementById('admin-dropdown-users-item');
+                const usersDesc = document.getElementById('admin-dropdown-users-desc');
+                if (usersItem) {
+                    if (pendingUsers > 0) {
+                        usersItem.classList.remove('hidden');
+                        if (usersDesc) usersDesc.textContent = `${pendingUsers} account${pendingUsers !== 1 ? 's' : ''} awaiting approval`;
+                    } else {
+                        usersItem.classList.add('hidden');
+                    }
+                }
+
+                const reportsItem = document.getElementById('admin-dropdown-reports-item');
+                const reportsDesc = document.getElementById('admin-dropdown-reports-desc');
+                if (reportsItem) {
+                    if (unreadReports > 0) {
+                        reportsItem.classList.remove('hidden');
+                        if (reportsDesc) reportsDesc.textContent = `${unreadReports} content flag${unreadReports !== 1 ? 's' : ''} to review`;
+                    } else {
+                        reportsItem.classList.add('hidden');
+                    }
+                }
+
+                const emptyState = document.getElementById('admin-dropdown-empty-state');
+                if (emptyState) {
+                    if (totalNotif > 0) {
+                        emptyState.classList.add('hidden');
+                    } else {
+                        emptyState.classList.remove('hidden');
+                    }
+                }
+            } catch (e) {
+                // Silently ignore network errors
+            }
+        };
+
+        poll();
+        setInterval(poll, 10000); // Poll every 10 seconds
+    }
 </script>
 </body>
 </html>

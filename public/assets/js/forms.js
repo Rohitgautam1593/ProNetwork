@@ -299,20 +299,116 @@ function initAuthActions() {
   document.querySelectorAll('[data-action="forgot-password"]').forEach(link => {
     link.addEventListener('click', async (e) => {
       e.preventDefault();
-      const entered = await pnModal({
+      
+      // Check which portal we are currently in
+      const portal = window.location.pathname.includes('/company') ? 'company' : 'user';
+
+      // Step 1: Request registered email address
+      const email = await pnModal({
         title: 'Forgot Password',
-        message: 'Enter your registered email address to receive a password reset link.',
+        message: 'Enter your registered email address to receive a 6-digit verification code.',
         type: 'info',
         isPrompt: true,
         placeholder: 'e.g. name@example.com',
-        confirmText: 'Send Reset Link',
+        confirmText: 'Send Verification Code',
         cancelText: 'Cancel'
       });
-      
-      if (entered && validateEmail(entered)) {
-        showToast('Password reset link sent to ' + entered.trim() + '.', 'success');
-      } else if (entered !== null) {
+
+      if (email === null) return; // User clicked cancel
+
+      if (!email.trim() || !validateEmail(email)) {
         showToast('Please enter a valid email address.', 'error');
+        return;
+      }
+
+      showToast('Dispatching security key...', 'info');
+
+      try {
+        const resForgot = await fetch(`${URLROOT}/auth/forgot_password`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: email.trim(), portal: portal })
+        });
+        const resultForgot = await resForgot.json();
+
+        if (!resultForgot.success) {
+          showToast(resultForgot.message || 'Security code dispatch failed.', 'error');
+          return;
+        }
+
+        showToast(resultForgot.message, 'success');
+
+        // Step 2: Request 6-digit verification code (OTP)
+        const otp = await pnModal({
+          title: 'Enter Verification Key',
+          message: 'A 6-digit security code has been sent to ' + email.trim() + '. Please enter it below to verify your identity.',
+          type: 'success',
+          isPrompt: true,
+          placeholder: 'Enter 6-digit OTP',
+          confirmText: 'Verify Code',
+          cancelText: 'Cancel'
+        });
+
+        if (otp === null) return; // User clicked cancel
+
+        if (!otp.trim() || otp.trim().length !== 6) {
+          showToast('Please enter a valid 6-digit verification key.', 'error');
+          return;
+        }
+
+        showToast('Verifying key...', 'info');
+
+        const resVerify = await fetch(`${URLROOT}/auth/verify_otp`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: email.trim(), otp: otp.trim() })
+        });
+        const resultVerify = await resVerify.json();
+
+        if (!resultVerify.success) {
+          showToast(resultVerify.message || 'Security key verification failed.', 'error');
+          return;
+        }
+
+        showToast(resultVerify.message, 'success');
+
+        // Step 3: Prompt for New Password
+        const password = await pnModal({
+          title: 'Establish New Password',
+          message: 'Your identity has been verified. Enter a new secure password (minimum 6 characters) to update your credentials.',
+          type: 'info',
+          isPrompt: true,
+          placeholder: 'Enter new password',
+          confirmText: 'Commit Password',
+          cancelText: 'Cancel'
+        });
+
+        if (password === null) return; // User clicked cancel
+
+        if (!password.trim() || password.trim().length < 6) {
+          showToast('Password must be at least 6 characters in length.', 'error');
+          return;
+        }
+
+        showToast('Updating authentication parameters...', 'info');
+
+        const resReset = await fetch(`${URLROOT}/auth/reset_password`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: email.trim(), otp: otp.trim(), password: password.trim() })
+        });
+        const resultReset = await resReset.json();
+
+        if (resultReset.success) {
+          showToast(resultReset.message || 'Credentials updated successfully!', 'success');
+          setTimeout(() => {
+            window.location.reload();
+          }, 1500);
+        } else {
+          showToast(resultReset.message || 'Reset failed.', 'error');
+        }
+      } catch (err) {
+        showToast('A server error occurred during authentication reset.', 'error');
       }
     });
   });
@@ -390,8 +486,37 @@ function initFeedComposer() {
   const form = document.getElementById('feed-post-form');
   const content = document.getElementById('feed-post-content');
   const mediaInput = document.getElementById('feed-post-media');
+  const errorDiv = document.getElementById('feed-post-error');
+  const errorTextSpan = document.getElementById('feed-post-error-text');
   
   if (!openBtn || !modal || !closeBtn || !form || !content) return;
+
+  function showComposerError(message) {
+    if (errorDiv) {
+      if (errorTextSpan) {
+        errorTextSpan.textContent = message;
+      } else {
+        errorDiv.textContent = message;
+      }
+      errorDiv.classList.remove('hidden');
+      errorDiv.classList.add('flex');
+    }
+    content.classList.add('border-red-500', 'focus:ring-red-500');
+    content.classList.remove('border-slate-200', 'focus:ring-[#0A66C2]');
+  }
+
+  function clearComposerError() {
+    if (errorDiv) {
+      errorDiv.classList.add('hidden');
+      errorDiv.classList.remove('flex');
+    }
+    content.classList.remove('border-red-500', 'focus:ring-red-500');
+    content.classList.add('border-slate-200', 'focus:ring-[#0A66C2]');
+  }
+
+  // Clear composer errors immediately when typing or selecting files
+  content.addEventListener('input', clearComposerError);
+  mediaInput?.addEventListener('change', clearComposerError);
 
   function setType(type) {
     document.getElementById('post-media-section')?.classList.toggle('hidden', type !== 'media');
@@ -401,6 +526,7 @@ function initFeedComposer() {
 
   function openModal(type) {
     setType(type);
+    clearComposerError();
     modal.classList.remove('hidden');
     modal.classList.add('flex');
     content.focus();
@@ -425,12 +551,14 @@ function initFeedComposer() {
   closeBtn.addEventListener('click', () => { 
     modal.classList.add('hidden'); 
     modal.classList.remove('flex'); 
+    clearComposerError();
   });
 
   modal.addEventListener('click', (e) => { 
     if (e.target === modal) { 
       modal.classList.add('hidden'); 
       modal.classList.remove('flex'); 
+      clearComposerError();
     } 
   });
 
@@ -440,7 +568,7 @@ function initFeedComposer() {
     const file = mediaInput?.files?.[0];
 
     if (!text && !file) {
-      showToast('Post content or media is required.', 'error');
+      showComposerError('Post content or media is required.');
       return;
     }
 
@@ -467,14 +595,15 @@ function initFeedComposer() {
         if (mediaInput) mediaInput.value = '';
         document.getElementById('post-event-section')?.classList.add('hidden');
         document.getElementById('post-article-section')?.classList.add('hidden');
+        clearComposerError();
         if (!result.post || typeof window.pnPrependFeedPost !== 'function') {
           location.reload();
         }
       } else {
-        showToast(result.message || 'Failed to create post.', 'error');
+        showComposerError(result.message || 'Failed to create post.');
       }
     } catch (err) {
-      showToast('A server error occurred.', 'error');
+      showComposerError('A server error occurred.');
     } finally {
       if (btn) { btn.disabled = false; btn.textContent = 'Post'; }
     }

@@ -47,16 +47,18 @@ $pnNavFill = static function (bool $active): string {
           <span class="material-symbols-outlined text-[24px] group-hover:scale-110 transition-transform"<?php echo $pnNavFill($pnNavActive['home']); ?>>home</span>
           <span class="text-[10px] font-bold hidden xl:block">Home</span>
         </a>
-        <a class="pn-nav-item flex flex-col items-center justify-center min-w-[56px] <?php echo pn_nav_item_cls($pnNavActive['network']); ?> transition-all group rounded-xl py-1" href="<?php echo URLROOT; ?>/user/network"<?php echo $pnNavAria($pnNavActive['network']); ?>>
+        <a class="pn-nav-item relative flex flex-col items-center justify-center min-w-[56px] <?php echo pn_nav_item_cls($pnNavActive['network']); ?> transition-all group rounded-xl py-1" href="<?php echo URLROOT; ?>/user/network"<?php echo $pnNavAria($pnNavActive['network']); ?>>
           <span class="material-symbols-outlined text-[24px] group-hover:scale-110 transition-transform"<?php echo $pnNavFill($pnNavActive['network']); ?>>group</span>
+          <span id="nav-network-badge" class="hidden absolute top-0 right-1 min-w-[18px] h-[18px] px-1 flex items-center justify-center bg-red-500 text-white text-[10px] font-black rounded-full border-2 border-white">0</span>
           <span class="text-[10px] font-bold hidden xl:block">Network</span>
         </a>
         <a class="pn-nav-item flex flex-col items-center justify-center min-w-[56px] <?php echo pn_nav_item_cls($pnNavActive['jobs']); ?> transition-all group rounded-xl py-1" href="<?php echo URLROOT; ?>/user/jobs"<?php echo $pnNavAria($pnNavActive['jobs']); ?>>
           <span class="material-symbols-outlined text-[24px] group-hover:scale-110 transition-transform"<?php echo $pnNavFill($pnNavActive['jobs']); ?>>work</span>
           <span class="text-[10px] font-bold hidden xl:block">Jobs</span>
         </a>
-        <a class="pn-nav-item flex flex-col items-center justify-center min-w-[56px] <?php echo pn_nav_item_cls($pnNavActive['messaging']); ?> transition-all group rounded-xl py-1" href="<?php echo URLROOT; ?>/user/messaging"<?php echo $pnNavAria($pnNavActive['messaging']); ?>>
+        <a class="pn-nav-item relative flex flex-col items-center justify-center min-w-[56px] <?php echo pn_nav_item_cls($pnNavActive['messaging']); ?> transition-all group rounded-xl py-1" href="<?php echo URLROOT; ?>/user/messaging"<?php echo $pnNavAria($pnNavActive['messaging']); ?>>
           <span class="material-symbols-outlined text-[24px] group-hover:scale-110 transition-transform"<?php echo $pnNavFill($pnNavActive['messaging']); ?>>chat</span>
+          <span id="nav-msg-badge" class="hidden absolute top-0 right-1 min-w-[18px] h-[18px] px-1 flex items-center justify-center bg-red-500 text-white text-[10px] font-black rounded-full border-2 border-white">0</span>
           <span class="text-[10px] font-bold hidden xl:block">Messages</span>
         </a>
         <a class="pn-nav-item relative flex flex-col items-center justify-center min-w-[56px] <?php echo pn_nav_item_cls($pnNavActive['notifications']); ?> transition-all group rounded-xl py-1" href="<?php echo URLROOT; ?>/user/notifications"<?php echo $pnNavAria($pnNavActive['notifications']); ?>>
@@ -142,20 +144,23 @@ $pnNavFill = static function (bool $active): string {
     <span class="material-symbols-outlined"<?php echo $pnNavFill($pnNavActive['home']); ?>>home</span>
     <span>Home</span>
   </a>
-  <a class="pn-mobile-nav-link <?php echo $pnNavActive['network'] ? 'is-active' : ''; ?>" href="<?php echo URLROOT; ?>/user/network"<?php echo $pnNavAria($pnNavActive['network']); ?>>
+  <a class="pn-mobile-nav-link relative <?php echo $pnNavActive['network'] ? 'is-active' : ''; ?>" href="<?php echo URLROOT; ?>/user/network"<?php echo $pnNavAria($pnNavActive['network']); ?>>
     <span class="material-symbols-outlined"<?php echo $pnNavFill($pnNavActive['network']); ?>>group</span>
+    <span id="nav-network-badge-mobile" class="hidden absolute top-0.5 right-3 min-w-[15px] h-[15px] px-1 flex items-center justify-center bg-red-500 text-white text-[8px] font-black rounded-full border border-white">0</span>
     <span>Network</span>
   </a>
   <a class="pn-mobile-nav-link <?php echo $pnNavActive['jobs'] ? 'is-active' : ''; ?>" href="<?php echo URLROOT; ?>/user/jobs"<?php echo $pnNavAria($pnNavActive['jobs']); ?>>
     <span class="material-symbols-outlined"<?php echo $pnNavFill($pnNavActive['jobs']); ?>>work</span>
     <span>Jobs</span>
   </a>
-  <a class="pn-mobile-nav-link <?php echo $pnNavActive['messaging'] ? 'is-active' : ''; ?>" href="<?php echo URLROOT; ?>/user/messaging"<?php echo $pnNavAria($pnNavActive['messaging']); ?>>
+  <a class="pn-mobile-nav-link relative <?php echo $pnNavActive['messaging'] ? 'is-active' : ''; ?>" href="<?php echo URLROOT; ?>/user/messaging"<?php echo $pnNavAria($pnNavActive['messaging']); ?>>
     <span class="material-symbols-outlined"<?php echo $pnNavFill($pnNavActive['messaging']); ?>>chat</span>
+    <span id="nav-msg-badge-mobile" class="hidden absolute top-0.5 right-3 min-w-[15px] h-[15px] px-1 flex items-center justify-center bg-red-500 text-white text-[8px] font-black rounded-full border border-white">0</span>
     <span>Messages</span>
   </a>
-  <a class="pn-mobile-nav-link <?php echo $pnNavActive['notifications'] ? 'is-active' : ''; ?>" href="<?php echo URLROOT; ?>/user/notifications"<?php echo $pnNavAria($pnNavActive['notifications']); ?>>
+  <a class="pn-mobile-nav-link relative <?php echo $pnNavActive['notifications'] ? 'is-active' : ''; ?>" href="<?php echo URLROOT; ?>/user/notifications"<?php echo $pnNavAria($pnNavActive['notifications']); ?>>
     <span class="material-symbols-outlined"<?php echo $pnNavFill($pnNavActive['notifications']); ?>>notifications</span>
+    <span id="nav-notif-badge-mobile" class="hidden absolute top-0.5 right-3 min-w-[15px] h-[15px] px-1 flex items-center justify-center bg-red-500 text-white text-[8px] font-black rounded-full border border-white">0</span>
     <span>Alerts</span>
   </a>
   <a class="pn-mobile-nav-link <?php echo ($pnNavActive['profile'] || $pnNavActive['settings']) ? 'is-active' : ''; ?>" href="<?php echo URLROOT; ?>/user/profile"<?php echo $pnNavAria($pnNavActive['profile'] || $pnNavActive['settings']); ?>>

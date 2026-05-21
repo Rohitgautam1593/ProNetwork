@@ -57,7 +57,12 @@
 </div>
 <div>
 <label class="block font-label-lg text-label-lg text-on-surface mb-xs" for="password">Password</label>
-<input class="w-full h-[48px] px-md rounded border border-outline-variant bg-white font-body-md form-input-focus" id="password" name="password" placeholder="••••••••" type="password" autocomplete="current-password"/>
+<div class="relative w-full">
+<input class="w-full h-[48px] pl-md pr-12 rounded border border-outline-variant bg-white font-body-md form-input-focus" id="password" name="password" placeholder="••••••••" type="password" autocomplete="current-password"/>
+<button type="button" data-toggle-password="password" class="absolute right-3 top-1/2 -translate-y-1/2 z-20 text-secondary hover:text-primary transition-colors flex items-center justify-center">
+<span class="material-symbols-outlined text-[20px]">visibility</span>
+</button>
+</div>
 </div>
 <div class="flex items-center justify-between">
 <label class="flex items-center space-x-sm cursor-pointer">
@@ -103,7 +108,12 @@
 </div>
 <div>
 <label class="block font-label-lg text-label-lg text-on-surface mb-xs" for="signup-password">Password</label>
-<input class="w-full h-[48px] px-md rounded border border-outline-variant bg-white font-body-md form-input-focus" id="signup-password" name="password" placeholder="••••••••" type="password" autocomplete="new-password"/>
+<div class="relative w-full">
+<input class="w-full h-[48px] pl-md pr-12 rounded border border-outline-variant bg-white font-body-md form-input-focus" id="signup-password" name="password" placeholder="••••••••" type="password" autocomplete="new-password"/>
+<button type="button" data-toggle-password="signup-password" class="absolute right-3 top-1/2 -translate-y-1/2 z-20 text-secondary hover:text-primary transition-colors flex items-center justify-center">
+<span class="material-symbols-outlined text-[20px]">visibility</span>
+</button>
+</div>
 <div class="mt-2">
 <div class="w-full h-1.5 bg-gray-200 rounded-full overflow-hidden"><div id="pw-strength-bar" class="h-full rounded-full transition-all duration-300" style="width:0%"></div></div>
 <p id="pw-strength-label" class="text-xs mt-1"></p>

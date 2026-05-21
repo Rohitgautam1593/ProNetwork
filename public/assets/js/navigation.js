@@ -4,6 +4,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     initProfileMenu();
     initMobileSearch();
+    startGlobalBadgePolling();
 });
 
 function initProfileMenu() {
@@ -121,5 +122,47 @@ function escapeNavHtml(value) {
         .replace(/>/g, '&gt;')
         .replace(/"/g, '&quot;')
         .replace(/'/g, '&#39;');
+}
+
+function startGlobalBadgePolling() {
+    const hasBadges = document.getElementById('nav-notif-badge') || 
+                      document.getElementById('nav-msg-badge') || 
+                      document.getElementById('nav-network-badge') || 
+                      document.getElementById('nav-notif-badge-mobile') || 
+                      document.getElementById('nav-msg-badge-mobile') || 
+                      document.getElementById('nav-network-badge-mobile');
+                      
+    if (!hasBadges) return;
+
+    const poll = async () => {
+        try {
+            const res = await fetch(`${URLROOT}/notification/badge_counts`);
+            const data = await res.json();
+            if (data.success) {
+                updateBadgeElement('nav-notif-badge', data.notifications);
+                updateBadgeElement('nav-notif-badge-mobile', data.notifications);
+                updateBadgeElement('nav-msg-badge', data.messages);
+                updateBadgeElement('nav-msg-badge-mobile', data.messages);
+                updateBadgeElement('nav-network-badge', data.network);
+                updateBadgeElement('nav-network-badge-mobile', data.network);
+            }
+        } catch (e) {
+            // Silently ignore network issues
+        }
+    };
+
+    poll();
+    setInterval(poll, 10000); // Poll every 10 seconds
+}
+
+function updateBadgeElement(id, count) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    if (count > 0) {
+        el.textContent = count > 99 ? '99+' : String(count);
+        el.classList.remove('hidden');
+    } else {
+        el.classList.add('hidden');
+    }
 }
 

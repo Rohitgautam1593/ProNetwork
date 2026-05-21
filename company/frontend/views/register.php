@@ -75,8 +75,13 @@
                     </div>
                     <div>
                         <label class="block font-label-md text-on-surface mb-1" for="password">Password <span class="text-error">*</span></label>
-                        <input id="password" type="password" name="password" required placeholder="Min. 6 characters" minlength="6"
-                               class="w-full h-10 px-3 rounded-md border border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary text-sm font-body-md bg-white">
+                        <div class="relative w-full">
+                            <input id="password" type="password" name="password" required placeholder="Min. 6 characters" minlength="6"
+                                   class="w-full h-10 pl-3 pr-10 rounded-md border border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary text-sm font-body-md bg-white">
+                            <button type="button" data-toggle-password="password" class="absolute right-3 top-1/2 -translate-y-1/2 z-20 text-secondary hover:text-primary transition-colors flex items-center justify-center">
+                                <span class="material-symbols-outlined text-[18px]">visibility</span>
+                            </button>
+                        </div>
                     </div>
 
                     <button type="submit" class="w-full bg-primary text-white font-label-lg px-6 py-3 mt-2 rounded-full hover:bg-[#004182] transition-colors shadow-sm flex items-center justify-center gap-2">
