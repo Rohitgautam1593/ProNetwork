@@ -62,11 +62,6 @@
               <span class="material-symbols-outlined text-base text-indigo-400 group-hover:scale-110 transition-transform">corporate_fare</span>
               <span>Continue as Company</span>
             </a>
-            <a href="<?php echo str_replace('/public', '/blog/', URLROOT); ?>"
-              class="px-7 py-3.5 bg-gradient-to-r from-sky-600 via-blue-600 to-indigo-700 text-white rounded-full font-title-md hover:opacity-95 hover:shadow-lg hover:shadow-blue-600/25 hover:-translate-y-0.5 active:scale-95 transition-all duration-300 text-center shadow-md shadow-blue-600/20 flex items-center justify-center gap-1.5 border border-blue-500/30 group">
-              <span class="material-symbols-outlined text-base text-sky-200 group-hover:rotate-12 transition-transform">newspaper</span>
-              <span>Visit Blog</span>
-            </a>
             <button onclick="window.scrollTo({top: 600, behavior: 'smooth'})"
               class="px-7 py-3.5 border-2 border-primary-container/40 text-primary-container rounded-full font-title-md hover:bg-primary-fixed hover:border-primary-container hover:-translate-y-0.5 active:scale-95 transition-all duration-300 flex items-center justify-center gap-1 text-center">
               <span>Learn more</span>

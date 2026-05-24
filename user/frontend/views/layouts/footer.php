@@ -10,31 +10,31 @@
       <div>
         <h4 class="font-title-md text-on-surface mb-4">Network</h4>
         <ul class="space-y-3">
-          <li><a class="text-gray-500 text-xs hover:text-[#0A66C2] hover:underline transition-colors" href="#">About</a>
+          <li><a class="text-gray-500 text-xs hover:text-[#0A66C2] hover:underline transition-colors" href="<?php echo str_replace('/public', '/blog/about-us/', URLROOT); ?>" target="_blank">About</a>
           </li>
           <li><a class="text-gray-500 text-xs hover:text-[#0A66C2] hover:underline transition-colors"
-              href="#">Accessibility</a></li>
-          <li><a class="text-gray-500 text-xs hover:text-[#0A66C2] hover:underline transition-colors" href="#">User
+              href="<?php echo URLROOT; ?>/pages/accessibility">Accessibility</a></li>
+          <li><a class="text-gray-500 text-xs hover:text-[#0A66C2] hover:underline transition-colors" href="<?php echo URLROOT; ?>/pages/user_agreement">User
               Agreement</a></li>
         </ul>
       </div>
       <div>
         <h4 class="font-title-md text-on-surface mb-4">Legal</h4>
         <ul class="space-y-3">
-          <li><a class="text-gray-500 text-xs hover:text-[#0A66C2] hover:underline transition-colors" href="#">Privacy
+          <li><a class="text-gray-500 text-xs hover:text-[#0A66C2] hover:underline transition-colors" href="<?php echo URLROOT; ?>/pages/privacy_policy">Privacy
               Policy</a></li>
-          <li><a class="text-gray-500 text-xs hover:text-[#0A66C2] hover:underline transition-colors" href="#">Cookie
+          <li><a class="text-gray-500 text-xs hover:text-[#0A66C2] hover:underline transition-colors" href="<?php echo URLROOT; ?>/pages/cookie_policy">Cookie
               Policy</a></li>
-          <li><a class="text-gray-500 text-xs hover:text-[#0A66C2] hover:underline transition-colors" href="#">Brand
+          <li><a class="text-gray-500 text-xs hover:text-[#0A66C2] hover:underline transition-colors" href="<?php echo URLROOT; ?>/pages/brand_policy">Brand
               Policy</a></li>
         </ul>
       </div>
       <div>
         <h4 class="font-title-md text-on-surface mb-4">Support</h4>
         <ul class="space-y-3">
-          <li><a class="text-gray-500 text-xs hover:text-[#0A66C2] hover:underline transition-colors" href="#">Guest
+          <li><a class="text-gray-500 text-xs hover:text-[#0A66C2] hover:underline transition-colors" href="<?php echo URLROOT; ?>/pages/guest_controls">Guest
               Controls</a></li>
-          <li><a class="text-gray-500 text-xs hover:text-[#0A66C2] hover:underline transition-colors" href="#">Community
+          <li><a class="text-gray-500 text-xs hover:text-[#0A66C2] hover:underline transition-colors" href="<?php echo URLROOT; ?>/pages/community_guidelines">Community
               Guidelines</a></li>
         </ul>
       </div>

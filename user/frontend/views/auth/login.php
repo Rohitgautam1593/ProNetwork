@@ -75,6 +75,13 @@
 </label>
 <a class="font-label-lg text-primary hover:underline" data-action="forgot-password" href="#">Forgot password?</a>
 </div>
+<!-- Math Captcha Security Check -->
+<div class="space-y-xs">
+<label class="block font-label-lg text-label-lg text-on-surface mb-xs" for="signin-captcha">
+    Security Check: Solve <span id="signin-captcha-question" class="font-bold text-primary"><?php echo CaptchaHelper::getQuestion(); ?></span>
+</label>
+<input class="w-full h-[48px] px-md rounded border border-outline-variant bg-white font-body-md form-input-focus" id="signin-captcha" name="captcha" placeholder="Your answer" type="number" required autocomplete="off"/>
+</div>
 <button class="w-full h-[48px] bg-primary text-on-primary font-title-md rounded-full hover:bg-[#004182] transition-colors shadow-sm" type="submit">
                             Sign In
                         </button>
@@ -127,14 +134,11 @@
 <label class="block font-label-lg text-label-lg text-on-surface mb-xs">What is your professional role?</label>
 <input id="role-input" name="role" type="hidden" />
 <div class="flex flex-wrap gap-sm">
-<button type="button" onclick="selectRole('Professional', this)" class="px-md py-sm rounded-full border border-primary bg-primary-container/10 text-primary font-label-lg">
+            <button type="button" onclick="selectRole('Professional', this)" class="px-md py-sm rounded-full border border-primary bg-primary-container/10 text-primary font-label-lg">
                                         Professional
                                     </button>
-<button type="button" onclick="selectRole('Student', this)" class="px-md py-sm rounded-full border border-outline-variant text-on-surface-variant font-label-lg hover:border-primary">
+            <button type="button" onclick="selectRole('Student', this)" class="px-md py-sm rounded-full border border-outline-variant text-on-surface-variant font-label-lg hover:border-primary">
                                         Student
-                                    </button>
-<button type="button" onclick="selectRole('Company', this)" class="px-md py-sm rounded-full border border-outline-variant text-on-surface-variant font-label-lg hover:border-primary">
-                                        Company
                                     </button>
 </div>
 </div>
@@ -142,6 +146,13 @@
 <input id="terms-check" name="terms" class="rounded border-outline-variant text-primary focus:ring-primary h-4 w-4" type="checkbox" />
 <span class="font-body-md text-on-surface-variant text-xs">I agree to the User Agreement, Privacy Policy, and Cookie Policy.</span>
 </label>
+<!-- Math Captcha Security Check -->
+<div class="space-y-xs">
+<label class="block font-label-lg text-label-lg text-on-surface mb-xs" for="signup-captcha">
+    Security Check: Solve <span id="signup-captcha-question" class="font-bold text-primary"><?php echo CaptchaHelper::getQuestion(); ?></span>
+</label>
+<input class="w-full h-[48px] px-md rounded border border-outline-variant bg-white font-body-md form-input-focus" id="signup-captcha" name="captcha" placeholder="Your answer" type="number" required autocomplete="off"/>
+</div>
 <button class="w-full h-[48px] border-2 bg-[#0A66C2] text-white font-title-md rounded-full hover:bg-[#004182] transition-colors" type="submit">
                                 Create an account
                             </button>
@@ -178,7 +189,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const urlParams = new URLSearchParams(window.location.search);
     const tab = urlParams.get('tab');
     if (tab === 'signup') {
-        
+        switchTab('signup');
     }
 });
 

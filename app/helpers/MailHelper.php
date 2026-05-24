@@ -24,7 +24,10 @@ class MailHelper {
                 'allow_self_signed' => true,
             ],
         ];
-        $mail->setFrom(SMTP_USER, SITENAME);
+        $mail->setFrom(
+            defined('SMTP_FROM_EMAIL') ? SMTP_FROM_EMAIL : SMTP_USER, 
+            defined('SMTP_FROM_NAME') ? SMTP_FROM_NAME : SITENAME
+        );
 
         return $mail;
     }

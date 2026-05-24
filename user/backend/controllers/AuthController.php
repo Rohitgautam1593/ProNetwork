@@ -28,20 +28,40 @@ class AuthController extends Controller {
             $email = strtolower(trim($data['email'] ?? ''));
             $password = trim($data['password'] ?? '');
             $role = trim($data['role'] ?? 'Professional');
+            $captcha = trim($data['captcha'] ?? '');
             $allowedRoles = ['Student', 'Professional', 'Company'];
 
+            // 1. Verify Security Captcha
+            if (empty($captcha)) {
+                echo json_encode([
+                    'success' => false,
+                    'message' => 'Please solve the captcha security check.',
+                    'new_captcha' => CaptchaHelper::getQuestion()
+                ]);
+                return;
+            }
+
+            if (!CaptchaHelper::validate($captcha)) {
+                echo json_encode([
+                    'success' => false,
+                    'message' => 'Incorrect security captcha answer. Please try again.',
+                    'new_captcha' => CaptchaHelper::getQuestion()
+                ]);
+                return;
+            }
+
             if(empty($fullName) || empty($email) || empty($password)) {
-                echo json_encode(['success' => false, 'message' => 'Please fill all fields']);
+                echo json_encode(['success' => false, 'message' => 'Please fill all fields', 'new_captcha' => CaptchaHelper::getQuestion()]);
                 return;
             }
 
             if(!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                echo json_encode(['success' => false, 'message' => 'Please enter a valid email']);
+                echo json_encode(['success' => false, 'message' => 'Please enter a valid email', 'new_captcha' => CaptchaHelper::getQuestion()]);
                 return;
             }
 
             if(strlen($password) < 6) {
-                echo json_encode(['success' => false, 'message' => 'Password must be at least 6 characters']);
+                echo json_encode(['success' => false, 'message' => 'Password must be at least 6 characters', 'new_captcha' => CaptchaHelper::getQuestion()]);
                 return;
             }
 
@@ -50,7 +70,7 @@ class AuthController extends Controller {
             }
 
             if($this->userModel->findUserByEmail($email)) {
-                echo json_encode(['success' => false, 'message' => 'Email already taken']);
+                echo json_encode(['success' => false, 'message' => 'Email already taken', 'new_captcha' => CaptchaHelper::getQuestion()]);
                 return;
             }
 
@@ -71,11 +91,12 @@ class AuthController extends Controller {
                 MailHelper::sendRegistrationAlert($userData);
                 echo json_encode(['success' => true, 'message' => 'Account created successfully! Awaiting administrative approval.']);
             } else {
-                echo json_encode(['success' => false, 'message' => 'Something went wrong']);
+                echo json_encode(['success' => false, 'message' => 'Something went wrong', 'new_captcha' => CaptchaHelper::getQuestion()]);
             }
         } else {
-            // Load view
-            $this->view('auth/register');
+            // Redirect to login page with registration tab active
+            header('Location: ' . URLROOT . '/auth/login?tab=signup');
+            exit;
         }
     }
 
@@ -89,9 +110,29 @@ class AuthController extends Controller {
 
             $email = strtolower(trim($data['email'] ?? ''));
             $password = trim($data['password'] ?? '');
+            $captcha = trim($data['captcha'] ?? '');
+
+            // 1. Verify Security Captcha
+            if (empty($captcha)) {
+                echo json_encode([
+                    'success' => false,
+                    'message' => 'Please solve the captcha security check.',
+                    'new_captcha' => CaptchaHelper::getQuestion()
+                ]);
+                return;
+            }
+
+            if (!CaptchaHelper::validate($captcha)) {
+                echo json_encode([
+                    'success' => false,
+                    'message' => 'Incorrect security captcha answer. Please try again.',
+                    'new_captcha' => CaptchaHelper::getQuestion()
+                ]);
+                return;
+            }
 
             if(empty($email) || empty($password)) {
-                echo json_encode(['success' => false, 'message' => 'Please fill all fields']);
+                echo json_encode(['success' => false, 'message' => 'Please fill all fields', 'new_captcha' => CaptchaHelper::getQuestion()]);
                 return;
             }
 
@@ -100,17 +141,17 @@ class AuthController extends Controller {
             if($loggedInUser) {
                 // Prevent Admin login through the regular portal
                 if (!empty($loggedInUser['is_admin']) || $loggedInUser['role'] === 'Admin') {
-                    echo json_encode(['success' => false, 'message' => 'Access Denied: Administrative accounts must authenticate exclusively via the secure Admin Portal.']);
+                    echo json_encode(['success' => false, 'message' => 'Access Denied: Administrative accounts must authenticate exclusively via the secure Admin Portal.', 'new_captcha' => CaptchaHelper::getQuestion()]);
                     return;
                 }
 
                 // Check if user is approved
                 if ($loggedInUser['status'] === 'Pending') {
-                    echo json_encode(['success' => false, 'message' => 'Your account is awaiting administrative approval.']);
+                    echo json_encode(['success' => false, 'message' => 'Your account is awaiting administrative approval.', 'new_captcha' => CaptchaHelper::getQuestion()]);
                     return;
                 }
                 if ($loggedInUser['status'] === 'Rejected') {
-                    echo json_encode(['success' => false, 'message' => 'Your account has been rejected. Please contact support.']);
+                    echo json_encode(['success' => false, 'message' => 'Your account has been rejected. Please contact support.', 'new_captcha' => CaptchaHelper::getQuestion()]);
                     return;
                 }
 
@@ -119,7 +160,7 @@ class AuthController extends Controller {
                 $redirect = $loggedInUser['role'] === 'Company' ? URLROOT . '/company/dashboard' : URLROOT . '/user/feed';
                 echo json_encode(['success' => true, 'message' => 'Login successful!', 'user' => $loggedInUser, 'redirect' => $redirect]);
             } else {
-                echo json_encode(['success' => false, 'message' => 'Email or password incorrect']);
+                echo json_encode(['success' => false, 'message' => 'Email or password incorrect', 'new_captcha' => CaptchaHelper::getQuestion()]);
             }
         } else {
             // Load view

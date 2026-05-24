@@ -69,7 +69,7 @@ class Controller {
             $paths[] = '../admin/frontend/views/' . $name . '.php';
         } elseif ($module === 'company' && $name !== '') {
             $paths[] = '../company/frontend/views/' . $name . '.php';
-        } elseif (($module === 'users' || $module === 'auth') && $name !== '') {
+        } elseif (($module === 'users' || $module === 'auth' || $module === 'pages') && $name !== '') {
             $paths[] = '../user/frontend/views/' . $module . '/' . $name . '.php';
         }
 

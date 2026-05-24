@@ -91,4 +91,12 @@ add_filter('get_custom_logo', function($html) {
 add_action('wp_enqueue_scripts', function() {
     wp_enqueue_style('google-font-manrope', 'https://fonts.googleapis.com/css2?family=Manrope:wght@800;900&display=swap', array(), null);
 });
+// Force outgoing WordPress emails to use noreply.com branding
+add_filter('wp_mail_from', function($email) {
+    return 'noreply@pronetwork.com';
+});
+
+add_filter('wp_mail_from_name', function($name) {
+    return 'noreply.com';
+});
 ?>

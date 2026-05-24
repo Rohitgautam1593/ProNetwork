@@ -77,6 +77,19 @@ function showToast(message, type) {
   setTimeout(() => t.remove(), 4000);
 }
 
+// ─── CAPTCHA HELPERS ──────────────────────────────────────────
+function updateCaptchaQuestions(newQuestion) {
+  const signinQ = document.getElementById('signin-captcha-question');
+  const signupQ = document.getElementById('signup-captcha-question');
+  if (signinQ) signinQ.textContent = newQuestion;
+  if (signupQ) signupQ.textContent = newQuestion;
+
+  const signinInput = document.getElementById('signin-captcha');
+  const signupInput = document.getElementById('signup-captcha');
+  if (signinInput) signinInput.value = '';
+  if (signupInput) signupInput.value = '';
+}
+
 // ─── LOGIN FORM (#form-signin) ───────────────────────────────
 
 function initLoginForm() {
@@ -85,6 +98,7 @@ function initLoginForm() {
 
   const emailEl = document.getElementById('email');
   const pwEl = document.getElementById('password');
+  const captchaEl = document.getElementById('signin-captcha');
 
   emailEl?.addEventListener('blur', () => {
     const v = emailEl.value.trim();
@@ -101,6 +115,7 @@ function initLoginForm() {
     else clearFieldError('password');
   });
   pwEl?.addEventListener('input', () => clearFieldError('password'));
+  captchaEl?.addEventListener('input', () => clearFieldError('signin-captcha'));
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -108,9 +123,11 @@ function initLoginForm() {
     
     clearFieldError('email');
     clearFieldError('password');
+    clearFieldError('signin-captcha');
 
     const em = (emailEl?.value || '').trim();
     const pw = pwEl?.value || '';
+    const cap = (captchaEl?.value || '').trim();
 
     if (!em) { 
       showFieldError('email', 'Email is required.'); 
@@ -128,6 +145,11 @@ function initLoginForm() {
       ok = false; 
     }
 
+    if (!cap) {
+      showFieldError('signin-captcha', 'Captcha answer is required.');
+      ok = false;
+    }
+
     if (!ok) return;
 
     const btn = form.querySelector('[type=submit]');
@@ -138,9 +160,13 @@ function initLoginForm() {
       const response = await fetch(`${URLROOT}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: em, password: pw })
+        body: JSON.stringify({ email: em, password: pw, captcha: cap })
       });
       const result = await response.json();
+
+      if (result.new_captcha) {
+        updateCaptchaQuestions(result.new_captcha);
+      }
 
       if (result.success) {
         showToast('Login successful!', 'success');
@@ -166,6 +192,7 @@ function initRegisterForm() {
   const emailEl = document.getElementById('signup-email');
   const pwEl = document.getElementById('signup-password');
   const roleEl = document.getElementById('role-input');
+  const captchaEl = document.getElementById('signup-captcha');
   const bar = document.getElementById('pw-strength-bar');
   const barLabel = document.getElementById('pw-strength-label');
 
@@ -175,6 +202,7 @@ function initRegisterForm() {
     if (barLabel) { barLabel.textContent = r.strength > 0 ? 'Strength: ' + r.label : ''; barLabel.style.color = r.color; }
     clearFieldError('signup-password');
   });
+  captchaEl?.addEventListener('input', () => clearFieldError('signup-captcha'));
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -184,11 +212,13 @@ function initRegisterForm() {
     clearFieldError('signup-email');
     clearFieldError('signup-password');
     clearFieldError('role-input');
+    clearFieldError('signup-captcha');
 
     const name = (nameEl?.value || '').trim();
     const em = (emailEl?.value || '').trim();
     const pw = pwEl?.value || '';
     const role = roleEl?.value || '';
+    const cap = (captchaEl?.value || '').trim();
     const pr = validatePassword(pw, true);
 
     if (!name || !validateName(name)) { 
@@ -207,6 +237,10 @@ function initRegisterForm() {
       showFieldError('role-input', 'Please select your professional role.'); 
       ok = false; 
     }
+    if (!cap) {
+      showFieldError('signup-captcha', 'Captcha answer is required.');
+      ok = false;
+    }
 
     if (!ok) return;
 
@@ -217,9 +251,13 @@ function initRegisterForm() {
       const response = await fetch(`${URLROOT}/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ fullName: name, email: em, password: pw, role: role })
+        body: JSON.stringify({ fullName: name, email: em, password: pw, role: role, captcha: cap })
       });
       const result = await response.json();
+
+      if (result.new_captcha) {
+        updateCaptchaQuestions(result.new_captcha);
+      }
 
       if (result.success) {
         showToast(result.message, 'success');

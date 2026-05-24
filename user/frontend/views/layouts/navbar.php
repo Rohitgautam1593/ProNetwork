@@ -121,6 +121,10 @@ $pnNavFill = static function (bool $active): string {
         <img data-user-pic="true" src="" alt="" class="w-full h-full object-cover">
       </a>
       <?php else : ?>
+      <a href="<?php echo str_replace('/public', '/blog/', URLROOT); ?>" class="flex items-center gap-1.5 text-slate-600 hover:text-[#0A66C2] font-semibold transition-all px-4 py-1.5 rounded-full hover:bg-slate-50">
+        <span class="material-symbols-outlined text-[20px] align-middle">newspaper</span>
+        <span>Blog</span>
+      </a>
       <a href="<?php echo URLROOT; ?>/auth/login" class="pn-nav-item px-5 py-1.5 rounded-full font-bold text-[#0A66C2] hover:bg-blue-50 transition-all">Sign in</a>
       <a href="<?php echo URLROOT; ?>/auth/register" class="pn-nav-item px-5 py-1.5 rounded-full font-bold bg-[#0A66C2] text-white hover:bg-[#004182] transition-all shadow-sm hover:shadow-md">Join now</a>
       <?php endif; ?>
