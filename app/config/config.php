@@ -18,7 +18,11 @@ define('USERROOT', PROJECTROOT . '/user');
 define('SITENAME', 'ProNetwork');
 
 // Dynamic URL Root detection (Works locally and on live hosting with or without public subfolder)
-$protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') ? 'https' : 'http';
+$protocol = 'http';
+if ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') || 
+    (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https')) {
+    $protocol = 'https';
+}
 $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
 $scriptName = $_SERVER['SCRIPT_NAME'] ?? '';
 
