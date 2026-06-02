@@ -30,6 +30,14 @@ composer.phar
 !/public/uploads/companies/
 !/public/uploads/profiles/
 !/public/uploads/covers/
+!/public/uploads/posts/
 
 # Ignore massive cover image to prevent git bloat
 /public/uploads/covers/1778245103_IMG_20260103_150817.jpg
+
+# Ignore heavy posts files (videos and large images) to prevent git bloat
+/public/uploads/posts/1778244209_1000059971.jpg.jpeg
+/public/uploads/posts/1778764805_a1524ddba2963071.mp4
+/public/uploads/posts/1778764828_93ff2a3031e82283.mp4
+/public/uploads/posts/1779112058_aa218ff6ac9024fb.jpg
+/public/uploads/posts/1779112261_f5d6c0b6ec31aa69.jpg
