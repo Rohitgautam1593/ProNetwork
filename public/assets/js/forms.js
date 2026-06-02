@@ -711,7 +711,7 @@ function escapeHtml(s) {
 
 // ─── BOOTSTRAP ───────────────────────────────────────────────
 
-document.addEventListener('DOMContentLoaded', () => {
+function initAllForms() {
   initLoginForm();
   initRegisterForm();
   initApplyForm();
@@ -722,4 +722,10 @@ document.addEventListener('DOMContentLoaded', () => {
   initFeedComposer();
   initProfilePicUpload();
   initBannerUpload();
-});
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initAllForms);
+} else {
+  initAllForms();
+}
