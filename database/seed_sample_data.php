@@ -4,10 +4,16 @@
  * Run from project root with: php database/seed_sample_data.php
  */
 
+$host = $_ENV['MYSQLHOST'] ?? getenv('MYSQLHOST') ?? 'localhost';
+$port = $_ENV['MYSQLPORT'] ?? getenv('MYSQLPORT') ?? '3306';
+$user = $_ENV['MYSQLUSER'] ?? getenv('MYSQLUSER') ?? 'root';
+$pass = $_ENV['MYSQLPASSWORD'] ?? getenv('MYSQLPASSWORD') ?? '102004';
+$dbname = $_ENV['MYSQLDATABASE'] ?? getenv('MYSQLDATABASE') ?? 'pronetwork';
+
 $pdo = new PDO(
-    'mysql:host=localhost;dbname=pronetwork;charset=utf8mb4',
-    'root',
-    '102004',
+    "mysql:host=$host;port=$port;dbname=$dbname;charset=utf8mb4",
+    $user,
+    $pass,
     [
         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
