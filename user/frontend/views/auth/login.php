@@ -54,7 +54,7 @@
 </div>
 
 <!-- Login Form -->
-<form id="form-signin"  class="space-y-md" method="POST" novalidate>
+<form id="form-signin"  class="space-y-md" method="POST" novalidate onsubmit="return false;">
 <div>
 <label class="block font-label-lg text-label-lg text-on-surface mb-xs" for="email">Email</label>
 <input class="w-full h-[48px] px-md rounded border border-outline-variant bg-white font-body-md form-input-focus" id="email" name="email" placeholder="name@company.com" type="email" autocomplete="email"/>
@@ -108,7 +108,7 @@
 </form>
 
 <!-- Registration Form Fields -->
-<form id="form-signup"  class="space-y-md hidden" method="POST" novalidate>
+<form id="form-signup"  class="space-y-md hidden" method="POST" novalidate onsubmit="return false;">
 <div>
 <label class="block font-label-lg text-label-lg text-on-surface mb-xs" for="fullname">Full Name</label>
 <input class="w-full h-[48px] px-md rounded border border-outline-variant bg-white font-body-md form-input-focus" id="fullname" name="fullname" placeholder="John Doe" type="text" autocomplete="name"/>
@@ -226,8 +226,8 @@ function selectRole(role, buttonEl) {
 <div class="fixed bottom-0 right-0 p-lg pointer-events-none opacity-5">
 <span class="material-symbols-outlined text-[200px]" data-icon="hub">hub</span>
 </div>
-<script src="<?php echo URLROOT; ?>/assets/js/forms.js?v=2"></script>
-<script src="<?php echo URLROOT; ?>/assets/js/main.js?v=2"></script>
+<script src="<?php echo URLROOT; ?>/assets/js/forms.js?v=<?php echo time(); ?>"></script>
+<script src="<?php echo URLROOT; ?>/assets/js/main.js?v=<?php echo time(); ?>"></script>
 
 </body>
 </html>
