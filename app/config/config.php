@@ -17,8 +17,27 @@ define('USERROOT', PROJECTROOT . '/user');
 // Site Name
 define('SITENAME', 'ProNetwork');
 
-// URL Root (Railway live domain ke hisab se apne aap adjust kar lega)
-define('URLROOT', 'https://' . ($_SERVER['HTTP_HOST'] ?? 'localhost'));
+// Dynamic URL Root detection (Works locally and on live hosting with or without public subfolder)
+$protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') ? 'https' : 'http';
+$host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+$requestUri = $_SERVER['REQUEST_URI'] ?? '';
+$scriptName = $_SERVER['SCRIPT_NAME'] ?? '';
+
+if (strpos($requestUri, '/public/') !== false) {
+    // If browser URL explicitly contains /public/
+    $dir = '/public';
+    if (strpos($scriptName, '/ProNetwork/') !== false) {
+        $dir = '/ProNetwork/public';
+    }
+} elseif (strpos($scriptName, '/ProNetwork/') !== false) {
+    // If local development under subfolder
+    $dir = '/ProNetwork/public';
+} else {
+    // If running on root (like Railway production)
+    $dir = '';
+}
+
+define('URLROOT', $protocol . '://' . $host . $dir);
 
 // Load local overrides if they exist (ignored in git)
 if (file_exists(APPROOT . '/config/config.local.php')) {

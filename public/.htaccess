@@ -2,7 +2,7 @@
     Options -Multiviews
     RewriteEngine On
     # Change this to match your install path under htdocs (keep trailing slash).
-    RewriteBase /ProNetwork/public/
+    # RewriteBase /ProNetwork/public/
 
     # Redirect direct external requests for .php or .html files (excluding index.php) to extension-less URLs
     RewriteCond %{THE_REQUEST} ^[A-Z]{3,}\s+(.*?)\.(php|html)[?\s] [NC]

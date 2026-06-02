@@ -1,0 +1,12 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    
+    # Avoid infinite loop on internal redirects
+    RewriteCond %{ENV:REDIRECT_STATUS} ^$
+    
+    # Do not rewrite if it is already requesting the public folder
+    RewriteCond %{REQUEST_URI} !^/public/
+    
+    # Rewrite all requests to public/ folder internally
+    RewriteRule ^(.*)$ public/$1 [L]
+</IfModule>
