@@ -20,20 +20,12 @@ define('SITENAME', 'ProNetwork');
 // Dynamic URL Root detection (Works locally and on live hosting with or without public subfolder)
 $protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') ? 'https' : 'http';
 $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
-$requestUri = $_SERVER['REQUEST_URI'] ?? '';
 $scriptName = $_SERVER['SCRIPT_NAME'] ?? '';
 
-if (strpos($requestUri, '/public/') !== false) {
-    // If browser URL explicitly contains /public/
-    $dir = '/public';
-    if (strpos($scriptName, '/ProNetwork/') !== false) {
-        $dir = '/ProNetwork/public';
-    }
-} elseif (strpos($scriptName, '/ProNetwork/') !== false) {
-    // If local development under subfolder
-    $dir = '/ProNetwork/public';
-} else {
-    // If running on root (like Railway production)
+// Determine directory path dynamically based on script path
+$dir = dirname($scriptName);
+$dir = str_replace('\\', '/', $dir);
+if ($dir === '/' || $dir === '\\') {
     $dir = '';
 }
 

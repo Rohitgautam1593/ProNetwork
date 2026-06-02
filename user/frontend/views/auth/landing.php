@@ -72,7 +72,7 @@
               <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
               <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
             </span>
-            <span class="leading-tight">Hiring for your company? <a href="<?php echo URLROOT; ?>/company/index" class="text-primary font-semibold hover:underline">Create an employer workspace</a> — it takes a minute.</span>
+            <span class="leading-tight">Hiring for your company? <a href="<?php echo URLROOT; ?>/company/register" class="text-primary font-semibold hover:underline">Create an employer workspace</a> — it takes a minute.</span>
           </div>
         </div>
         <div class="relative">
