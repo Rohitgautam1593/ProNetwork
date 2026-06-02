@@ -33,6 +33,14 @@ if ($dir === '/' || $dir === '\\') {
     $dir = '';
 }
 
+// If we are executing the root index.php router (e.g. running on a server where document root is the project root /app instead of /app/public)
+// then we must append /public to the URLROOT so assets and dynamic actions load from the public folder.
+$scriptFilename = $_SERVER['SCRIPT_FILENAME'] ?? '';
+$scriptFilename = str_replace('\\', '/', $scriptFilename);
+if (basename($scriptFilename) === 'index.php' && strpos($scriptFilename, '/public/index.php') === false) {
+    $dir .= '/public';
+}
+
 define('URLROOT', $protocol . '://' . $host . $dir);
 
 // Load local overrides if they exist (ignored in git)
