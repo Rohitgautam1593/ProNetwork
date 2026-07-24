@@ -87,8 +87,12 @@ class AuthController extends Controller {
             ];
 
             if($this->userModel->register($userData)) {
+                $registeredUser = $this->userModel->findUserByEmail($email) ?: $userData;
+                $approvalToken = !empty($registeredUser['user_id']) ? $this->userModel->createApprovalToken((int)$registeredUser['user_id']) : false;
+                $approvalUrl = $approvalToken ? MailHelper::publicUrl('/admin/approve_request?token=' . $approvalToken) : '';
+
                 // Send email notification to admin
-                MailHelper::sendRegistrationAlert($userData);
+                MailHelper::sendRegistrationAlert($registeredUser, $approvalUrl);
                 echo json_encode(['success' => true, 'message' => 'Account created successfully! Awaiting administrative approval.']);
             } else {
                 echo json_encode(['success' => false, 'message' => 'Something went wrong', 'new_captcha' => CaptchaHelper::getQuestion()]);

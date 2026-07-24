@@ -462,6 +462,29 @@ class AdminController extends Controller {
         header('Location: ' . URLROOT . '/admin/users');
     }
 
+    public function approve_request() {
+        $token = trim($_GET['token'] ?? '');
+        $userModel = $this->model('User');
+        $result = $userModel->approvePendingUserByApprovalToken($token);
+
+        if ($result['success']) {
+            $emailSent = MailHelper::sendApprovalNotification($result['user']);
+            $message = $emailSent
+                ? 'User approved successfully and approval email sent.'
+                : 'User approved successfully, but the approval email could not be sent.';
+            if (function_exists('flash')) {
+                flash('admin_message', $message, $emailSent ? 'alert alert-success' : 'bg-yellow-100 text-yellow-700');
+            }
+        } else {
+            if (function_exists('flash')) {
+                flash('admin_message', $result['message'] ?? 'This approval link is invalid or expired.', 'bg-red-100 text-red-600');
+            }
+        }
+
+        header('Location: ' . URLROOT . '/admin/users');
+        exit;
+    }
+
     public function reject_user($id) {
         $this->requireAdmin();
         if ($this->adminModel->rejectUser($id)) {

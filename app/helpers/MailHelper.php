@@ -29,7 +29,6 @@ class MailHelper {
         $smtpUser = trim((string)(defined('SMTP_USER') ? SMTP_USER : ''));
         $configuredFrom = trim((string)(defined('SMTP_FROM_EMAIL') ? SMTP_FROM_EMAIL : ''));
 
-        // Gmail SMTP should send from the authenticated account unless an alias is configured.
         if (stripos((string)SMTP_HOST, 'gmail') !== false && self::validEmail($smtpUser)) {
             return $smtpUser;
         }
@@ -43,6 +42,14 @@ class MailHelper {
         }
 
         return (defined('ADMIN_EMAIL') && self::validEmail(ADMIN_EMAIL)) ? ADMIN_EMAIL : 'no-reply@pronetwork.site.je';
+    }
+
+    private static function replyToAddress(bool $replyToAdmin): string {
+        if ($replyToAdmin && defined('ADMIN_EMAIL') && self::validEmail(ADMIN_EMAIL)) {
+            return ADMIN_EMAIL;
+        }
+
+        return 'no-reply@pronetwork.site.je';
     }
 
     private static function configureMailer(): PHPMailer {
@@ -76,14 +83,10 @@ class MailHelper {
         ];
 
         $mail->setFrom(self::senderEmail(), defined('SMTP_FROM_NAME') ? SMTP_FROM_NAME : SITENAME);
-        if ((defined('ADMIN_EMAIL') && self::validEmail(ADMIN_EMAIL))) {
-            $mail->addReplyTo(ADMIN_EMAIL, 'ProNetwork Admin');
-        }
-
         return $mail;
     }
 
-    private static function sendMessage(string $toEmail, string $toName, string $subject, string $htmlBody, string $textBody, string $context): bool {
+    private static function sendMessage(string $toEmail, string $toName, string $subject, string $htmlBody, string $textBody, string $context, bool $replyToAdmin = false): bool {
         $toEmail = trim($toEmail);
         if (!self::validEmail($toEmail)) {
             self::$lastError = $context . ': invalid recipient email.';
@@ -95,6 +98,7 @@ class MailHelper {
         try {
             $mail = self::configureMailer();
             $mail->addAddress($toEmail, $toName ?: $toEmail);
+            $mail->addReplyTo(self::replyToAddress($replyToAdmin), $replyToAdmin ? 'ProNetwork Admin' : 'ProNetwork No Reply');
             $mail->isHTML(true);
             $mail->Subject = $subject;
             $mail->Body = $htmlBody;
@@ -108,21 +112,21 @@ class MailHelper {
             error_log(self::$lastError);
         }
 
-        if (self::sendWithPhpMail($toEmail, $toName, $subject, $htmlBody, $textBody, $context)) {
+        if (self::sendWithPhpMail($toEmail, $subject, $htmlBody, $textBody, $context, $replyToAdmin)) {
             return true;
         }
 
         return false;
     }
 
-    private static function sendWithPhpMail(string $toEmail, string $toName, string $subject, string $htmlBody, string $textBody, string $context): bool {
+    private static function sendWithPhpMail(string $toEmail, string $subject, string $htmlBody, string $textBody, string $context, bool $replyToAdmin = false): bool {
         $from = self::senderEmail();
         $encodedSubject = '=?UTF-8?B?' . base64_encode($subject) . '?=';
         $headers = [
             'MIME-Version: 1.0',
             'Content-Type: text/html; charset=UTF-8',
             'From: ' . (defined('SMTP_FROM_NAME') ? SMTP_FROM_NAME : SITENAME) . ' <' . $from . '>',
-            'Reply-To: ' . ((defined('ADMIN_EMAIL') && self::validEmail(ADMIN_EMAIL)) ? ADMIN_EMAIL : $from),
+            'Reply-To: ' . self::replyToAddress($replyToAdmin),
         ];
 
         $ok = @mail($toEmail, $encodedSubject, $htmlBody, implode("\r\n", $headers));
@@ -133,18 +137,21 @@ class MailHelper {
         return $ok;
     }
 
-    public static function sendRegistrationAlert($userData) {
+    public static function sendRegistrationAlert($userData, string $approvalUrl = '') {
         $safeUser = array_map(
             fn($value) => htmlspecialchars((string)$value, ENT_QUOTES, 'UTF-8'),
             $userData
         );
         $adminUrl = self::publicUrl('/admin/users');
         $adminEmail = trim((string)(defined('ADMIN_EMAIL') ? ADMIN_EMAIL : ''));
+        $approveButton = $approvalUrl !== ''
+            ? "<a href='{$approvalUrl}' style='display: inline-block; margin-right: 10px; margin-bottom: 8px; padding: 10px 20px; background: #16a34a; color: #fff; text-decoration: none; border-radius: 5px; font-weight: bold;'>Approve Directly</a>"
+            : '';
 
-        $subject = 'New User Registration: ' . ($userData['full_name'] ?? 'ProNetwork user');
+        $subject = 'Approval needed: ' . ($userData['full_name'] ?? 'New ProNetwork user');
         $body = "
-            <h2>New User Registered</h2>
-            <p>A new user has registered and is awaiting approval.</p>
+            <h2>New User Awaiting Approval</h2>
+            <p>A new user has registered and is waiting for admin approval.</p>
             <table border='1' cellpadding='10' cellspacing='0' style='border-collapse: collapse; width: 100%; max-width: 600px;'>
                 <tr><td><strong>Name:</strong></td><td>{$safeUser['full_name']}</td></tr>
                 <tr><td><strong>Email:</strong></td><td>{$safeUser['email']}</td></tr>
@@ -152,11 +159,12 @@ class MailHelper {
                 <tr><td><strong>Location:</strong></td><td>{$safeUser['location']}</td></tr>
                 <tr><td><strong>Registered At:</strong></td><td>" . date('Y-m-d H:i:s') . "</td></tr>
             </table>
-            <p><a href='{$adminUrl}' style='display: inline-block; padding: 10px 20px; background: #0A66C2; color: #fff; text-decoration: none; border-radius: 5px;'>View Admin Panel</a></p>
+            <p style='margin-top: 18px;'>{$approveButton}<a href='{$adminUrl}' style='display: inline-block; margin-bottom: 8px; padding: 10px 20px; background: #0A66C2; color: #fff; text-decoration: none; border-radius: 5px; font-weight: bold;'>Open Admin Panel</a></p>
+            <p style='color: #64748b; font-size: 12px;'>The direct approval link is one-time use and expires in 24 hours.</p>
         ";
-        $text = "New User Registered: {$userData['full_name']} ({$userData['email']}). View Admin Panel: {$adminUrl}";
+        $text = "New User Registered: {$userData['full_name']} ({$userData['email']})." . ($approvalUrl !== '' ? " Approve directly: {$approvalUrl}." : '') . " Open Admin Panel: {$adminUrl}";
 
-        return self::sendMessage($adminEmail, 'Admin', $subject, $body, $text, 'Registration alert email');
+        return self::sendMessage($adminEmail, 'Admin', $subject, $body, $text, 'Registration alert email', true);
     }
 
     public static function sendApprovalNotification($userData) {
@@ -170,6 +178,7 @@ class MailHelper {
             <p>Hello {$safeName},</p>
             <p>Your " . SITENAME . " account has been approved by an administrator. You can now sign in and start using your professional network.</p>
             <p><a href='{$loginUrl}' style='display: inline-block; padding: 10px 20px; background: #0A66C2; color: #fff; text-decoration: none; border-radius: 5px;'>Sign in to " . SITENAME . "</a></p>
+            <p style='color: #64748b; font-size: 12px;'>This inbox is not monitored. Please do not reply to this email.</p>
         ";
         $text = "Hello {$userData['full_name']}, your " . SITENAME . " account has been approved. Sign in: {$loginUrl}";
 
@@ -198,6 +207,7 @@ class MailHelper {
                     <p style='color: #4b5563; font-size: 12px; line-height: 1.5;'>If the button does not work, copy and paste this URL into your browser:</p>
                     <p style='color: #0A66C2; font-size: 11px; word-break: break-all; margin: 8px 0;'>{$link}</p>
                     <p style='color: #ef4444; font-size: 12px; line-height: 1.5; font-weight: 500; margin-top: 20px;'>This security link and code expire in 15 minutes. If you did not request this, you can ignore this email.</p>
+                    <p style='color: #9ca3af; font-size: 11px; margin-top: 20px;'>This inbox is not monitored. Please do not reply to this email.</p>
                 </div>
             </div>
         ";

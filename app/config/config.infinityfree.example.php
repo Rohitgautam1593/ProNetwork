@@ -21,3 +21,4 @@ define('SMTP_USER', 'your-email@gmail.com');
 define('SMTP_PASS', 'YOUR_GMAIL_APP_PASSWORD');
 define('ADMIN_EMAIL', 'your-email@gmail.com');
 define('SMTP_FROM_EMAIL', 'your-email@gmail.com');
+define('SMTP_FROM_NAME', 'ProNetwork');

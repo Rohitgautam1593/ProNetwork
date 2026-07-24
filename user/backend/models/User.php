@@ -45,6 +45,85 @@ class User extends Model {
         }
     }
 
+    private function ensureApprovalTokenStorage() {
+        $this->db->query("CREATE TABLE IF NOT EXISTS approval_tokens (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            user_id INT NOT NULL,
+            token_hash CHAR(64) NOT NULL,
+            expires_at DATETIME NOT NULL,
+            used_at DATETIME NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            UNIQUE KEY idx_token_hash (token_hash),
+            INDEX idx_user_id (user_id),
+            CONSTRAINT fk_approval_tokens_user FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE ON UPDATE CASCADE
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+        $this->db->execute();
+    }
+
+    public function createApprovalToken($userId) {
+        $this->ensureApprovalTokenStorage();
+        $token = bin2hex(random_bytes(32));
+        $tokenHash = hash('sha256', $token);
+        $expiresAt = gmdate('Y-m-d H:i:s', time() + 86400);
+
+        $this->db->query("DELETE FROM approval_tokens WHERE user_id = :user_id AND (used_at IS NOT NULL OR expires_at <= UTC_TIMESTAMP())");
+        $this->db->bind(':user_id', (int)$userId);
+        $this->db->execute();
+
+        $this->db->query("INSERT INTO approval_tokens (user_id, token_hash, expires_at) VALUES (:user_id, :token_hash, :expires_at)");
+        $this->db->bind(':user_id', (int)$userId);
+        $this->db->bind(':token_hash', $tokenHash);
+        $this->db->bind(':expires_at', $expiresAt);
+        return $this->db->execute() ? $token : false;
+    }
+
+    public function approvePendingUserByApprovalToken($token) {
+        $token = trim((string)$token);
+        if ($token === '' || !preg_match('/^[a-f0-9]{64}$/i', $token)) {
+            return ['success' => false, 'message' => 'Invalid approval link.'];
+        }
+
+        $this->ensureApprovalTokenStorage();
+        $tokenHash = hash('sha256', $token);
+        $this->db->query("SELECT at.id, at.user_id, u.full_name, u.email, u.status
+                          FROM approval_tokens at
+                          JOIN users u ON u.user_id = at.user_id
+                          WHERE at.token_hash = :token_hash
+                            AND at.used_at IS NULL
+                            AND at.expires_at > UTC_TIMESTAMP()
+                          LIMIT 1");
+        $this->db->bind(':token_hash', $tokenHash);
+        $row = $this->db->single();
+
+        if (!$row) {
+            return ['success' => false, 'message' => 'This approval link is invalid or expired.'];
+        }
+
+        if ($row['status'] === 'Approved') {
+            $this->db->query("UPDATE approval_tokens SET used_at = UTC_TIMESTAMP() WHERE id = :id");
+            $this->db->bind(':id', (int)$row['id']);
+            $this->db->execute();
+            return ['success' => true, 'already_approved' => true, 'user' => $row, 'message' => 'This user is already approved.'];
+        }
+
+        if ($row['status'] === 'Rejected') {
+            return ['success' => false, 'message' => 'This user was rejected and cannot be approved from this email link.'];
+        }
+
+        $this->db->query("UPDATE users SET status = 'Approved' WHERE user_id = :user_id AND status = 'Pending'");
+        $this->db->bind(':user_id', (int)$row['user_id']);
+        $updated = $this->db->execute();
+
+        if (!$updated) {
+            return ['success' => false, 'message' => 'Could not approve this user.'];
+        }
+
+        $this->db->query("UPDATE approval_tokens SET used_at = UTC_TIMESTAMP() WHERE id = :id");
+        $this->db->bind(':id', (int)$row['id']);
+        $this->db->execute();
+
+        return ['success' => true, 'already_approved' => false, 'user' => $row, 'message' => 'User approved successfully.'];
+    }
     // Login user
     public function login($email, $password) {
         $this->db->query("SELECT * FROM users WHERE email = :email");
