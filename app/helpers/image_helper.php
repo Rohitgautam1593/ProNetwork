@@ -82,7 +82,12 @@ function pn_profile_pic_url(?array $user = null): string {
         if (preg_match('/^https?:\/\//i', $pic)) {
             return $pic;
         }
-        return pn_upload_url('profiles', $pic);
+        $pic = ltrim($pic, '/');
+        $fallbacks = [
+            // The original demo image is very large and can time out on shared hosting.
+            '1778245058_IMG_20240111_163428.jpg' => '1779110989_90a1591ae53dea5e.jpg',
+        ];
+        return pn_upload_url('profiles', $fallbacks[$pic] ?? $pic);
     }
 
     return pn_ui_avatar_url($user['full_name'] ?? null);

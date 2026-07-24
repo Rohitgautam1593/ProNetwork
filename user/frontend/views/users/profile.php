@@ -61,7 +61,7 @@
                         <div class="hidden md:flex flex-col gap-3 text-right shrink-0 ml-4">
                             <!-- Populated dynamically via JS from latest experience/education -->
                             <div id="header-latest-exp" class="flex items-center gap-2 justify-end cursor-pointer group/link">
-                                <img src="<?php echo URLROOT; ?>/assets/images/default_company.png" class="w-8 h-8 rounded object-cover shadow-sm hidden" id="header-exp-img">
+                                <img src="<?php echo pn_ui_avatar_url('Company', '6366f1'); ?>" class="w-8 h-8 rounded object-cover shadow-sm hidden" id="header-exp-img">
                                 <span class="text-sm text-slate-800 font-bold group-hover/link:text-[#0A66C2] transition-colors" id="header-exp-text"></span>
                             </div>
                             <div id="header-latest-edu" class="flex items-center gap-2 justify-end cursor-pointer group/link">

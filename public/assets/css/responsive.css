@@ -1,3 +1,214 @@
 ﻿@media (max-width: 768px) {
   .hide-mobile { display: none !important; }
 }
+
+/* ProNetwork responsive hardening */
+html,
+body {
+  max-width: 100%;
+  overflow-x: clip;
+}
+
+img,
+video,
+canvas,
+svg {
+  max-width: 100%;
+}
+
+img,
+video {
+  height: auto;
+}
+
+.pn-topbar .pn-nav-item,
+.pn-topbar a,
+.pn-mobile-bottom-nav a,
+button {
+  min-width: 0;
+}
+
+@media (max-width: 767px) {
+  .pn-topbar > div {
+    height: auto;
+    min-height: 4rem;
+    gap: 0.5rem;
+  }
+
+  .pn-topbar .pn-brand-mark {
+    width: 2.1rem;
+    height: 2.1rem;
+    border-radius: 10px;
+  }
+
+  .pn-topbar .pn-nav-item,
+  .pn-topbar a[href*="/pages/about_us"] {
+    padding-left: 0.65rem;
+    padding-right: 0.65rem;
+    font-size: 0.82rem;
+    white-space: nowrap;
+  }
+
+  .pn-topbar a[href*="/auth/register"] {
+    padding-left: 0.8rem;
+    padding-right: 0.8rem;
+  }
+
+  section .max-w-\[1128px\] {
+    width: 100%;
+  }
+
+  .animate-ticker {
+    animation-duration: 45s;
+  }
+
+  .user-page-shell {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .user-page-shell .max-w-\[1128px\] {
+    padding-left: 0.85rem;
+    padding-right: 0.85rem;
+  }
+
+  .user-page-shell .pn-feed-card:hover,
+  .user-page-shell section:hover,
+  .user-page-shell aside > .bg-white:hover,
+  .user-page-shell .settings-hero:hover,
+  .user-page-shell .settings-panel > .bg-white:hover {
+    transform: none !important;
+  }
+
+  #post-composer-modal,
+  #reactions-list-modal {
+    align-items: flex-end;
+    padding: 0.75rem;
+  }
+
+  #post-composer-modal > div,
+  #reactions-list-modal > div {
+    max-height: calc(100dvh - 1.5rem);
+    overflow: hidden;
+  }
+
+  #feed-post-form {
+    max-height: calc(100dvh - 8rem);
+    overflow-y: auto;
+  }
+
+  #big-post-view-modal {
+    padding: 0;
+  }
+
+  #big-post-view-modal > div {
+    height: 100dvh;
+    max-height: none;
+    border-radius: 0;
+  }
+
+  #big-post-modal-right {
+    min-height: 0;
+  }
+
+  .msg-row {
+    max-width: 92%;
+  }
+
+  .msg-bubble {
+    overflow-wrap: anywhere;
+  }
+
+  #call-local-video {
+    right: 1rem;
+    bottom: 6.5rem;
+    width: 6rem;
+    height: 8rem;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1179px) {
+  .pn-main-nav .pn-nav-item {
+    min-width: 2.85rem;
+  }
+
+  .pn-profile-menu-toggle {
+    padding-left: 0.35rem;
+    padding-right: 0.35rem;
+  }
+
+  .user-page-shell .max-w-\[1128px\] {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .msg-row {
+    max-width: 86%;
+  }
+}
+
+/* Landing decorative clamp */
+@media (max-width: 767px) {
+  .animate-float-slow,
+  .animate-float-delay {
+    opacity: 0.18 !important;
+    transform: none !important;
+  }
+
+  section[aria-label="Trusted companies"] {
+    overflow: hidden;
+  }
+
+  .flex.-space-x-4 {
+    margin-left: 0;
+    transform: scale(0.9);
+    transform-origin: right center;
+  }
+}
+
+/* Mobile landing overflow guard */
+@media (max-width: 767px) {
+  main > section,
+  main > section > div {
+    max-width: 100vw;
+  }
+
+  .pn-topbar .max-w-\[1180px\] {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+
+  .pn-topbar .flex.items-center.gap-2.md\:gap-4 {
+    gap: 0.35rem;
+    flex-shrink: 1;
+    min-width: 0;
+  }
+
+  .pn-topbar a[href*="/pages/about_us"] {
+    padding-left: 0.4rem;
+    padding-right: 0.4rem;
+  }
+
+  .pn-topbar a[href*="/auth/login"],
+  .pn-topbar a[href*="/auth/register"] {
+    padding-left: 0.6rem;
+    padding-right: 0.6rem;
+  }
+}
+
+/* Landing mobile overflow cleanup */
+@media (max-width: 767px) {
+  main .animate-float-slow,
+  main .animate-float-delay,
+  main .bg-primary-fixed-dim\/15,
+  main .bg-indigo-500\/15 {
+    display: none !important;
+  }
+
+  main .flex.-space-x-4 {
+    max-width: 11rem;
+    overflow: hidden;
+    justify-content: flex-start;
+    transform: none;
+  }
+}

@@ -42,9 +42,9 @@
 <!-- Hero Section -->
 
     <section class="relative bg-white overflow-hidden">
-      <div class="max-w-[1128px] mx-auto px-4 py-12 md:py-20 grid md:grid-cols-2 gap-12 items-center">
+      <div class="max-w-[1128px] mx-auto px-4 py-10 sm:py-12 md:py-20 grid md:grid-cols-2 gap-8 md:gap-12 items-center">
         <div class="z-10">
-          <h1 class="font-display-lg text-5xl md:text-6xl text-slate-950 font-black mb-6 leading-tight tracking-tight">
+          <h1 class="font-display-lg text-4xl sm:text-5xl md:text-6xl text-slate-950 font-black mb-6 leading-tight tracking-tight">
             Connect with <span class="bg-gradient-to-r from-primary via-primary-container to-indigo-600 bg-clip-text text-transparent">professionals</span> worldwide
           </h1>
           <p class="font-body-lg text-secondary mb-10 max-w-lg">
@@ -67,12 +67,12 @@
               <span>Learn more</span>
             </button>
           </div>
-          <div class="flex items-center gap-2 text-xs text-secondary mt-2 backdrop-blur-xs py-1 rounded-lg">
+          <div class="flex items-start sm:items-center gap-2 text-xs text-secondary mt-2 backdrop-blur-xs py-1 rounded-lg">
             <span class="flex h-2 w-2 relative shrink-0">
               <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
               <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
             </span>
-            <span class="leading-tight">Hiring for your company? <a href="<?php echo URLROOT; ?>/company/register" class="text-primary font-semibold hover:underline">Create an employer workspace</a> — it takes a minute.</span>
+            <span class="leading-tight">Hiring for your company? <a href="<?php echo URLROOT; ?>/company/register" class="text-primary font-semibold hover:underline">Create an employer workspace</a> - it takes a minute.</span>
           </div>
         </div>
         <div class="relative">
@@ -82,7 +82,7 @@
           <div
             class="absolute -bottom-10 -left-10 w-64 h-64 bg-tertiary-fixed rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-float-delay">
           </div>
-          <video class="rounded-xl shadow-2xl relative z-10 w-full aspect-[4/3] object-cover"
+          <video class="rounded-xl shadow-2xl relative z-10 w-full aspect-[4/3] object-cover bg-slate-100"
             autoplay loop muted playsinline>
             <source src="<?php echo URLROOT; ?>/assets/videos/indexhtml.mp4" type="video/mp4">
             Your browser does not support the video tag.
@@ -188,7 +188,7 @@
                 src="<?php echo pn_upload_url('profiles', '1778650251_46eeb713fe06f091.jpg'); ?>" />
               <img class="w-12 h-12 rounded-full border-2 border-white object-cover group-hover:scale-110 transition-transform duration-300"
                 data-alt="Portrait headshot of a professional"
-                src="<?php echo pn_upload_url('profiles', '1778245058_IMG_20240111_163428.jpg'); ?>" />
+                src="<?php echo pn_upload_url('profiles', '1779110989_90a1591ae53dea5e.jpg'); ?>" />
               <div
                 class="w-12 h-12 rounded-full border-2 border-white bg-primary text-white flex items-center justify-center font-label-md group-hover:scale-110 transition-transform duration-300">
                 +2k</div>
@@ -247,7 +247,7 @@
               <div class="flex items-center gap-4 mb-6">
                 <img class="w-16 h-16 rounded-full object-cover ring-2 ring-slate-100 group-hover:ring-primary-fixed-dim transition-all"
                   data-alt="Professional headshot"
-                  src="<?php echo pn_upload_url('profiles', '1778245058_IMG_20240111_163428.jpg'); ?>" />
+                  src="<?php echo pn_upload_url('profiles', '1779110989_90a1591ae53dea5e.jpg'); ?>" />
                 <div>
                   <p class="font-title-md text-slate-900">David Miller</p>
                   <p class="text-xs text-secondary uppercase font-label-md">Freelance Specialist</p>

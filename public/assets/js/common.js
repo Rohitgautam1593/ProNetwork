@@ -51,13 +51,20 @@ function pnUiAvatarUrl(name, options = {}) {
     return `https://ui-avatars.com/api/?name=${label}&background=${bg}&color=${color}&size=${size}&bold=true`;
 }
 
+const PN_PROFILE_IMAGE_FALLBACKS = {
+    // The original demo image is very large and can time out on shared hosting.
+    '1778245058_IMG_20240111_163428.jpg': '1779110989_90a1591ae53dea5e.jpg'
+};
+
 function pnProfilePicUrl(user = {}) {
-    const pic = user.profile_pic || '';
+    let pic = user.profile_pic || '';
     if (pic) {
         if (pic.startsWith('http')) return pic;
+        pic = pic.replace(/^\/+/, '');
+        pic = PN_PROFILE_IMAGE_FALLBACKS[pic] || pic;
         const isCompany = user.role === 'Company' || pic.startsWith('logos/');
         const folder = isCompany ? 'companies' : 'profiles';
-        return `${URLROOT}/uploads/${folder}/${pic.replace(/^\/+/, '')}`;
+        return `${URLROOT}/uploads/${folder}/${pic}`;
     }
     return pnUiAvatarUrl(user.full_name);
 }

@@ -114,7 +114,7 @@
         <video id="call-remote-video" class="absolute inset-0 w-full h-full object-cover opacity-30" playsinline></video>
         <video id="call-local-video" class="absolute bottom-24 right-6 w-36 h-48 rounded-xl object-cover border-2 border-white/30 shadow-2xl hidden" playsinline muted></video>
         <div class="relative z-10 flex flex-col items-center text-center px-6">
-            <img id="call-avatar" src="" alt="" class="w-28 h-28 rounded-full border-4 border-white/20 shadow-2xl object-cover mb-4">
+            <img id="call-avatar" src="<?php echo pn_ui_avatar_url('Call', '0A66C2'); ?>" alt="Call participant" class="w-28 h-28 rounded-full border-4 border-white/20 shadow-2xl object-cover mb-4">
             <h2 id="call-name" class="text-2xl font-black">Calling…</h2>
             <p id="call-status" class="text-slate-300 mt-1">Connecting…</p>
             <p id="call-timer" class="text-sm text-slate-400 mt-2 font-mono hidden">00:00</p>

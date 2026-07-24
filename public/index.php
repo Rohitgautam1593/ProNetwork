@@ -8,23 +8,14 @@ session_start();
 
 // Redirect legacy /public/ URLs to clean root URLs in production to prevent asset and routing issues
 $requestUriForRedirect = $_SERVER['REQUEST_URI'] ?? '';
-$scriptNameForRedirect = $_SERVER['SCRIPT_NAME'] ?? '';
-$baseDirForRedirect = dirname($scriptNameForRedirect);
-$baseDirForRedirect = str_replace('\\', '/', $baseDirForRedirect);
-if ($baseDirForRedirect === '/' || $baseDirForRedirect === '\\') {
-    $baseDirForRedirect = '';
-} else {
-    $baseDirForRedirect = rtrim($baseDirForRedirect, '/');
-}
-
-if ($baseDirForRedirect === '' && (strpos($requestUriForRedirect, '/public/') !== false || preg_match('/^\/public\b/', $requestUriForRedirect))) {
-    $cleanUri = preg_replace('/^\/public(\/|$)/', '/', $requestUriForRedirect);
-    if ($cleanUri !== $requestUriForRedirect) {
-        $protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') ? 'https' : 'http';
-        $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
-        header('Location: ' . $protocol . '://' . $host . $cleanUri);
-        exit;
-    }
+$requestPathForRedirect = parse_url($requestUriForRedirect, PHP_URL_PATH) ?? '';
+if (preg_match('#^/public(?:/|$)#', $requestPathForRedirect)) {
+    $cleanPath = preg_replace('#^/public(?:/|$)#', '/', $requestPathForRedirect);
+    $query = parse_url($requestUriForRedirect, PHP_URL_QUERY);
+    $protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') ? 'https' : 'http';
+    $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+    header('Location: ' . $protocol . '://' . $host . $cleanPath . ($query ? '?' . $query : ''), true, 301);
+    exit;
 }
 
 // Require configuration

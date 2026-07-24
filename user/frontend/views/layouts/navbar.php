@@ -84,7 +84,7 @@ $pnNavFill = static function (bool $active): string {
         <div class="relative pn-profile-menu-wrap">
           <button id="pn-profile-menu-toggle" type="button" class="pn-profile-menu-toggle <?php echo ($pnNavActive['profile'] || $pnNavActive['settings']) ? 'is-active' : ''; ?>" aria-expanded="false" aria-haspopup="true">
             <span class="w-8 h-8 rounded-full overflow-hidden bg-slate-200 border border-slate-300">
-              <img data-user-pic="true" src="" alt="" class="w-full h-full object-cover">
+              <img data-user-pic="true" src="<?php echo pn_profile_pic_url(); ?>" alt="Profile photo" class="w-full h-full object-cover">
             </span>
             <span class="hidden lg:flex flex-col text-left leading-tight min-w-0">
               <span class="text-[11px] font-black text-slate-900">Me</span>
@@ -95,7 +95,7 @@ $pnNavFill = static function (bool $active): string {
           <div id="pn-profile-menu" class="pn-profile-menu hidden" role="menu">
             <div class="px-4 py-3 border-b border-slate-100">
               <div class="flex items-center gap-3">
-                <img data-user-pic="true" src="" alt="" class="w-11 h-11 rounded-full object-cover bg-slate-100 border border-slate-200">
+                <img data-user-pic="true" src="<?php echo pn_profile_pic_url(); ?>" alt="Profile photo" class="w-11 h-11 rounded-full object-cover bg-slate-100 border border-slate-200">
                 <div class="min-w-0">
                   <p data-user-name="full" class="text-sm font-black text-slate-900 truncate">Me</p>
                   <p data-user-headline class="text-xs text-slate-500 truncate">Professional</p>
@@ -118,7 +118,7 @@ $pnNavFill = static function (bool $active): string {
         </div>
       </nav>
       <a href="<?php echo URLROOT; ?>/user/profile" class="pn-mobile-avatar-link md:hidden w-10 h-10 rounded-full overflow-hidden bg-slate-200 border border-slate-300 shadow-sm ring-2 ring-white" aria-label="Open profile">
-        <img data-user-pic="true" src="" alt="" class="w-full h-full object-cover">
+        <img data-user-pic="true" src="<?php echo pn_profile_pic_url(); ?>" alt="Profile photo" class="w-full h-full object-cover">
       </a>
       <?php else : ?>
       <a href="<?php echo URLROOT; ?>/pages/about_us" class="flex items-center gap-1.5 text-slate-600 hover:text-[#0A66C2] font-semibold transition-all px-4 py-1.5 rounded-full hover:bg-slate-50">

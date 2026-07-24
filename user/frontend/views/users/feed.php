@@ -24,7 +24,7 @@
                 <!-- Profile Pic & Info -->
                 <div class="px-4 pb-4 -mt-10 flex flex-col items-center text-center">
                     <div class="w-20 h-20 rounded-full border-4 border-white dark:border-slate-900 overflow-hidden bg-slate-100 shadow-md relative z-10 ring-1 ring-slate-200/80">
-                        <img data-user-pic="true" alt="" class="w-full h-full object-cover" src="" />
+                        <img data-user-pic="true" alt="" class="w-full h-full object-cover" src="<?php echo pn_profile_pic_url(); ?>" />
                     </div>
                     <div class="mt-3 min-h-[3.5rem]">
                         <h1 data-user-name="full" class="font-title-md text-sm font-bold text-slate-900 dark:text-white">Welcome</h1>
@@ -79,7 +79,7 @@
             <!-- Composer -->
             <div class="bg-white rounded-lg border border-slate-200 shadow-[0px_4px_12px_rgba(0,0,0,0.05)] p-4">
                 <div class="flex items-center space-x-3 mb-4">
-                    <img data-user-pic="true" alt="" class="w-12 h-12 rounded-full object-cover bg-slate-200 ring-1 ring-slate-200/80" src="" decoding="async" />
+                    <img data-user-pic="true" alt="" class="w-12 h-12 rounded-full object-cover bg-slate-200 ring-1 ring-slate-200/80" src="<?php echo pn_profile_pic_url(); ?>" decoding="async" />
                     <button id="open-post-composer" class="flex-1 text-left bg-slate-50 border border-slate-200 rounded-full px-4 py-3 text-slate-500 font-medium hover:bg-slate-100 transition-colors">
                         Start a post
                     </button>
