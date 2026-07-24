@@ -1,11 +1,11 @@
 <?php
 $current_page = $data['current_page'] ?? '';
 $menu_items = [
-    'about' => [
+    'about_us' => [
         'title' => 'About Us',
         'icon' => 'corporate_fare',
-        'url' => str_replace('/public', '/blog/about-us/', URLROOT),
-        'external' => true
+        'url' => URLROOT . '/pages/about_us',
+        'external' => false
     ],
     'accessibility' => [
         'title' => 'Accessibility',

@@ -1,5 +1,13 @@
 <?php
 class PagesController extends Controller {
+    public function about_us() {
+        $data = [
+            'title' => 'About ProNetwork',
+            'current_page' => 'about_us'
+        ];
+        $this->view('pages/about_us', $data);
+    }
+
     public function accessibility() {
         $data = [
             'title' => 'Accessibility Statement',

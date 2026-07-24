@@ -10,7 +10,7 @@
       <div>
         <h4 class="font-title-md text-on-surface mb-4">Network</h4>
         <ul class="space-y-3">
-          <li><a class="text-gray-500 text-xs hover:text-[#0A66C2] hover:underline transition-colors" href="<?php echo str_replace('/public', '/blog/about-us/', URLROOT); ?>" target="_blank">About</a>
+          <li><a class="text-gray-500 text-xs hover:text-[#0A66C2] hover:underline transition-colors" href="<?php echo URLROOT; ?>/pages/about_us">About</a>
           </li>
           <li><a class="text-gray-500 text-xs hover:text-[#0A66C2] hover:underline transition-colors"
               href="<?php echo URLROOT; ?>/pages/accessibility">Accessibility</a></li>
