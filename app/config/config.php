@@ -48,6 +48,13 @@ if (file_exists(APPROOT . '/config/config.local.php')) {
     require_once APPROOT . '/config/config.local.php';
 }
 
+// Public URL used in outbound emails. Keep mail links on the live site even
+// when a reset/approval is triggered from localhost or an internal /public URL.
+if (!defined('MAIL_BASE_URL')) {
+    $mailBaseUrl = $_ENV['MAIL_BASE_URL'] ?? getenv('MAIL_BASE_URL') ?: ($_ENV['PUBLIC_URL'] ?? getenv('PUBLIC_URL') ?: ($_ENV['APP_URL'] ?? getenv('APP_URL') ?: 'https://pronetwork.site.je'));
+    define('MAIL_BASE_URL', rtrim((string)$mailBaseUrl, '/'));
+}
+
 // DB Params (Railway Environment Variables support, fallbacks to localhost or empty strings)
 if (!defined('DB_HOST')) {
     define('DB_HOST', $_ENV['MYSQLHOST'] ?? getenv('MYSQLHOST') ?? 'localhost');
@@ -84,7 +91,7 @@ if (!defined('ADMIN_EMAIL')) {
 
 // Outgoing Mail Customization
 if (!defined('SMTP_FROM_EMAIL')) {
-    define('SMTP_FROM_EMAIL', $_ENV['SMTP_FROM_EMAIL'] ?? getenv('SMTP_FROM_EMAIL') ?? 'noreply@pronetwork.com');
+    define('SMTP_FROM_EMAIL', $_ENV['SMTP_FROM_EMAIL'] ?? getenv('SMTP_FROM_EMAIL') ?: (defined('SMTP_USER') ? SMTP_USER : ''));
 }
 if (!defined('SMTP_FROM_NAME')) {
     define('SMTP_FROM_NAME', $_ENV['SMTP_FROM_NAME'] ?? getenv('SMTP_FROM_NAME') ?? 'ProNetwork');

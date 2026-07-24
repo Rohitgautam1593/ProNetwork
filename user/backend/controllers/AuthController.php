@@ -242,7 +242,7 @@ class AuthController extends Controller {
 
             if ($this->userModel->createPasswordReset($email, $otp, $token, $expiresAt)) {
                 // Construct instant verification link
-                $link = URLROOT . '/auth/verify_reset_link?token=' . $token;
+                $link = MailHelper::publicUrl('/auth/verify_reset_link?token=' . $token);
 
                 // Dispatch email
                 if (MailHelper::sendPasswordResetOTP($email, $user['full_name'], $otp, $link)) {
